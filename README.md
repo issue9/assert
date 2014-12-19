@@ -1,6 +1,17 @@
 assert [![Build Status](https://travis-ci.org/issue9/assert.svg?branch=master)](https://travis-ci.org/issue9/assert)
 ======
 
+assert包是对testing的一个简单扩展，提供的一系列的断言函数，
+方便在测试函数中使用：
+```go
+func TestA(t testing.T) {
+    v := true
+    assert.True(v)
+
+    a := assert.New(t)
+    a.True(v)
+}
+```
 
 ### 安装
 
