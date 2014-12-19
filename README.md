@@ -23,7 +23,7 @@ go get github.com/issue9/assert
 ### 文档
 
 [![Go Walker](http://gowalker.org/api/v1/badge)](http://gowalker.org/github.com/issue9/assert)
-[![GoDoc](https://godoc.org/github.com/caixw/lib.go/assert?status.svg)](https://godoc.org/github.com/issue9/assert)
+[![GoDoc](https://godoc.org/github.com/issue9/assert/assert?status.svg)](https://godoc.org/github.com/issue9/assert)
 
 
 ### 版权
