@@ -1,4 +1,4 @@
-assert [![Build Status](https://travis-ci.org/caixw/lib.go.svg?branch=master)](https://travis-ci.org/caixw/lib.go)
+assert [![Build Status](https://travis-ci.org/issue9/assert.svg?branch=master)](https://travis-ci.org/issue9/assert)
 ======
 
 
