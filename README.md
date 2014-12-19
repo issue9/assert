@@ -4,7 +4,9 @@ assert [![Build Status](https://travis-ci.org/issue9/assert.svg?branch=master)](
 
 ### 安装
 
+```shell
 go get github.com/issue9/assert
+```
 
 
 ### 文档
@@ -13,6 +15,6 @@ go get github.com/issue9/assert
 [![GoDoc](https://godoc.org/github.com/caixw/lib.go/assert?status.svg)](https://godoc.org/github.com/issue9/assert)
 
 
-### 版本
+### 版权
 
 [![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://github.com/issue9/assert/blob/master/LICENSE)
