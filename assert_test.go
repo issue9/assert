@@ -101,9 +101,20 @@ func TestNotEmpty(t *testing.T) {
 	NotEmpty(t, []string{"ab"}, "NotEmpty(slice(abc)) falid")
 }
 
+type ErrorImpl struct {
+	msg string
+}
+
+func (err *ErrorImpl) Error() string {
+	return err.msg
+}
+
 func TestError(t *testing.T) {
-	err := errors.New("test")
-	Error(t, err, "Error(err) falid")
+	err1 := errors.New("test")
+	Error(t, err1, "Error(err) falid")
+
+	err2 := &ErrorImpl{msg: "msg"}
+	Error(t, err2, "Error(ErrorImpl) falid")
 }
 
 func TestNotError(t *testing.T) {
@@ -111,6 +122,9 @@ func TestNotError(t *testing.T) {
 
 	var err1 error = nil
 	NotError(t, err1, "var err1 error falid")
+
+	err2 := &ErrorImpl{msg: "msg"}
+	Error(t, err2, "Error(ErrorImpl) falid")
 }
 
 func TestFileExists(t *testing.T) {
