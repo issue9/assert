@@ -157,11 +157,3 @@ func TestContains(t *testing.T) {
 func TestNotContains(t *testing.T) {
 	NotContains(t, []int{1, 2, 3}, []int8{1, 3})
 }
-
-func TestStringEqual(t *testing.T) {
-	StringEqual(t, "abc", "aBc", StyleCase)
-}
-
-func TestStringNotEqual(t *testing.T) {
-	StringNotEqual(t, "abc", "aBc", StyleStrit)
-}

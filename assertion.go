@@ -120,15 +120,3 @@ func (a *Assertion) NotContains(container, item interface{}, msg ...interface{})
 	NotContains(a.t, container, item, msg...)
 	return a
 }
-
-// 参照assert.StringEqual()函数
-func (a *Assertion) StringEqual(s1, s2 string, style int, msg ...interface{}) *Assertion {
-	StringEqual(a.t, s1, s2, style, msg...)
-	return a
-}
-
-// 参照assert.StringNotEqual()函数
-func (a *Assertion) StringNotEqual(s1, s2 string, style int, msg ...interface{}) *Assertion {
-	StringNotEqual(a.t, s1, s2, style, msg...)
-	return a
-}

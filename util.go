@@ -7,8 +7,6 @@ package assert
 import (
 	"bytes"
 	"reflect"
-	"regexp"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -352,69 +350,4 @@ func IsContains(container, item interface{}) bool {
 	}
 
 	return false
-}
-
-const (
-	StyleStrit = 1 << iota // 严格的字符串比较，会忽略其它方式
-	StyleTrim              // 去掉首尾空格
-	StyleSpace             // 缩减所有的空格为一个
-	StyleCase              // 不区分大小写
-	styleAll   = StyleTrim | StyleSpace | StyleCase
-)
-
-// 将StringIsEqual()中的Style参数转换为字符串
-func styleString(style int) (ret string) {
-	if style > styleAll {
-		return "<invalid style:" + strconv.Itoa(style) + ">"
-	}
-
-	if (style & StyleStrit) == StyleStrit {
-		return "StyleStrit"
-	}
-
-	if (style & StyleTrim) == StyleTrim {
-		ret += " | StyleTrim"
-	}
-
-	if (style & StyleSpace) == StyleSpace {
-		ret += " | StyleSpace"
-	}
-
-	if (style & StyleCase) == StyleCase {
-		ret += " | StyleCase"
-	}
-
-	return ret[3:] // 去掉第一个|
-}
-
-var spaceReplaceRegexp = regexp.MustCompile("\\s+")
-
-// 比较两个字符串是否相等。
-// 根据第三个参数style指定比较方式，style值可以是：
-//  - StyleStrit
-//  - StyleTrim
-//  - StyleSpace
-//  - StyleCase
-func StringIsEqual(s1, s2 string, style int) (ret bool) {
-	// 若存在StyleStrit，则忽略其它比较属性。
-	if (style & StyleStrit) == StyleStrit {
-		return s1 == s2
-	}
-
-	if (style & StyleTrim) == StyleTrim {
-		s1 = strings.TrimSpace(s1)
-		s2 = strings.TrimSpace(s2)
-	}
-
-	if (style & StyleSpace) == StyleSpace {
-		s1 = spaceReplaceRegexp.ReplaceAllString(s1, " ")
-		s2 = spaceReplaceRegexp.ReplaceAllString(s2, " ")
-	}
-
-	if (style & StyleCase) == StyleCase {
-		s1 = strings.ToLower(s1)
-		s2 = strings.ToLower(s2)
-	}
-
-	return s1 == s2
 }

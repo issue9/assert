@@ -199,20 +199,3 @@ func NotContains(t *testing.T, container, item interface{}, args ...interface{})
 	assert(t, !IsContains(container, item), args,
 		[]interface{}{"container:[%v]包含item[%v]", container, item})
 }
-
-// 判断两个字符串相等。
-//
-// StringEqual()与Equal()的不同之处在于：
-// StringEqual()可以以相对宽松的条件来比较字符串是否相等，
-// 比如忽略大小写；忽略多余的空格等，比较方式由style参数指定。
-// 若style值指定为StyleStrit，则和Equal()完全相等。
-func StringEqual(t *testing.T, s1, s2 string, style int, args ...interface{}) {
-	assert(t, StringIsEqual(s1, s2, style), args,
-		[]interface{}{"在[%v]比较方式中s1[%v] != s2[%v]", styleString(style), s1, s2})
-}
-
-// 判断两个字符串不相等。
-func StringNotEqual(t *testing.T, s1, s2 string, style int, args ...interface{}) {
-	assert(t, !StringIsEqual(s1, s2, style), args,
-		[]interface{}{"在[%v]比较方式中s1[%v] == s2[%v]", styleString(style), s1, s2})
-}
