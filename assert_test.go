@@ -6,8 +6,24 @@ package assert
 
 import (
 	"errors"
+	"runtime"
 	"testing"
 )
+
+func TestFuncName(t *testing.T) {
+	pc, _, _, ok := runtime.Caller(0)
+	if !ok {
+		t.Error("TestFuncName:调度信息出错")
+	}
+
+	if funcName(pc) != "assert.TestFuncName" {
+		t.Errorf("funcName返回值与预期的不相等，返回值为：%v", funcName(pc))
+	}
+
+	if funcName(0) != "<无法获取函数信息>" {
+		t.Errorf("funcName返回值与预期的不相等，返回值为：%v", funcName(pc))
+	}
+}
 
 func TestGetCallerInfo(t *testing.T) {
 	str := getCallerInfo()

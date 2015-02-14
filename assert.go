@@ -21,8 +21,8 @@ func funcName(pc uintptr) string {
 	}
 
 	name := runtime.FuncForPC(pc).Name()
-	arr := strings.Split(name, "/")
-	return arr[len(arr)-1]
+	index := strings.LastIndex(name, "/")
+	return name[index+1:]
 }
 
 // 获取调用者的信息。
