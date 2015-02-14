@@ -101,42 +101,42 @@ func assert(t *testing.T, expr bool, msg1 []interface{}, msg2 []interface{}) {
 // 具体可参数getCallerInfo()函数的介绍。
 // 其它断言函数的args参数，功能与此相同。
 func True(t *testing.T, expr bool, args ...interface{}) {
-	assert(t, expr, args, []interface{}{"True失败，实际值为[%T:%v]", expr, expr})
+	assert(t, expr, args, []interface{}{"True失败，实际值为[%T:%[1]v]", expr})
 }
 
 // 断言表达式expr为false，否则输出错误信息
 func False(t *testing.T, expr bool, args ...interface{}) {
-	assert(t, !expr, args, []interface{}{"False失败，实际值为[%T:%v]", expr, expr})
+	assert(t, !expr, args, []interface{}{"False失败，实际值为[%T:%[1]v]", expr})
 }
 
 // 断言表达式expr为nil，否则输出错误信息
 func Nil(t *testing.T, expr interface{}, args ...interface{}) {
-	assert(t, IsNil(expr), args, []interface{}{"Nil失败，实际值为[%T:%v]", expr, expr})
+	assert(t, IsNil(expr), args, []interface{}{"Nil失败，实际值为[%T:%[1]v]", expr})
 }
 
 // 断言表达式expr为非nil值，否则输出错误信息
 func NotNil(t *testing.T, expr interface{}, args ...interface{}) {
-	assert(t, !IsNil(expr), args, []interface{}{"NotNil失败，实际值为[%T:%v]", expr, expr})
+	assert(t, !IsNil(expr), args, []interface{}{"NotNil失败，实际值为[%T:%[1]v]", expr})
 }
 
 // 断言v1与v2两个值相等，否则输出错误信息
 func Equal(t *testing.T, v1, v2 interface{}, args ...interface{}) {
-	assert(t, IsEqual(v1, v2), args, []interface{}{"Equal失败，实际值为v1=[%T:%v];v2=[%T:%v]", v1, v1, v2, v2})
+	assert(t, IsEqual(v1, v2), args, []interface{}{"Equal失败，实际值为v1=[%T:%[1]v];v2=[%T:%[2]v]", v1, v2})
 }
 
 // 断言v1与v2两个值不相等，否则输出错误信息
 func NotEqual(t *testing.T, v1, v2 interface{}, args ...interface{}) {
-	assert(t, !IsEqual(v1, v2), args, []interface{}{"NotEqual失败，实际值为v1=[%T:%v];v2=[%T:%v]", v1, v1, v2, v2})
+	assert(t, !IsEqual(v1, v2), args, []interface{}{"NotEqual失败，实际值为v1=[%T:%[1]v];v2=[%T:%[2]v]", v1, v2})
 }
 
 // 断言expr的值为空(nil,"",0,false)，否则输出错误信息
 func Empty(t *testing.T, expr interface{}, args ...interface{}) {
-	assert(t, IsEmpty(expr), args, []interface{}{"Empty失败，实际值为[%T:%v]", expr, expr})
+	assert(t, IsEmpty(expr), args, []interface{}{"Empty失败，实际值为[%T:%[1]v]", expr})
 }
 
 // 断言expr的值为非空(除nil,"",0,false之外)，否则输出错误信息
 func NotEmpty(t *testing.T, expr interface{}, args ...interface{}) {
-	assert(t, !IsEmpty(expr), args, []interface{}{"NotEmpty失败，实际值为[%T:%v]", expr, expr})
+	assert(t, !IsEmpty(expr), args, []interface{}{"NotEmpty失败，实际值为[%T:%[1]v]", expr})
 }
 
 // 断言有错误发生，否则输出错误信息。
@@ -184,7 +184,7 @@ func Panic(t *testing.T, fn func(), args ...interface{}) {
 // 断言函数会发生panic，否则输出错误信息。
 func NotPanic(t *testing.T, fn func(), args ...interface{}) {
 	has, msg := HasPanic(fn)
-	assert(t, !has, args, []interface{}{"发生了panic，其信息为[%]", msg})
+	assert(t, !has, args, []interface{}{"发生了panic，其信息为[%v]", msg})
 }
 
 // 断言container包含item的或是包含item中的所有项
