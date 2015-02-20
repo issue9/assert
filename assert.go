@@ -19,7 +19,7 @@ func getCallerInfo() string {
 	for i := 0; ; i++ {
 		pc, file, line, ok := runtime.Caller(i)
 		if !ok {
-			return "<无法获取调用者信息>"
+			break
 		}
 
 		basename := path.Base(file)
@@ -32,6 +32,17 @@ func getCallerInfo() string {
 		}
 
 		// 定位函数名为Test开头的行。
+		// 为什么要定位到TestXxx函数，是因为考虑以下情况：
+		//  func isOK(val interface{}, t *testing.T) {
+		//      // do somthing
+		//      assert.True(t, val)  // (1
+		//  }
+		//
+		//  func TestOK(t *testing.T) {
+		//      isOK("123", t)       // (2
+		//      isOK(123, t)         // (3
+		//  }
+		// 以上这段代码，定位到(2,(3的位置比总是定位到(1的位置更直观！
 		funcName := runtime.FuncForPC(pc).Name()
 		index := strings.LastIndex(funcName, ".Test")
 		if -1 == index {

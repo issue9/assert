@@ -13,8 +13,31 @@ func TestGetCallerInfo(t *testing.T) {
 	str := getCallerInfo()
 	// NOTE:注意这里涉及到调用函数的行号信息
 	if str != "TestGetCallerInfo(assert_test.go:13)" {
+		t.Errorf("getCallerInfo返回的信息不正确，其返回值为：%v", str)
+	}
+
+	// 嵌套调用，第二个参数为当前的行号
+	testGetCallerInfo(t, "20")
+	testGetCallerInfo(t, "21")
+
+	// 闭合函数，line为调用所在的行号。
+	f := func(line string) {
+		str := getCallerInfo()
+		if str != "TestGetCallerInfo(assert_test.go:"+line+")" {
+			t.Errorf("getCallerInfo返回的信息不正确，其返回值为：%v", str)
+		}
+	}
+	f("30") // 参数为当前等号
+	f("31")
+}
+
+// 参数line，为调用此函数所在的行号。
+func testGetCallerInfo(t *testing.T, line string) {
+	str := getCallerInfo()
+	if str != "TestGetCallerInfo(assert_test.go:"+line+")" {
 		t.Error("getCallerInfo返回的信息不正确，其返回值为：%v", str)
 	}
+
 }
 
 func TestFormatMsg(t *testing.T) {
