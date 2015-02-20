@@ -14,21 +14,7 @@ import (
 	"testing"
 )
 
-// 获取某个pc寄存器中的函数名，并去掉函数名之前的路径信息。
-func funcName(pc uintptr) string {
-	if pc == 0 {
-		return "<无法获取函数信息>"
-	}
-
-	name := runtime.FuncForPC(pc).Name()
-	index := strings.LastIndex(name, "/")
-	return name[index+1:]
-}
-
-// 获取调用者的信息。
-//
-// 输出错误信息在*_test.go中的位置，方便调试时定位错误位置。
-// 若测试包中的函数是嵌套调用的，则输出内容可能不正确。
+// 定位错误信息的触发函数。输出格式为：TestXxx(xxx_test.go:17)。
 func getCallerInfo() string {
 	for i := 0; ; i++ {
 		pc, file, line, ok := runtime.Caller(i)
@@ -38,14 +24,21 @@ func getCallerInfo() string {
 
 		basename := path.Base(file)
 
-		// 定位以_test.go结尾的文件，认定为起始调用的测试包。
+		// 定位以_test.go结尾的文件。
 		// 8 == len("_test.go")
 		l := len(basename)
 		if l < 8 || (basename[l-8:l] != "_test.go") {
 			continue
 		}
 
-		return " @ " + funcName(pc) + "(" + basename + ":" + strconv.Itoa(line) + ")"
+		// 定位函数名为Test开头的行。
+		funcName := runtime.FuncForPC(pc).Name()
+		index := strings.LastIndex(funcName, ".Test")
+		if -1 == index {
+			continue
+		}
+
+		return funcName[index+1:] + "(" + basename + ":" + strconv.Itoa(line) + ")"
 	}
 
 	return "<无法获取调用者信息>"
@@ -98,7 +91,7 @@ func assert(t *testing.T, expr bool, msg1 []interface{}, msg2 []interface{}) {
 // 断言表达式expr为true，否则输出错误信息。
 //
 // args对应fmt.Printf()函数中的参数，其中args[0]对应第一个参数format，依次类推，
-// 具体可参数getCallerInfo()函数的介绍。
+// 具体可参数formatMessage()函数的介绍。
 // 其它断言函数的args参数，功能与此相同。
 func True(t *testing.T, expr bool, args ...interface{}) {
 	assert(t, expr, args, []interface{}{"True失败，实际值为[%T:%[1]v]", expr})
