@@ -28,8 +28,8 @@ func TestGetCallerInfo(t *testing.T) {
 			t.Errorf("getCallerInfo返回的信息不正确，其返回值为：%v", str)
 		}
 	}
-	f("30") // 参数为当前等号
-	f("31")
+	f("31") // 参数为当前等号
+	f("32")
 }
 
 // 参数line，为调用此函数所在的行号。
