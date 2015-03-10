@@ -48,8 +48,12 @@ func getCallerInfo() string {
 		if -1 == index {
 			continue
 		}
+		funcName = funcName[index+1:]
+		if strings.IndexByte(funcName, '.') > -1 { // Go1.5之后的匿名函数
+			continue
+		}
 
-		return funcName[index+1:] + "(" + basename + ":" + strconv.Itoa(line) + ")"
+		return funcName + "(" + basename + ":" + strconv.Itoa(line) + ")"
 	}
 
 	return "<无法获取调用者信息>"
