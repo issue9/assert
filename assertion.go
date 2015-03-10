@@ -9,8 +9,7 @@ import (
 )
 
 // Assertion是对testing.T进行了简单的封装。
-// 可以以对象的方式调用包中的各个断言函数，
-// 减少了参数t的传递。
+// 可以以对象的方式调用包中的各个断言函数。
 type Assertion struct {
 	t *testing.T
 }

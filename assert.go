@@ -95,15 +95,14 @@ func formatMessage(msg1 []interface{}, msg2 []interface{}) string {
 // 可以使用系统内部提供的信息，优先使用msg1中的信息，若不存在，则使用msg2的内容。
 func assert(t *testing.T, expr bool, msg1 []interface{}, msg2 []interface{}) {
 	if !expr {
-		t.Error(formatMessage(msg1, msg2) + getCallerInfo())
+		t.Error(formatMessage(msg1, msg2) + "@" + getCallerInfo())
 	}
 }
 
 // 断言表达式expr为true，否则输出错误信息。
 //
 // args对应fmt.Printf()函数中的参数，其中args[0]对应第一个参数format，依次类推，
-// 具体可参数formatMessage()函数的介绍。
-// 其它断言函数的args参数，功能与此相同。
+// 具体可参数formatMessage()函数的介绍。其它断言函数的args参数，功能与此相同。
 func True(t *testing.T, expr bool, args ...interface{}) {
 	assert(t, expr, args, []interface{}{"True失败，实际值为[%T:%[1]v]", expr})
 }

@@ -23,7 +23,8 @@ func TestGetCallerInfo(t *testing.T) {
 	// 闭合函数，line为调用所在的行号。
 	f := func(line string) {
 		str := getCallerInfo()
-		if str != "TestGetCallerInfo(assert_test.go:"+line+")" {
+		if str != "TestGetCallerInfo(assert_test.go:"+line+")" ||
+			str != "TestGetCallerInfo.fun1(assert_test.go:"+line+")" { // Go1.5之后变这样了
 			t.Errorf("getCallerInfo返回的信息不正确，其返回值为：%v", str)
 		}
 	}
@@ -44,6 +45,7 @@ func TestFormatMsg(t *testing.T) {
 	msg1 := []interface{}{}
 	msg2 := []interface{}{[]rune("msg:%v"), 2}
 	msg3 := []interface{}{"msg:%v", 3}
+	msg4 := []interface{}{123, 456}
 
 	str := formatMessage(msg1, msg2)
 	if str != "msg:2" {
@@ -58,6 +60,16 @@ func TestFormatMsg(t *testing.T) {
 	str = formatMessage(msg2, msg3)
 	if str != "msg:2" {
 		t.Errorf("formatMessage(msg2,msg3)返回信息错误:[%v]", str)
+	}
+
+	str = formatMessage(nil, nil)
+	if str != "<未提供任何错误信息>" {
+		t.Errorf("formatMessage(nil,nil)返回信息错误:[%v]", str)
+	}
+
+	str = formatMessage(nil, msg4)
+	if str != "<无法正确转换错误提示信息>" {
+		t.Errorf("formatMessage(nil,nil)返回信息错误:[%v]", str)
 	}
 }
 
@@ -151,10 +163,12 @@ func TestNotError(t *testing.T) {
 
 func TestFileExists(t *testing.T) {
 	FileExists(t, "./assert.go", "FileExists() falid")
+	FileExists(t, "./", "FileExists() falid")
 }
 
 func TestFileNotExists(t *testing.T) {
 	FileNotExists(t, "c:/win", "FileNotExists() falid")
+	FileNotExists(t, "./abcefg/", "FileNotExists() falid")
 }
 
 func TestPanic(t *testing.T) {
