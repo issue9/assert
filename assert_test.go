@@ -23,7 +23,7 @@ func TestGetCallerInfo(t *testing.T) {
 	// 闭合函数，line为调用所在的行号。
 	f := func(line string) {
 		str := getCallerInfo()
-		if str != "TestGetCallerInfo(assert_test.go:"+line+")" ||
+		if str != "TestGetCallerInfo(assert_test.go:"+line+")" &&
 			str != "TestGetCallerInfo.fun1(assert_test.go:"+line+")" { // Go1.5之后变这样了
 			t.Errorf("getCallerInfo返回的信息不正确，其返回值为：%v", str)
 		}
