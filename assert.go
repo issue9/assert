@@ -157,6 +157,15 @@ func Error(t *testing.T, expr interface{}, args ...interface{}) {
 	}
 }
 
+// 断言有错误发生，且错误信息中包含指定的字符串str。
+// 传递未初始化的error值(var err error = nil)，将断言失败
+func Error2(t *testing.T, expr interface{}, str string, args ...interface{}) {
+	if err, ok := expr.(error); ok {
+		index := strings.Index(err.Error(), str)
+		assert(t, index >= 0, args, []interface{}{"Error失败，实际类型为[%T]", expr})
+	}
+}
+
 // 断言没有错误发生，否则输出错误信息
 func NotError(t *testing.T, expr interface{}, args ...interface{}) {
 	if IsNil(expr) { // 空值必定没有错误
@@ -186,6 +195,15 @@ func FileNotExists(t *testing.T, path string, args ...interface{}) {
 func Panic(t *testing.T, fn func(), args ...interface{}) {
 	has, _ := HasPanic(fn)
 	assert(t, has, args, []interface{}{"并未发生panic"})
+}
+
+// 断言函数会发生panic，且panic信息中包含指定的字符串内容，否则输出错误信息。
+func Panic2(t *testing.T, fn func(), str string, args ...interface{}) {
+	if has, msg := HasPanic(fn); has {
+		index := strings.Index(fmt.Sprint(msg), str)
+		assert(t, index >= 0, args, []interface{}{"并未发生panic"})
+	}
+
 }
 
 // 断言函数会发生panic，否则输出错误信息。

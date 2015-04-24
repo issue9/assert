@@ -78,6 +78,12 @@ func (a *Assertion) Error(expr interface{}, msg ...interface{}) *Assertion {
 	return a
 }
 
+// 参照assert.Error2()函数
+func (a *Assertion) Error2(expr interface{}, str string, msg ...interface{}) *Assertion {
+	Error2(a.t, expr, str, msg...)
+	return a
+}
+
 // 参照assert.NotError()函数
 func (a *Assertion) NotError(expr interface{}, msg ...interface{}) *Assertion {
 	NotError(a.t, expr, msg...)
@@ -99,6 +105,12 @@ func (a *Assertion) FileNotExists(path string, msg ...interface{}) *Assertion {
 // 参照assert.Panic()函数
 func (a *Assertion) Panic(fn func(), msg ...interface{}) *Assertion {
 	Panic(a.t, fn, msg...)
+	return a
+}
+
+// 参照assert.Panic2()函数
+func (a *Assertion) Panic2(fn func(), str string, msg ...interface{}) *Assertion {
+	Panic2(a.t, fn, str, msg...)
 	return a
 }
 

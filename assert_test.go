@@ -150,6 +150,14 @@ func TestError(t *testing.T) {
 	Error(t, err2, "Error(ErrorImpl) falid")
 }
 
+func TestError2(t *testing.T) {
+	err1 := errors.New("test")
+	Error2(t, err1, "test", "Error(err1) falid")
+
+	err2 := &ErrorImpl{msg: "msg"}
+	Error(t, err2, "msg", "Error(ErrorImpl) falid")
+}
+
 func TestNotError(t *testing.T) {
 	NotError(t, "123", "NotError(123) falid")
 
@@ -176,6 +184,14 @@ func TestPanic(t *testing.T) {
 	}
 
 	Panic(t, f1)
+}
+
+func TestPanic2(t *testing.T) {
+	f1 := func() {
+		panic("panic")
+	}
+
+	Panic2(t, f1, "pani")
 }
 
 func TestNotPanic(t *testing.T) {
