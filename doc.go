@@ -2,7 +2,8 @@
 // Use of this source code is governed by a MIT
 // license that can be found in the LICENSE file.
 
-// assert是对testing包的一些简单包装。方便在测试包里少写一点代码。
+// assert是对testing.T和testing.B包的一些简单包装。
+// 方便在测试包里少写一点代码。
 //
 // 提供了两种操作方式：直接调用包函数；或是使用Assertion对象。
 // 两种方式完全等价，可以根据自己需要，选择一种。
@@ -24,7 +25,15 @@
 //      // 以函数链的形式调用Assertion对象的方法
 //      a.True(false).Equal(5,6)
 //  }
+//  // 也可以对testing.B使用
+//  func Benchmark1(b *testing.B) {
+//      a := assert.New(b)
+//      a.True(false)
+//      for(i:=0; i<b.N; i++) {
+//          // do something
+//      }
+//  }
 package assert
 
 // 当前库的版本号
-const Version = "0.2.4.150424"
+const Version = "0.2.5.150525"

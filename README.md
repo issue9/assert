@@ -11,6 +11,16 @@ func TestA(t testing.T) {
     a := assert.New(t)
     a.True(v)
 }
+
+// 也可以对testing.B使用
+func Benchmark1(b *testing.B) {
+    a := assert.New(b)
+    v := false
+    a.True(v)
+    for(i:=0; i<b.N; i++) {
+        // do something
+    }
+}
 ```
 
 ### 安装

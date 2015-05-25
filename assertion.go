@@ -4,23 +4,19 @@
 
 package assert
 
-import (
-	"testing"
-)
-
-// Assertion是对testing.T进行了简单的封装。
+// Assertion是对testing.T和testing.B进行了简单的封装。
 // 可以以对象的方式调用包中的各个断言函数。
 type Assertion struct {
-	t *testing.T
+	t tester
 }
 
 // 返回Assertion对象。
-func New(t *testing.T) *Assertion {
+func New(t tester) *Assertion {
 	return &Assertion{t: t}
 }
 
-// 返回testing.T对象
-func (a *Assertion) T() *testing.T {
+// 返回tester接口，该接口包含了testing.T和testing.B的共有接口
+func (a *Assertion) T() tester {
 	return a.t
 }
 
