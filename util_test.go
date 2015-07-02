@@ -88,6 +88,8 @@ func TestIsEqual(t *testing.T) {
 	neq(true, "true")
 	neq(true, 1)
 	neq(true, "1")
+	// 判断包含不同键名的两个map
+	neq(map[int]int{1: 1, 2: 2}, map[int]int{5: 5, 6: 6})
 }
 
 func TestIsEmpty(t *testing.T) {

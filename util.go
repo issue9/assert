@@ -168,7 +168,12 @@ func IsEqual(v1, v2 interface{}) bool {
 		}
 
 		for _, index := range vv1.MapKeys() {
-			if !IsEqual(vv1.MapIndex(index).Interface(), vv2.MapIndex(index).Interface()) {
+			vv2Index := vv2.MapIndex(index)
+			if !vv2Index.IsValid() {
+				return false
+			}
+
+			if !IsEqual(vv1.MapIndex(index).Interface(), vv2Index.Interface()) {
 				return false
 			}
 		}
