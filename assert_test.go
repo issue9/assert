@@ -150,12 +150,18 @@ func TestError(t *testing.T) {
 	Error(t, err2, "Error(ErrorImpl) falid")
 }
 
-func TestError2(t *testing.T) {
+func TestErrorString(t *testing.T) {
 	err1 := errors.New("test")
-	Error2(t, err1, "test", "Error(err1) falid")
+	ErrorString(t, err1, "test", "Error(err1) falid")
 
 	err2 := &ErrorImpl{msg: "msg"}
 	Error(t, err2, "msg", "Error(ErrorImpl) falid")
+}
+
+func TestErrorType(t *testing.T) {
+	ErrorType(t, errors.New("abc"), errors.New("def"), "ErrorType:errors.New(abc) != errors.New(def)")
+
+	ErrorType(t, &ErrorImpl{msg: "abc"}, &ErrorImpl{}, "ErrorType:&ErrorImpl{} != &ErrorImpl{}")
 }
 
 func TestNotError(t *testing.T) {
@@ -186,12 +192,29 @@ func TestPanic(t *testing.T) {
 	Panic(t, f1)
 }
 
-func TestPanic2(t *testing.T) {
+func TestPanicString(t *testing.T) {
 	f1 := func() {
 		panic("panic")
 	}
 
-	Panic2(t, f1, "pani")
+	PanicString(t, f1, "pani")
+}
+
+func TestPanicType(t *testing.T) {
+	f1 := func() {
+		panic("panic")
+	}
+	PanicType(t, f1, "abc")
+
+	f1 = func() {
+		panic(errors.New("panic"))
+	}
+	PanicType(t, f1, errors.New("abc"))
+
+	f1 = func() {
+		panic(&ErrorImpl{msg: "panic"})
+	}
+	PanicType(t, f1, &ErrorImpl{msg: "abc"})
 }
 
 func TestNotPanic(t *testing.T) {

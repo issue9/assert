@@ -74,9 +74,15 @@ func (a *Assertion) Error(expr interface{}, msg ...interface{}) *Assertion {
 	return a
 }
 
-// 参照assert.Error2()函数
-func (a *Assertion) Error2(expr interface{}, str string, msg ...interface{}) *Assertion {
-	Error2(a.t, expr, str, msg...)
+// 参照assert.ErrorString()函数
+func (a *Assertion) ErrorString(expr interface{}, str string, msg ...interface{}) *Assertion {
+	ErrorString(a.t, expr, str, msg...)
+	return a
+}
+
+// 参照assert.ErrorType()函数
+func (a *Assertion) ErrorType(expr interface{}, typ error, msg ...interface{}) *Assertion {
+	ErrorType(a.t, expr, typ, msg...)
 	return a
 }
 
@@ -104,9 +110,15 @@ func (a *Assertion) Panic(fn func(), msg ...interface{}) *Assertion {
 	return a
 }
 
-// 参照assert.Panic2()函数
-func (a *Assertion) Panic2(fn func(), str string, msg ...interface{}) *Assertion {
-	Panic2(a.t, fn, str, msg...)
+// 参照assert.PanicString()函数
+func (a *Assertion) PanicString(fn func(), str string, msg ...interface{}) *Assertion {
+	PanicString(a.t, fn, str, msg...)
+	return a
+}
+
+// 参照assert.PanicType()函数
+func (a *Assertion) PanicType(fn func(), typ interface{}, msg ...interface{}) *Assertion {
+	PanicType(a.t, fn, typ, msg...)
 	return a
 }
 

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"reflect"
 	"runtime"
 	"strconv"
 	"strings"
@@ -158,11 +159,23 @@ func Error(t tester, expr interface{}, args ...interface{}) {
 
 // 断言有错误发生，且错误信息中包含指定的字符串str。
 // 传递未初始化的error值(var err error = nil)，将断言失败
-func Error2(t tester, expr interface{}, str string, args ...interface{}) {
+func ErrorString(t tester, expr interface{}, str string, args ...interface{}) {
 	if err, ok := expr.(error); ok {
 		index := strings.Index(err.Error(), str)
 		assert(t, index >= 0, args, []interface{}{"Error失败，实际类型为[%T]", expr})
 	}
+}
+
+// 断言有错误发生，且错误的类型与typ的类型相同。
+// 传递未初始化的error值(var err error = nil)，将断言失败
+func ErrorType(t tester, expr interface{}, typ error, args ...interface{}) {
+	if _, ok := expr.(error); !ok {
+		return
+	}
+
+	t1 := reflect.TypeOf(expr)
+	t2 := reflect.TypeOf(typ)
+	assert(t, t1 == t2, args, []interface{}{"ErrorType失败，v1[%v]为一个错误类型，但与v2[%v]的类型不相同", t1, t2})
 }
 
 // 断言没有错误发生，否则输出错误信息
@@ -197,11 +210,23 @@ func Panic(t tester, fn func(), args ...interface{}) {
 }
 
 // 断言函数会发生panic，且panic信息中包含指定的字符串内容，否则输出错误信息。
-func Panic2(t tester, fn func(), str string, args ...interface{}) {
+func PanicString(t tester, fn func(), str string, args ...interface{}) {
 	if has, msg := HasPanic(fn); has {
 		index := strings.Index(fmt.Sprint(msg), str)
 		assert(t, index >= 0, args, []interface{}{"并未发生panic"})
 	}
+}
+
+// 断言函数会发生panic，且panic返回的类型与typ的类型相同。
+func PanicType(t tester, fn func(), typ interface{}, args ...interface{}) {
+	has, msg := HasPanic(fn)
+	if !has {
+		return
+	}
+
+	t1 := reflect.TypeOf(msg)
+	t2 := reflect.TypeOf(typ)
+	assert(t, t1 == t2, args, []interface{}{"PanicType失败，v1[%v]的类型与v2[%v]的类型不相同", t1, t2})
 
 }
 
