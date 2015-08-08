@@ -34,6 +34,3 @@
 //      }
 //  }
 package assert
-
-// 当前库的版本号
-const Version = "0.2.5.150525"

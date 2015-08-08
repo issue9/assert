@@ -113,6 +113,14 @@ func TestIsEmpty(t *testing.T) {
 		t.Error("IsEmpty(0)")
 	}
 
+	if !IsEmpty(uint64(0)) {
+		t.Error("IsEmpty(uint64(0))")
+	}
+
+	if !IsEmpty(0.0) {
+		t.Error("IsEmpty(0.0)")
+	}
+
 	if !IsEmpty("") {
 		t.Error("IsEmpty(``)")
 	}

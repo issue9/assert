@@ -20,7 +20,7 @@ func IsEmpty(expr interface{}) bool {
 
 	switch v := expr.(type) {
 	case bool:
-		return false == v
+		return !v
 	case int:
 		return 0 == v
 	case int8:
@@ -43,6 +43,10 @@ func IsEmpty(expr interface{}) bool {
 		return 0 == v
 	case string:
 		return "" == v
+	case float32:
+		return 0 == v
+	case float64:
+		return 0 == v
 	case time.Time:
 		return v.IsZero()
 	case *time.Time:
@@ -50,17 +54,15 @@ func IsEmpty(expr interface{}) bool {
 	}
 
 	// 符合IsNil条件的，都为Empty
-	ret := IsNil(expr)
-	if ret {
+	if IsNil(expr) {
 		return true
 	}
 
+	// 长度为0的数组也是empty
 	v := reflect.ValueOf(expr)
 	switch v.Kind() {
 	case reflect.Slice, reflect.Map, reflect.Chan:
 		return 0 == v.Len()
-	case reflect.Ptr:
-		return false
 	}
 
 	return false
@@ -76,17 +78,13 @@ func IsNil(expr interface{}) bool {
 	v := reflect.ValueOf(expr)
 	k := v.Kind()
 
-	if (k == reflect.Chan ||
+	return (k == reflect.Chan ||
 		k == reflect.Func ||
 		k == reflect.Interface ||
 		k == reflect.Map ||
 		k == reflect.Ptr ||
 		k == reflect.Slice) &&
-		v.IsNil() {
-		return true
-	}
-
-	return false
+		v.IsNil()
 }
 
 // 判断两个值是否相等。
