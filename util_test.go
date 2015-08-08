@@ -124,6 +124,10 @@ func TestIsEmpty(t *testing.T) {
 	if !IsEmpty("") {
 		t.Error("IsEmpty(``)")
 	}
+
+	if IsEmpty("  ") {
+		t.Error("IsEmpty(\"  \")")
+	}
 }
 
 func TestIsNil(t *testing.T) {
