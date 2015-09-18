@@ -42,7 +42,6 @@ func IsEmpty(expr interface{}) bool {
 	case uint64:
 		return 0 == v
 	case string:
-		println("aa", v, "bb")
 		return len(v) == 0
 	case float32:
 		return 0 == v
