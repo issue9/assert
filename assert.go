@@ -150,16 +150,22 @@ func NotEmpty(t tester, expr interface{}, args ...interface{}) {
 // 传递未初始化的error值(var err error = nil)，将断言失败
 func Error(t tester, expr interface{}, args ...interface{}) {
 	if IsNil(expr) { // 空值，必定没有错误
-		assert(t, false, args, []interface{}{"Error失败，实际类型为[%T]", expr})
-	} else {
-		_, ok := expr.(error)
-		assert(t, ok, args, []interface{}{"Error失败，实际类型为[%T]", expr})
+		assert(t, false, args, []interface{}{"Error失败，未初始化的类型[%T]", expr})
+		return
 	}
+
+	_, ok := expr.(error)
+	assert(t, ok, args, []interface{}{"Error失败，实际类型为[%T]", expr})
 }
 
 // 断言有错误发生，且错误信息中包含指定的字符串str。
 // 传递未初始化的error值(var err error = nil)，将断言失败
 func ErrorString(t tester, expr interface{}, str string, args ...interface{}) {
+	if IsNil(expr) { // 空值，必定没有错误
+		assert(t, false, args, []interface{}{"ErrorString失败，未初始化的类型[%T]", expr})
+		return
+	}
+
 	if err, ok := expr.(error); ok {
 		index := strings.Index(err.Error(), str)
 		assert(t, index >= 0, args, []interface{}{"Error失败，实际类型为[%T]", expr})
@@ -169,7 +175,13 @@ func ErrorString(t tester, expr interface{}, str string, args ...interface{}) {
 // 断言有错误发生，且错误的类型与typ的类型相同。
 // 传递未初始化的error值(var err error = nil)，将断言失败
 func ErrorType(t tester, expr interface{}, typ error, args ...interface{}) {
+	if IsNil(expr) { // 空值，必定没有错误
+		assert(t, false, args, []interface{}{"ErrorType失败，未初始化的类型[%T]", expr})
+		return
+	}
+
 	if _, ok := expr.(error); !ok {
+		assert(t, false, args, []interface{}{"ErrorType失败，实际类型为[%T]，且无法转换成error接口", expr})
 		return
 	}
 
@@ -182,10 +194,10 @@ func ErrorType(t tester, expr interface{}, typ error, args ...interface{}) {
 func NotError(t tester, expr interface{}, args ...interface{}) {
 	if IsNil(expr) { // 空值必定没有错误
 		assert(t, true, args, []interface{}{"NotError失败，实际类型为[%T]", expr})
-	} else {
-		err, ok := expr.(error)
-		assert(t, !ok, args, []interface{}{"NotError失败，错误信息为[%v]", err})
+		return
 	}
+	err, ok := expr.(error)
+	assert(t, !ok, args, []interface{}{"NotError失败，错误信息为[%v]", err})
 }
 
 // 断言文件存在，否则输出错误信息
