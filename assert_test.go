@@ -35,7 +35,7 @@ func TestGetCallerInfo(t *testing.T) {
 func testGetCallerInfo(t *testing.T, line string) {
 	str := getCallerInfo()
 	if str != "TestGetCallerInfo(assert_test.go:"+line+")" {
-		t.Error("getCallerInfo返回的信息不正确，其返回值为：%v", str)
+		t.Errorf("getCallerInfo返回的信息不正确，其返回值为：%v", str)
 	}
 
 }
@@ -167,7 +167,7 @@ func TestErrorType(t *testing.T) {
 func TestNotError(t *testing.T) {
 	NotError(t, "123", "NotError(123) falid")
 
-	var err1 error = nil
+	var err1 error
 	NotError(t, err1, "var err1 error falid")
 
 	err2 := &ErrorImpl{msg: "msg"}

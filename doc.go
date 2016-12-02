@@ -2,10 +2,10 @@
 // Use of this source code is governed by a MIT
 // license that can be found in the LICENSE file.
 
-// assert是对testing.T和testing.B包的一些简单包装。
+// Package assert 是对 testing 包的一些简单包装。
 // 方便在测试包里少写一点代码。
 //
-// 提供了两种操作方式：直接调用包函数；或是使用Assertion对象。
+// 提供了两种操作方式：直接调用包函数；或是使用 Assertion 对象。
 // 两种方式完全等价，可以根据自己需要，选择一种。
 //  func TestAssert(t *testing.T) {
 //      var v interface{} = 5
@@ -20,12 +20,12 @@
 //      a.True(v==5, "v的值[%v]不等于5", v)
 //      a.Equal(5, v, "v的值[%v]不等于5", v)
 //      a.Nil(v)
-//      a.T().Log("success")
+//      a.TB().Log("success")
 //
-//      // 以函数链的形式调用Assertion对象的方法
+//      // 以函数链的形式调用 Assertion 对象的方法
 //      a.True(false).Equal(5,6)
 //  }
-//  // 也可以对testing.B使用
+//  // 也可以对 testing.B 使用
 //  func Benchmark1(b *testing.B) {
 //      a := assert.New(b)
 //      a.True(false)

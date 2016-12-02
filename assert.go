@@ -12,6 +12,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"testing"
 )
 
 // 定位错误信息的触发函数。输出格式为：TestXxx(xxx_test.go:17)。
@@ -24,15 +25,15 @@ func getCallerInfo() string {
 
 		basename := path.Base(file)
 
-		// 定位以_test.go结尾的文件。
+		// 定位以 _test.go 结尾的文件。
 		// 8 == len("_test.go")
 		l := len(basename)
 		if l < 8 || (basename[l-8:l] != "_test.go") {
 			continue
 		}
 
-		// 定位函数名为Test开头的行。
-		// 为什么要定位到TestXxx函数，是因为考虑以下情况：
+		// 定位函数名为 Test 开头的行。
+		// 为什么要定位到 TestXxx 函数，是因为考虑以下情况：
 		//  func isOK(val interface{}, t *testing.T) {
 		//      // do somthing
 		//      assert.True(t, val)  // (1
@@ -49,7 +50,7 @@ func getCallerInfo() string {
 			continue
 		}
 		funcName = funcName[index+1:]
-		if strings.IndexByte(funcName, '.') > -1 { // Go1.5之后的匿名函数
+		if strings.IndexByte(funcName, '.') > -1 { // Go1.5 之后的匿名函数
 			continue
 		}
 
@@ -61,11 +62,11 @@ func getCallerInfo() string {
 
 // 格式化错误提示信息。
 //
-// msg1中的所有参数将依次被传递给fmt.Sprintf()函数，
-// 所以msg1[0]必须可以转换成string(如:string, []byte, []rune, fmt.Stringer)
+// msg1 中的所有参数将依次被传递给 fmt.Sprintf() 函数，
+// 所以 msg1[0] 必须可以转换成 string(如:string, []byte, []rune, fmt.Stringer)
 //
-// msg2参数格式与msg1完全相同，在msg1为空的情况下，会使用msg2的内容，
-// 否则msg2不会启作用。
+// msg2 参数格式与 msg1 完全相同，在 msg1 为空的情况下，会使用 msg2 的内容，
+// 否则 msg2 不会启作用。
 func formatMessage(msg1 []interface{}, msg2 []interface{}) string {
 	if len(msg1) == 0 {
 		msg1 = msg2
@@ -92,63 +93,63 @@ func formatMessage(msg1 []interface{}, msg2 []interface{}) string {
 	return fmt.Sprintf(format, msg1[1:]...)
 }
 
-// 当expr条件不成立时，输出错误信息。
+// 当 expr 条件不成立时，输出错误信息。
 //
 // expr 返回结果值为bool类型的表达式；
-// msg1,msg2输出的错误信息，之所以提供两组信息，是方便在用户没有提供的情况下，
-// 可以使用系统内部提供的信息，优先使用msg1中的信息，若不存在，则使用msg2的内容。
-func assert(t tester, expr bool, msg1 []interface{}, msg2 []interface{}) {
+// msg1,msg2 输出的错误信息，之所以提供两组信息，是方便在用户没有提供的情况下，
+// 可以使用系统内部提供的信息，优先使用 msg1 中的信息，若不存在，则使用 msg2 的内容。
+func assert(t testing.TB, expr bool, msg1 []interface{}, msg2 []interface{}) {
 	if !expr {
 		t.Error(formatMessage(msg1, msg2) + "@" + getCallerInfo())
 	}
 }
 
-// 断言表达式expr为true，否则输出错误信息。
+// True 断言表达式 expr 为 true，否则输出错误信息。
 //
-// args对应fmt.Printf()函数中的参数，其中args[0]对应第一个参数format，依次类推，
-// 具体可参数formatMessage()函数的介绍。其它断言函数的args参数，功能与此相同。
-func True(t tester, expr bool, args ...interface{}) {
+// args 对应 fmt.Printf() 函数中的参数，其中 args[0] 对应第一个参数 format，依次类推，
+// 具体可参数 formatMessage() 函数的介绍。其它断言函数的 args 参数，功能与此相同。
+func True(t testing.TB, expr bool, args ...interface{}) {
 	assert(t, expr, args, []interface{}{"True失败，实际值为[%T:%[1]v]", expr})
 }
 
-// 断言表达式expr为false，否则输出错误信息
-func False(t tester, expr bool, args ...interface{}) {
+// False 断言表达式 expr 为 false，否则输出错误信息
+func False(t testing.TB, expr bool, args ...interface{}) {
 	assert(t, !expr, args, []interface{}{"False失败，实际值为[%T:%[1]v]", expr})
 }
 
-// 断言表达式expr为nil，否则输出错误信息
-func Nil(t tester, expr interface{}, args ...interface{}) {
+// Nil 断言表达式 expr 为 nil，否则输出错误信息
+func Nil(t testing.TB, expr interface{}, args ...interface{}) {
 	assert(t, IsNil(expr), args, []interface{}{"Nil失败，实际值为[%T:%[1]v]", expr})
 }
 
-// 断言表达式expr为非nil值，否则输出错误信息
-func NotNil(t tester, expr interface{}, args ...interface{}) {
+// NotNil 断言表达式 expr 为非 nil 值，否则输出错误信息
+func NotNil(t testing.TB, expr interface{}, args ...interface{}) {
 	assert(t, !IsNil(expr), args, []interface{}{"NotNil失败，实际值为[%T:%[1]v]", expr})
 }
 
-// 断言v1与v2两个值相等，否则输出错误信息
-func Equal(t tester, v1, v2 interface{}, args ...interface{}) {
+// Equal 断言 v1 与 v2 两个值相等，否则输出错误信息
+func Equal(t testing.TB, v1, v2 interface{}, args ...interface{}) {
 	assert(t, IsEqual(v1, v2), args, []interface{}{"Equal失败，实际值为v1=[%T:%[1]v];v2=[%T:%[2]v]", v1, v2})
 }
 
-// 断言v1与v2两个值不相等，否则输出错误信息
-func NotEqual(t tester, v1, v2 interface{}, args ...interface{}) {
+// NotEqual 断言 v1 与 v2 两个值不相等，否则输出错误信息
+func NotEqual(t testing.TB, v1, v2 interface{}, args ...interface{}) {
 	assert(t, !IsEqual(v1, v2), args, []interface{}{"NotEqual失败，实际值为v1=[%T:%[1]v];v2=[%T:%[2]v]", v1, v2})
 }
 
-// 断言expr的值为空(nil,"",0,false)，否则输出错误信息
-func Empty(t tester, expr interface{}, args ...interface{}) {
+// Empty 断言 expr 的值为空(nil,"",0,false)，否则输出错误信息
+func Empty(t testing.TB, expr interface{}, args ...interface{}) {
 	assert(t, IsEmpty(expr), args, []interface{}{"Empty失败，实际值为[%T:%[1]v]", expr})
 }
 
-// 断言expr的值为非空(除nil,"",0,false之外)，否则输出错误信息
-func NotEmpty(t tester, expr interface{}, args ...interface{}) {
+// NotEmpty 断言 expr 的值为非空(除 nil,"",0,false之外)，否则输出错误信息
+func NotEmpty(t testing.TB, expr interface{}, args ...interface{}) {
 	assert(t, !IsEmpty(expr), args, []interface{}{"NotEmpty失败，实际值为[%T:%[1]v]", expr})
 }
 
-// 断言有错误发生，否则输出错误信息。
-// 传递未初始化的error值(var err error = nil)，将断言失败
-func Error(t tester, expr interface{}, args ...interface{}) {
+// Error 断言有错误发生，否则输出错误信息。
+// 传递未初始化的 error 值(var err error = nil)，将断言失败
+func Error(t testing.TB, expr interface{}, args ...interface{}) {
 	if IsNil(expr) { // 空值，必定没有错误
 		assert(t, false, args, []interface{}{"Error失败，未初始化的类型[%T]", expr})
 		return
@@ -158,9 +159,9 @@ func Error(t tester, expr interface{}, args ...interface{}) {
 	assert(t, ok, args, []interface{}{"Error失败，实际类型为[%T]", expr})
 }
 
-// 断言有错误发生，且错误信息中包含指定的字符串str。
-// 传递未初始化的error值(var err error = nil)，将断言失败
-func ErrorString(t tester, expr interface{}, str string, args ...interface{}) {
+// ErrorString 断言有错误发生，且错误信息中包含指定的字符串 str。
+// 传递未初始化的 error 值(var err error = nil)，将断言失败
+func ErrorString(t testing.TB, expr interface{}, str string, args ...interface{}) {
 	if IsNil(expr) { // 空值，必定没有错误
 		assert(t, false, args, []interface{}{"ErrorString失败，未初始化的类型[%T]", expr})
 		return
@@ -172,9 +173,9 @@ func ErrorString(t tester, expr interface{}, str string, args ...interface{}) {
 	}
 }
 
-// 断言有错误发生，且错误的类型与typ的类型相同。
-// 传递未初始化的error值(var err error = nil)，将断言失败
-func ErrorType(t tester, expr interface{}, typ error, args ...interface{}) {
+// ErrorType 断言有错误发生，且错误的类型与 typ 的类型相同。
+// 传递未初始化的 error 值(var err error = nil)，将断言失败
+func ErrorType(t testing.TB, expr interface{}, typ error, args ...interface{}) {
 	if IsNil(expr) { // 空值，必定没有错误
 		assert(t, false, args, []interface{}{"ErrorType失败，未初始化的类型[%T]", expr})
 		return
@@ -190,8 +191,8 @@ func ErrorType(t tester, expr interface{}, typ error, args ...interface{}) {
 	assert(t, t1 == t2, args, []interface{}{"ErrorType失败，v1[%v]为一个错误类型，但与v2[%v]的类型不相同", t1, t2})
 }
 
-// 断言没有错误发生，否则输出错误信息
-func NotError(t tester, expr interface{}, args ...interface{}) {
+// NotError 断言没有错误发生，否则输出错误信息
+func NotError(t testing.TB, expr interface{}, args ...interface{}) {
 	if IsNil(expr) { // 空值必定没有错误
 		assert(t, true, args, []interface{}{"NotError失败，实际类型为[%T]", expr})
 		return
@@ -200,8 +201,8 @@ func NotError(t tester, expr interface{}, args ...interface{}) {
 	assert(t, !ok, args, []interface{}{"NotError失败，错误信息为[%v]", err})
 }
 
-// 断言文件存在，否则输出错误信息
-func FileExists(t tester, path string, args ...interface{}) {
+// FileExists 断言文件存在，否则输出错误信息
+func FileExists(t testing.TB, path string, args ...interface{}) {
 	_, err := os.Stat(path)
 
 	if err != nil && !os.IsExist(err) {
@@ -209,28 +210,28 @@ func FileExists(t tester, path string, args ...interface{}) {
 	}
 }
 
-// 断言文件不存在，否则输出错误信息
-func FileNotExists(t tester, path string, args ...interface{}) {
+// FileNotExists 断言文件不存在，否则输出错误信息
+func FileNotExists(t testing.TB, path string, args ...interface{}) {
 	_, err := os.Stat(path)
 	assert(t, os.IsNotExist(err), args, []interface{}{"FileExists发生以下错误：%v", err.Error()})
 }
 
-// 断言函数会发生panic，否则输出错误信息。
-func Panic(t tester, fn func(), args ...interface{}) {
+// Panic 断言函数会发生 panic，否则输出错误信息。
+func Panic(t testing.TB, fn func(), args ...interface{}) {
 	has, _ := HasPanic(fn)
 	assert(t, has, args, []interface{}{"并未发生panic"})
 }
 
-// 断言函数会发生panic，且panic信息中包含指定的字符串内容，否则输出错误信息。
-func PanicString(t tester, fn func(), str string, args ...interface{}) {
+// PanicString 断言函数会发生 panic，且 panic 信息中包含指定的字符串内容，否则输出错误信息。
+func PanicString(t testing.TB, fn func(), str string, args ...interface{}) {
 	if has, msg := HasPanic(fn); has {
 		index := strings.Index(fmt.Sprint(msg), str)
 		assert(t, index >= 0, args, []interface{}{"并未发生panic"})
 	}
 }
 
-// 断言函数会发生panic，且panic返回的类型与typ的类型相同。
-func PanicType(t tester, fn func(), typ interface{}, args ...interface{}) {
+// PanicType 断言函数会发生 panic，且 panic 返回的类型与 typ 的类型相同。
+func PanicType(t testing.TB, fn func(), typ interface{}, args ...interface{}) {
 	has, msg := HasPanic(fn)
 	if !has {
 		return
@@ -242,21 +243,21 @@ func PanicType(t tester, fn func(), typ interface{}, args ...interface{}) {
 
 }
 
-// 断言函数会发生panic，否则输出错误信息。
-func NotPanic(t tester, fn func(), args ...interface{}) {
+// NotPanic 断言函数会发生 panic，否则输出错误信息。
+func NotPanic(t testing.TB, fn func(), args ...interface{}) {
 	has, msg := HasPanic(fn)
 	assert(t, !has, args, []interface{}{"发生了panic，其信息为[%v]", msg})
 }
 
-// 断言container包含item的或是包含item中的所有项
-// 具体函数说明可参考IsContains()
-func Contains(t tester, container, item interface{}, args ...interface{}) {
+// Contains 断言 container 包含 item 的或是包含 item 中的所有项
+// 具体函数说明可参考 IsContains()
+func Contains(t testing.TB, container, item interface{}, args ...interface{}) {
 	assert(t, IsContains(container, item), args,
 		[]interface{}{"container:[%v]并未包含item[%v]", container, item})
 }
 
-// 断言container不包含item的或是不包含item中的所有项
-func NotContains(t tester, container, item interface{}, args ...interface{}) {
+// NotContains 断言 container 不包含 item 的或是不包含 item 中的所有项
+func NotContains(t testing.TB, container, item interface{}, args ...interface{}) {
 	assert(t, !IsContains(container, item), args,
 		[]interface{}{"container:[%v]包含item[%v]", container, item})
 }

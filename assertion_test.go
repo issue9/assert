@@ -12,7 +12,7 @@ import (
 func TestAssertion(t *testing.T) {
 	a := New(t)
 
-	if t != a.T() {
+	if t != a.TB() {
 		t.Error("a.T与t不相等")
 	}
 

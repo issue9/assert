@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-// 判断一个值是否为空(0, "", false, 空数组等)。
+// IsEmpty 判断一个值是否为空(0, "", false, 空数组等)。
 // []string{""}空数组里套一个空字符串，不会被判断为空。
 func IsEmpty(expr interface{}) bool {
 	if expr == nil {
@@ -68,8 +68,8 @@ func IsEmpty(expr interface{}) bool {
 	return false
 }
 
-// 判断一个值是否为nil。
-// 当特定类型的变量，已经声明，但还未赋值时，也将返回true
+// IsNil 判断一个值是否为 nil。
+// 当特定类型的变量，已经声明，但还未赋值时，也将返回 true
 func IsNil(expr interface{}) bool {
 	if nil == expr {
 		return true
@@ -87,9 +87,9 @@ func IsNil(expr interface{}) bool {
 		v.IsNil()
 }
 
-// 判断两个值是否相等。
+// IsEqual 判断两个值是否相等。
 //
-// 除了通过reflect.DeepEqual()判断值是否相等之外，一些类似
+// 除了通过 reflect.DeepEqual() 判断值是否相等之外，一些类似
 // 可转换的数值也能正确判断，比如以下值也将会被判断为相等：
 //  int8(5)                     == int(5)
 //  []int{1,2}                  == []int8{1,2}
@@ -196,8 +196,8 @@ func IsEqual(v1, v2 interface{}) bool {
 	return false
 }
 
-// 判断fn函数是否会发生panic
-// 若发生了panic，将把msg一起返回。
+// HasPanic 判断 fn 函数是否会发生 panic
+// 若发生了 panic，将把 msg 一起返回。
 func HasPanic(fn func()) (has bool, msg interface{}) {
 	defer func() {
 		if msg = recover(); msg != nil {
@@ -209,13 +209,13 @@ func HasPanic(fn func()) (has bool, msg interface{}) {
 	return
 }
 
-// 判断container是否包含了item的内容。若是指针，会判断指针指向的内容，
+// IsContains 判断 container 是否包含了 item 的内容。若是指针，会判断指针指向的内容，
 // 但是不支持多重指针。
 //
-// 若container是字符串(string、[]byte和[]rune，不包含fmt.Stringer接口)，
-// 都将会以字符串的形式判断其是否包含item。
-// 若container是个列表(array、slice、map)则判断其元素中是否包含item中的
-// 的所有项，或是item本身就是container中的一个元素。
+// 若 container 是字符串(string、[]byte和[]rune，不包含 fmt.Stringer 接口)，
+// 都将会以字符串的形式判断其是否包含 item。
+// 若 container是个列表(array、slice、map)则判断其元素中是否包含 item 中的
+// 的所有项，或是 item 本身就是 container 中的一个元素。
 func IsContains(container, item interface{}) bool {
 	if container == nil { // nil不包含任何东西
 		return false
@@ -288,26 +288,26 @@ func IsContains(container, item interface{}) bool {
 			return false
 		}
 
-		// item是container的一个元素
+		// item 是 container 的一个元素
 		for i := 0; i < cv.Len(); i++ {
 			if IsEqual(cv.Index(i).Interface(), iv.Interface()) {
 				return true
 			}
 		}
 
-		// 开始判断item的元素是否与container中的元素相等。
+		// 开始判断 item 的元素是否与 container 中的元素相等。
 
-		// 若item的长度为0，表示不包含
+		// 若 item 的长度为 0，表示不包含
 		if (iv.Kind() != reflect.Slice) || (iv.Len() == 0) {
 			return false
 		}
 
-		// item的元素比container的元素多，必须在判断完item不是container中的一个元素之
+		// item 的元素比 container 的元素多，必须在判断完 item 不是 container 中的一个元素之
 		if iv.Len() > cv.Len() {
 			return false
 		}
 
-		// 依次比较item的各个子元素是否都存在于container，且下标都相同
+		// 依次比较 item 的各个子元素是否都存在于 container，且下标都相同
 		ivIndex := 0
 		for i := 0; i < cv.Len(); i++ {
 			if IsEqual(cv.Index(i).Interface(), iv.Index(ivIndex).Interface()) {
@@ -315,7 +315,7 @@ func IsContains(container, item interface{}) bool {
 					return false
 				}
 				ivIndex++
-				if ivIndex == iv.Len() { // 已经遍历完iv
+				if ivIndex == iv.Len() { // 已经遍历完 iv
 					return true
 				}
 			} else if ivIndex > 0 {
@@ -338,17 +338,17 @@ func IsContains(container, item interface{}) bool {
 			return false
 		}
 
-		// 判断所有item的项都存在于container中
+		// 判断所有 item 的项都存在于 container 中
 		for _, key := range iv.MapKeys() {
 			cvItem := iv.MapIndex(key)
-			if !cvItem.IsValid() { // container中不包含该值。
+			if !cvItem.IsValid() { // container 中不包含该值。
 				return false
 			}
 			if !IsEqual(cvItem.Interface(), iv.MapIndex(key).Interface()) {
 				return false
 			}
 		}
-		// for中的所有判断都成立，返回true
+		// for 中的所有判断都成立，返回 true
 		return true
 	}
 

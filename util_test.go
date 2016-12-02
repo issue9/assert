@@ -176,7 +176,7 @@ func TestHasPanic(t *testing.T) {
 	}
 
 	if has, msg := HasPanic(f3); has {
-		t.Error("f3发生了panic，其信息为:[%v]", msg)
+		t.Errorf("f3发生了panic，其信息为:[%v]", msg)
 	}
 
 	f4 := func() {
@@ -184,7 +184,7 @@ func TestHasPanic(t *testing.T) {
 	}
 
 	if has, msg := HasPanic(f4); has {
-		t.Error("f4发生panic，其信息为[%v]", msg)
+		t.Errorf("f4发生panic，其信息为[%v]", msg)
 	}
 }
 
