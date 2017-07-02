@@ -43,7 +43,7 @@ func getCallerInfo() string {
 		//      isOK("123", t)       // (2
 		//      isOK(123, t)         // (3
 		//  }
-		// 以上这段代码，定位到(2,(3的位置比总是定位到(1的位置更直观！
+		// 以上这段代码，定位到 (2、(3 的位置比总是定位到 (1 的位置更直观！
 		funcName := runtime.FuncForPC(pc).Name()
 		index := strings.LastIndex(funcName, ".Test")
 		if -1 == index {

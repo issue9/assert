@@ -15,7 +15,7 @@
 //      assert.Equal(t, 5, v, "v的值[%v]不等于5", v)
 //      assert.Nil(t, v)
 //
-//      // 以Assertion对象方式使用
+//      // 以 Assertion 对象方式使用
 //      a := assert.New(t)
 //      a.True(v==5, "v的值[%v]不等于5", v)
 //      a.Equal(5, v, "v的值[%v]不等于5", v)
