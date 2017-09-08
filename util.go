@@ -78,11 +78,7 @@ func IsNil(expr interface{}) bool {
 	v := reflect.ValueOf(expr)
 	k := v.Kind()
 
-	if k >= reflect.Chan && k <= reflect.Slice && v.IsNil() {
-		return true
-	}
-
-	return false
+	return k >= reflect.Chan && k <= reflect.Slice && v.IsNil()
 }
 
 // IsEqual 判断两个值是否相等。
