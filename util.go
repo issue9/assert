@@ -91,7 +91,7 @@ func IsNil(expr interface{}) bool {
 //  []int{1,2}                  == []float32{1,2}
 //  map[string]int{"1":"2":2}   == map[string]int8{"1":1,"2":2}
 //
-//  // map的键值不同，即使可相互转换也判断不相等。
+//  // map 的键值不同，即使可相互转换也判断不相等。
 //  map[int]int{1:1,2:2}        != map[int8]int{1:1,2:2}
 func IsEqual(v1, v2 interface{}) bool {
 	if reflect.DeepEqual(v1, v2) {
