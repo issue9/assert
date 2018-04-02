@@ -26,9 +26,7 @@ func getCallerInfo() string {
 		basename := path.Base(file)
 
 		// 定位以 _test.go 结尾的文件。
-		// 8 == len("_test.go")
-		l := len(basename)
-		if l < 8 || (basename[l-8:l] != "_test.go") {
+		if !strings.HasSuffix(basename, "_test.go") {
 			continue
 		}
 
@@ -109,67 +107,67 @@ func assert(t testing.TB, expr bool, msg1 []interface{}, msg2 []interface{}) {
 // args 对应 fmt.Printf() 函数中的参数，其中 args[0] 对应第一个参数 format，依次类推，
 // 具体可参数 formatMessage() 函数的介绍。其它断言函数的 args 参数，功能与此相同。
 func True(t testing.TB, expr bool, args ...interface{}) {
-	assert(t, expr, args, []interface{}{"True失败，实际值为[%T:%[1]v]", expr})
+	assert(t, expr, args, []interface{}{"True 失败，实际值为[%T:%[1]v]", expr})
 }
 
 // False 断言表达式 expr 为 false，否则输出错误信息
 func False(t testing.TB, expr bool, args ...interface{}) {
-	assert(t, !expr, args, []interface{}{"False失败，实际值为[%T:%[1]v]", expr})
+	assert(t, !expr, args, []interface{}{"False 失败，实际值为[%T:%[1]v]", expr})
 }
 
 // Nil 断言表达式 expr 为 nil，否则输出错误信息
 func Nil(t testing.TB, expr interface{}, args ...interface{}) {
-	assert(t, IsNil(expr), args, []interface{}{"Nil失败，实际值为[%T:%[1]v]", expr})
+	assert(t, IsNil(expr), args, []interface{}{"Nil 失败，实际值为[%T:%[1]v]", expr})
 }
 
 // NotNil 断言表达式 expr 为非 nil 值，否则输出错误信息
 func NotNil(t testing.TB, expr interface{}, args ...interface{}) {
-	assert(t, !IsNil(expr), args, []interface{}{"NotNil失败，实际值为[%T:%[1]v]", expr})
+	assert(t, !IsNil(expr), args, []interface{}{"NotNil 失败，实际值为[%T:%[1]v]", expr})
 }
 
 // Equal 断言 v1 与 v2 两个值相等，否则输出错误信息
 func Equal(t testing.TB, v1, v2 interface{}, args ...interface{}) {
-	assert(t, IsEqual(v1, v2), args, []interface{}{"Equal失败，实际值为v1=[%T:%[1]v];v2=[%T:%[2]v]", v1, v2})
+	assert(t, IsEqual(v1, v2), args, []interface{}{"Equal 失败，实际值为v1=[%T:%[1]v];v2=[%T:%[2]v]", v1, v2})
 }
 
 // NotEqual 断言 v1 与 v2 两个值不相等，否则输出错误信息
 func NotEqual(t testing.TB, v1, v2 interface{}, args ...interface{}) {
-	assert(t, !IsEqual(v1, v2), args, []interface{}{"NotEqual失败，实际值为v1=[%T:%[1]v];v2=[%T:%[2]v]", v1, v2})
+	assert(t, !IsEqual(v1, v2), args, []interface{}{"NotEqual 失败，实际值为v1=[%T:%[1]v];v2=[%T:%[2]v]", v1, v2})
 }
 
 // Empty 断言 expr 的值为空(nil,"",0,false)，否则输出错误信息
 func Empty(t testing.TB, expr interface{}, args ...interface{}) {
-	assert(t, IsEmpty(expr), args, []interface{}{"Empty失败，实际值为[%T:%[1]v]", expr})
+	assert(t, IsEmpty(expr), args, []interface{}{"Empty 失败，实际值为[%T:%[1]v]", expr})
 }
 
 // NotEmpty 断言 expr 的值为非空(除 nil,"",0,false之外)，否则输出错误信息
 func NotEmpty(t testing.TB, expr interface{}, args ...interface{}) {
-	assert(t, !IsEmpty(expr), args, []interface{}{"NotEmpty失败，实际值为[%T:%[1]v]", expr})
+	assert(t, !IsEmpty(expr), args, []interface{}{"NotEmpty 失败，实际值为[%T:%[1]v]", expr})
 }
 
 // Error 断言有错误发生，否则输出错误信息。
 // 传递未初始化的 error 值(var err error = nil)，将断言失败
 func Error(t testing.TB, expr interface{}, args ...interface{}) {
 	if IsNil(expr) { // 空值，必定没有错误
-		assert(t, false, args, []interface{}{"Error失败，未初始化的类型[%T]", expr})
+		assert(t, false, args, []interface{}{"Error 失败，未初始化的类型[%T]", expr})
 		return
 	}
 
 	_, ok := expr.(error)
-	assert(t, ok, args, []interface{}{"Error失败，实际类型为[%T]", expr})
+	assert(t, ok, args, []interface{}{"Error 失败，实际类型为[%T]", expr})
 }
 
 // ErrorString 断言有错误发生，且错误信息中包含指定的字符串 str。
 // 传递未初始化的 error 值(var err error = nil)，将断言失败
 func ErrorString(t testing.TB, expr interface{}, str string, args ...interface{}) {
 	if IsNil(expr) { // 空值，必定没有错误
-		assert(t, false, args, []interface{}{"ErrorString失败，未初始化的类型[%T]", expr})
+		assert(t, false, args, []interface{}{"ErrorString 失败，未初始化的类型[%T]", expr})
 		return
 	}
 
 	if err, ok := expr.(error); ok {
 		index := strings.Index(err.Error(), str)
-		assert(t, index >= 0, args, []interface{}{"Error失败，实际类型为[%T]", expr})
+		assert(t, index >= 0, args, []interface{}{"Error 失败，实际类型为[%T]", expr})
 	}
 }
 
@@ -177,28 +175,28 @@ func ErrorString(t testing.TB, expr interface{}, str string, args ...interface{}
 // 传递未初始化的 error 值(var err error = nil)，将断言失败
 func ErrorType(t testing.TB, expr interface{}, typ error, args ...interface{}) {
 	if IsNil(expr) { // 空值，必定没有错误
-		assert(t, false, args, []interface{}{"ErrorType失败，未初始化的类型[%T]", expr})
+		assert(t, false, args, []interface{}{"ErrorType 失败，未初始化的类型[%T]", expr})
 		return
 	}
 
 	if _, ok := expr.(error); !ok {
-		assert(t, false, args, []interface{}{"ErrorType失败，实际类型为[%T]，且无法转换成error接口", expr})
+		assert(t, false, args, []interface{}{"ErrorType 失败，实际类型为[%T]，且无法转换成 error 接口", expr})
 		return
 	}
 
 	t1 := reflect.TypeOf(expr)
 	t2 := reflect.TypeOf(typ)
-	assert(t, t1 == t2, args, []interface{}{"ErrorType失败，v1[%v]为一个错误类型，但与v2[%v]的类型不相同", t1, t2})
+	assert(t, t1 == t2, args, []interface{}{"ErrorType 失败，v1[%v]为一个错误类型，但与v2[%v]的类型不相同", t1, t2})
 }
 
 // NotError 断言没有错误发生，否则输出错误信息
 func NotError(t testing.TB, expr interface{}, args ...interface{}) {
 	if IsNil(expr) { // 空值必定没有错误
-		assert(t, true, args, []interface{}{"NotError失败，实际类型为[%T]", expr})
+		assert(t, true, args, []interface{}{"NotError 失败，实际类型为[%T]", expr})
 		return
 	}
 	err, ok := expr.(error)
-	assert(t, !ok, args, []interface{}{"NotError失败，错误信息为[%v]", err})
+	assert(t, !ok, args, []interface{}{"NotError 失败，错误信息为[%v]", err})
 }
 
 // FileExists 断言文件存在，否则输出错误信息
@@ -213,20 +211,20 @@ func FileExists(t testing.TB, path string, args ...interface{}) {
 // FileNotExists 断言文件不存在，否则输出错误信息
 func FileNotExists(t testing.TB, path string, args ...interface{}) {
 	_, err := os.Stat(path)
-	assert(t, os.IsNotExist(err), args, []interface{}{"FileExists发生以下错误：%v", err.Error()})
+	assert(t, os.IsNotExist(err), args, []interface{}{"FileExists 发生以下错误：%v", err.Error()})
 }
 
 // Panic 断言函数会发生 panic，否则输出错误信息。
 func Panic(t testing.TB, fn func(), args ...interface{}) {
 	has, _ := HasPanic(fn)
-	assert(t, has, args, []interface{}{"并未发生panic"})
+	assert(t, has, args, []interface{}{"并未发生 panic"})
 }
 
 // PanicString 断言函数会发生 panic，且 panic 信息中包含指定的字符串内容，否则输出错误信息。
 func PanicString(t testing.TB, fn func(), str string, args ...interface{}) {
 	if has, msg := HasPanic(fn); has {
 		index := strings.Index(fmt.Sprint(msg), str)
-		assert(t, index >= 0, args, []interface{}{"并未发生panic"})
+		assert(t, index >= 0, args, []interface{}{"并未发生 panic"})
 	}
 }
 
@@ -239,14 +237,14 @@ func PanicType(t testing.TB, fn func(), typ interface{}, args ...interface{}) {
 
 	t1 := reflect.TypeOf(msg)
 	t2 := reflect.TypeOf(typ)
-	assert(t, t1 == t2, args, []interface{}{"PanicType失败，v1[%v]的类型与v2[%v]的类型不相同", t1, t2})
+	assert(t, t1 == t2, args, []interface{}{"PanicType 失败，v1[%v]的类型与v2[%v]的类型不相同", t1, t2})
 
 }
 
 // NotPanic 断言函数会发生 panic，否则输出错误信息。
 func NotPanic(t testing.TB, fn func(), args ...interface{}) {
 	has, msg := HasPanic(fn)
-	assert(t, !has, args, []interface{}{"发生了panic，其信息为[%v]", msg})
+	assert(t, !has, args, []interface{}{"发生了 panic，其信息为[%v]", msg})
 }
 
 // Contains 断言 container 包含 item 的或是包含 item 中的所有项
