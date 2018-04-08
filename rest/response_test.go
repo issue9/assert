@@ -12,10 +12,8 @@ import (
 )
 
 func TestRequest_Do(t *testing.T) {
-	a := assert.New(t)
-
-	srv := NewServer(a, h, nil)
-	a.NotNil(srv)
+	srv := NewServer(t, h, nil)
+	assert.NotNil(t, srv)
 	defer srv.Close()
 
 	srv.NewRequest(http.MethodGet, "/get").
@@ -28,10 +26,8 @@ func TestRequest_Do(t *testing.T) {
 }
 
 func TestResponse_Status(t *testing.T) {
-	a := assert.New(t)
-
-	srv := NewServer(a, h, nil)
-	a.NotNil(srv)
+	srv := NewServer(t, h, nil)
+	assert.NotNil(t, srv)
 	defer srv.Close()
 
 	srv.NewRequest(http.MethodGet, "/get").
@@ -45,10 +41,8 @@ func TestResponse_Status(t *testing.T) {
 }
 
 func TestResponse_Body(t *testing.T) {
-	a := assert.New(t)
-
-	srv := NewServer(a, h, nil)
-	a.NotNil(srv)
+	srv := NewServer(t, h, nil)
+	assert.NotNil(t, srv)
 	defer srv.Close()
 
 	srv.NewRequest(http.MethodGet, "/body").

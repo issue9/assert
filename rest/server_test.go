@@ -14,14 +14,14 @@ import (
 func TestNew(t *testing.T) {
 	a := assert.New(t)
 
-	srv := NewTLSServer(a, nil, nil)
+	srv := NewTLSServer(t, nil, nil)
 	a.NotNil(srv)
 	a.Equal(srv.client, http.DefaultClient)
 	a.True(len(srv.server.URL) > 0)
 	srv.Close()
 
 	client := &http.Client{}
-	srv = NewServer(a, nil, client)
+	srv = NewServer(t, nil, client)
 	a.NotNil(srv)
 	a.Equal(srv.client, client)
 	srv.Close()

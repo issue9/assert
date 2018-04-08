@@ -8,6 +8,7 @@ package rest
 import (
 	"net/http"
 	"net/http/httptest"
+	"testing"
 
 	"github.com/issue9/assert"
 )
@@ -22,24 +23,24 @@ type Server struct {
 // NewServer 声明新的测试服务
 //
 // 如果 client 为 nil，则会采用 http.DefaultClient 作为默认值
-func NewServer(a *assert.Assertion, h http.Handler, client *http.Client) *Server {
-	return newServer(a, httptest.NewServer(h), client)
+func NewServer(t testing.TB, h http.Handler, client *http.Client) *Server {
+	return newServer(t, httptest.NewServer(h), client)
 }
 
 // NewTLSServer 声明新的测试服务
 //
 // 如果 client 为 nil，则会采用 http.DefaultClient 作为默认值
-func NewTLSServer(a *assert.Assertion, h http.Handler, client *http.Client) *Server {
-	return newServer(a, httptest.NewTLSServer(h), client)
+func NewTLSServer(t testing.TB, h http.Handler, client *http.Client) *Server {
+	return newServer(t, httptest.NewTLSServer(h), client)
 }
 
-func newServer(a *assert.Assertion, srv *httptest.Server, client *http.Client) *Server {
+func newServer(t testing.TB, srv *httptest.Server, client *http.Client) *Server {
 	if client == nil {
 		client = http.DefaultClient
 	}
 
 	return &Server{
-		assertion: a,
+		assertion: assert.New(t),
 		server:    srv,
 		client:    client,
 	}

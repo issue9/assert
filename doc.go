@@ -25,6 +25,7 @@
 //      // 以函数链的形式调用 Assertion 对象的方法
 //      a.True(false).Equal(5,6)
 //  }
+//
 //  // 也可以对 testing.B 使用
 //  func Benchmark1(b *testing.B) {
 //      a := assert.New(b)

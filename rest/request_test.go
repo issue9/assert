@@ -58,7 +58,7 @@ var h = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 func TestRequest_buildPath(t *testing.T) {
 	a := assert.New(t)
-	srv := NewServer(a, h, nil)
+	srv := NewServer(t, h, nil)
 	a.NotNil(srv)
 	defer srv.Close()
 
