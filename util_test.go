@@ -6,6 +6,7 @@ package assert
 
 import (
 	"testing"
+	"time"
 )
 
 func TestIsEqual(t *testing.T) {
@@ -113,6 +114,10 @@ func TestIsEmpty(t *testing.T) {
 		t.Error("IsEmpty(0)")
 	}
 
+	if !IsEmpty(int64(0)) {
+		t.Error("IsEmpty(int64(0))")
+	}
+
 	if !IsEmpty(uint64(0)) {
 		t.Error("IsEmpty(uint64(0))")
 	}
@@ -121,7 +126,19 @@ func TestIsEmpty(t *testing.T) {
 		t.Error("IsEmpty(0.0)")
 	}
 
+	if !IsEmpty(float32(0)) {
+		t.Error("IsEmpty(0.0)")
+	}
+
 	if !IsEmpty("") {
+		t.Error("IsEmpty(``)")
+	}
+
+	if !IsEmpty(time.Time{}) {
+		t.Error("IsEmpty(``)")
+	}
+
+	if !IsEmpty(&time.Time{}) {
 		t.Error("IsEmpty(``)")
 	}
 
@@ -191,17 +208,35 @@ func TestHasPanic(t *testing.T) {
 func TestIsContains(t *testing.T) {
 	fn := func(result bool, container, item interface{}) {
 		if result != IsContains(container, item) {
-			t.Errorf("%v == (IsContains%v, %v)出错\n", result, container, item)
+			t.Errorf("%v == (IsContains(%v, %v))出错\n", result, container, item)
 		}
 	}
 
 	fn(false, nil, nil)
 
 	fn(true, "abc", "a")
-	fn(true, "abc", 'a')       // string vs byte
-	fn(true, "abc", rune('a')) // string vs rune
 	fn(true, "abc", "c")
 	fn(true, "abc", "bc")
+	fn(true, "abc", byte('a'))    // string vs byte
+	fn(true, "abc", rune('a'))    // string vs rune
+	fn(true, "abc", []byte("ab")) // string vs []byte
+	fn(true, "abc", []rune("ab")) // string vs []rune
+
+	fn(true, []byte("abc"), "a")
+	fn(true, []byte("abc"), "c")
+	fn(true, []byte("abc"), "bc")
+	fn(true, []byte("abc"), byte('a'))
+	fn(true, []byte("abc"), rune('a'))
+	fn(true, []byte("abc"), []byte("ab"))
+	fn(true, []byte("abc"), []rune("ab"))
+
+	fn(true, []rune("abc"), "a")
+	fn(true, []rune("abc"), "c")
+	fn(true, []rune("abc"), "bc")
+	fn(true, []rune("abc"), byte('a'))
+	fn(true, []rune("abc"), rune('a'))
+	fn(true, []rune("abc"), []byte("ab"))
+	fn(true, []rune("abc"), []rune("ab"))
 
 	fn(true, "中文a", "中")
 	fn(true, "中文a", "a")
@@ -227,6 +262,10 @@ func TestIsContains(t *testing.T) {
 
 	fn(false, map[string]int{}, nil)
 	fn(false, map[string]int{"1": 1, "2": 2}, map[string]int8{})
+	fn(false, map[string]int{"1": 1, "2": 2}, map[string]int8{"1": 110}) // 同键名，不同值
+	fn(false, map[string]int{"1": 1, "2": 2}, map[string]int8{"5": 5})
 	fn(false, []int{1, 2, 3}, nil)
 	fn(false, []int{1, 2, 3}, []int8{1, 3})
+	fn(false, []int{1, 2, 3}, []int{1, 2, 3, 4})
+	fn(false, []int{}, []int{1}) // 空数组
 }

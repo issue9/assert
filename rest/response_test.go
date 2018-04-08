@@ -52,5 +52,6 @@ func TestResponse_Body(t *testing.T) {
 		Do().
 		Status(http.StatusCreated).
 		Header("content-type", "application/json;charset=utf-8").
+		NotHeader("content-type", "invalid value").
 		JSONBody(&bodyTest{ID: 6})
 }

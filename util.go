@@ -53,12 +53,12 @@ func IsEmpty(expr interface{}) bool {
 		return v.IsZero()
 	}
 
-	// 符合IsNil条件的，都为Empty
+	// 符合 IsNil 条件的，都为 Empty
 	if IsNil(expr) {
 		return true
 	}
 
-	// 长度为0的数组也是empty
+	// 长度为 0 的数组也是 empty
 	v := reflect.ValueOf(expr)
 	switch v.Kind() {
 	case reflect.Slice, reflect.Map, reflect.Chan:
@@ -101,7 +101,7 @@ func IsEqual(v1, v2 interface{}) bool {
 	vv1 := reflect.ValueOf(v1)
 	vv2 := reflect.ValueOf(v2)
 
-	// NOTE: 这里返回false，而不是true
+	// NOTE: 这里返回 false，而不是 true
 	if !vv1.IsValid() || !vv2.IsValid() {
 		return false
 	}
@@ -113,22 +113,22 @@ func IsEqual(v1, v2 interface{}) bool {
 	vv1Type := vv1.Type()
 	vv2Type := vv2.Type()
 
-	// 过滤掉已经在reflect.DeepEqual()进行处理的类型
+	// 过滤掉已经在 reflect.DeepEqual() 进行处理的类型
 	switch vv1Type.Kind() {
 	case reflect.Struct, reflect.Ptr, reflect.Func, reflect.Interface:
 		return false
 	case reflect.Slice, reflect.Array:
-		// vv2.Kind()与vv1的不相同
+		// vv2.Kind() 与 vv1 的不相同
 		if vv2.Kind() != reflect.Slice && vv2.Kind() != reflect.Array {
-			// 虽然类型不同，但可以相互转换成vv1的，如：vv2是string，vv2是[]byte，
+			// 虽然类型不同，但可以相互转换成 vv1 的，如：vv2 是 string，vv2 是 []byte，
 			if vv2Type.ConvertibleTo(vv1Type) {
 				return IsEqual(vv1.Interface(), vv2.Convert(vv1Type).Interface())
 			}
 			return false
 		}
 
-		// reflect.DeepEqual()未考虑类型不同但是类型可转换的情况，比如：
-		// []int{8,9} == []int8{8,9}，此处重新对slice和array做比较处理。
+		// reflect.DeepEqual() 未考虑类型不同但是类型可转换的情况，比如：
+		// []int{8,9} == []int8{8,9}，此处重新对 slice 和 array 做比较处理。
 		if vv1.Len() != vv2.Len() {
 			return false
 		}
@@ -138,7 +138,7 @@ func IsEqual(v1, v2 interface{}) bool {
 				return false
 			}
 		}
-		return true // for中所有的值比较都相等，返回true
+		return true // for 中所有的值比较都相等，返回 true
 	case reflect.Map:
 		if vv2.Kind() != reflect.Map {
 			return false
@@ -154,7 +154,7 @@ func IsEqual(v1, v2 interface{}) bool {
 			return true
 		}
 
-		// 两个map的键名类型不同
+		// 两个 map 的键名类型不同
 		if vv2Type.Key().Kind() != vv1Type.Key().Kind() {
 			return false
 		}
@@ -169,12 +169,12 @@ func IsEqual(v1, v2 interface{}) bool {
 				return false
 			}
 		}
-		return true // for中所有的值比较都相等，返回true
+		return true // for 中所有的值比较都相等，返回 true
 	case reflect.String:
 		if vv2.Kind() == reflect.String {
 			return vv1.String() == vv2.String()
 		}
-		if vv2Type.ConvertibleTo(vv1Type) { // 考虑v1是string，v2是[]byte的情况
+		if vv2Type.ConvertibleTo(vv1Type) { // 考虑 v1 是 string，v2 是 []byte 的情况
 			return IsEqual(vv1.Interface(), vv2.Convert(vv1Type).Interface())
 		}
 
@@ -206,9 +206,9 @@ func HasPanic(fn func()) (has bool, msg interface{}) {
 // IsContains 判断 container 是否包含了 item 的内容。若是指针，会判断指针指向的内容，
 // 但是不支持多重指针。
 //
-// 若 container 是字符串(string、[]byte和[]rune，不包含 fmt.Stringer 接口)，
+// 若 container 是字符串(string、[]byte 和 []rune，不包含 fmt.Stringer 接口)，
 // 都将会以字符串的形式判断其是否包含 item。
-// 若 container是个列表(array、slice、map)则判断其元素中是否包含 item 中的
+// 若 container 是个列表(array、slice、map)则判断其元素中是否包含 item 中的
 // 的所有项，或是 item 本身就是 container 中的一个元素。
 func IsContains(container, item interface{}) bool {
 	if container == nil { // nil不包含任何东西
@@ -218,11 +218,11 @@ func IsContains(container, item interface{}) bool {
 	cv := reflect.ValueOf(container)
 	iv := reflect.ValueOf(item)
 
-	if cv.Kind() == reflect.Ptr {
+	for cv.Kind() == reflect.Ptr {
 		cv = cv.Elem()
 	}
 
-	if iv.Kind() == reflect.Ptr {
+	for iv.Kind() == reflect.Ptr {
 		iv = iv.Elem()
 	}
 
@@ -296,7 +296,7 @@ func IsContains(container, item interface{}) bool {
 			return false
 		}
 
-		// item 的元素比 container 的元素多，必须在判断完 item 不是 container 中的一个元素之
+		// item 的元素比 container 的元素多
 		if iv.Len() > cv.Len() {
 			return false
 		}
@@ -334,7 +334,7 @@ func IsContains(container, item interface{}) bool {
 
 		// 判断所有 item 的项都存在于 container 中
 		for _, key := range iv.MapKeys() {
-			cvItem := iv.MapIndex(key)
+			cvItem := cv.MapIndex(key)
 			if !cvItem.IsValid() { // container 中不包含该值。
 				return false
 			}
