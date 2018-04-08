@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"net/http"
 	"net/url"
 	"strings"
 )
@@ -20,6 +19,7 @@ type Request struct {
 	body    io.Reader
 	queries url.Values
 	params  map[string]string
+	headers map[string]string
 
 	srv *Server
 }
@@ -44,17 +44,15 @@ func (req *Request) Query(key, val string) *Request {
 	return req
 }
 
-// Body 指定提交的内容
-func (req *Request) Body(body []byte) *Request {
-	req.body = bytes.NewReader(body)
-	return req
-}
+// Header 指定请求时的报头
+func (req *Request) Header(key, val string) *Request {
+	if req.headers == nil {
+		req.headers = make(map[string]string, 5)
+	}
 
-// JSONBody 指定一个 JSON 格式的 body
-func (req *Request) JSONBody(obj interface{}) *Request {
-	data, err := json.Marshal(obj)
-	req.srv.assertion.NotError(err).NotNil(data)
-	return req.Body(data)
+	req.headers[key] = val
+
+	return req
 }
 
 // Param 替换参数
@@ -68,22 +66,30 @@ func (req *Request) Param(key, val string) *Request {
 	return req
 }
 
-// Do 执行请求操作
-func (req *Request) Do() *Response {
+// Body 指定提交的内容
+func (req *Request) Body(body []byte) *Request {
+	req.body = bytes.NewReader(body)
+	return req
+}
+
+// JSONBody 指定一个 JSON 格式的 body
+func (req *Request) JSONBody(obj interface{}) *Request {
+	data, err := json.Marshal(obj)
+	req.srv.assertion.NotError(err).NotNil(data)
+	return req.Body(data)
+}
+
+func (req *Request) buildPath() string {
 	path := req.path
+
 	for key, val := range req.params {
 		key = "{" + key + "}"
 		path = strings.Replace(path, key, val, -1)
 	}
 
-	r, err := http.NewRequest(req.method, req.srv.server.URL+path, req.body)
-	req.srv.assertion.NotError(err).NotNil(r)
-
-	resp, err := req.srv.client.Do(r)
-	req.srv.assertion.NotError(err).NotNil(resp)
-
-	return &Response{
-		assertion: req.srv.assertion,
-		resp:      resp,
+	if len(req.queries) > 0 {
+		path += ("?" + req.queries.Encode())
 	}
+
+	return path
 }
