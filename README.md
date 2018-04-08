@@ -4,7 +4,7 @@ assert [![Build Status](https://travis-ci.org/issue9/assert.svg?branch=master)](
 assert 包是对 testing 的一个简单扩展，提供的一系列的断言函数，
 方便在测试函数中使用：
 ```go
-func TestA(t testing.T) {
+func TestA(t *testing.T) {
     v := true
     assert.True(v)
 
@@ -12,7 +12,7 @@ func TestA(t testing.T) {
     a.True(v)
 }
 
-// 也可以对testing.B使用
+// 也可以对 testing.B 使用
 func Benchmark1(b *testing.B) {
     a := assert.New(b)
     v := false
@@ -20,6 +20,24 @@ func Benchmark1(b *testing.B) {
     for(i:=0; i<b.N; i++) {
         // do something
     }
+}
+
+// 对 API 请求做测试，可以引用 assert/rest
+func TestHTTP( t *testing.T) {
+    a := assert.New(t)
+
+	srv := rest.NewServer(a, h, nil)
+	a.NotNil(srv)
+	defer srv.Close()
+
+	srv.NewRequest(http.MethodGet, "/body").
+		Header("content-type", "application/json").
+		Query("page", "5").
+		JSONBody(&bodyTest{ID: 5}).
+		Do().
+		Status(http.StatusCreated).
+		Header("content-type", "application/json;charset=utf-8").
+        JSONBody(&bodyTest{ID: 6})
 }
 ```
 
