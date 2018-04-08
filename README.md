@@ -1,4 +1,4 @@
-assert [![Build Status](https://travis-ci.org/issue9/assert.svg?branch=master)](https://travis-ci.org/issue9/assert)
+assert [![Build Status](https://travis-ci.org/issue9/assert.svg?branch=master)](https://travis-ci.org/issue9/assert) [![codecov](https://codecov.io/gh/issue9/assert/branch/master/graph/badge.svg)](https://codecov.io/gh/issue9/assert)
 ======
 
 assert 包是对 testing 的一个简单扩展，提供的一系列的断言函数，
