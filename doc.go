@@ -34,4 +34,4 @@
 //          // do something
 //      }
 //  }
-package assert
+package assert // import "github.com/issue9/assert"
