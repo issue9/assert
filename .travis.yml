@@ -9,3 +9,7 @@ go:
   - "1.10"
   - 1.9
   - 1.8
+
+script: go test -coverprofile=coverage.txt -covermode=atomic $(go list ./...| grep -v /vendor/)
+
+after_success: bash <(curl -s https://codecov.io/bash)
