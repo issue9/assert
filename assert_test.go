@@ -9,16 +9,26 @@ import (
 	"testing"
 )
 
+func BenchmarkGetCallerInfo(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		str := getCallerInfo()
+
+		if str != "BenchmarkGetCallerInfo(assert_test.go:14)" {
+			b.Errorf("getCallerInfo 返回的信息不正确，其返回值为：%v", str)
+		}
+	}
+}
+
 func TestGetCallerInfo(t *testing.T) {
 	str := getCallerInfo()
 	// NOTE:注意这里涉及到调用函数的行号信息
-	if str != "TestGetCallerInfo(assert_test.go:13)" {
+	if str != "TestGetCallerInfo(assert_test.go:23)" {
 		t.Errorf("getCallerInfo返回的信息不正确，其返回值为：%v", str)
 	}
 
 	// 嵌套调用，第二个参数为当前的行号
-	testGetCallerInfo(t, "20")
-	testGetCallerInfo(t, "21")
+	testGetCallerInfo(t, "30")
+	testGetCallerInfo(t, "31")
 
 	// 闭合函数，line为调用所在的行号。
 	f := func(line string) {
@@ -27,8 +37,8 @@ func TestGetCallerInfo(t *testing.T) {
 			t.Errorf("getCallerInfo返回的信息不正确，其返回值为：%v", str)
 		}
 	}
-	f("30") // 参数为当前等号
-	f("31")
+	f("40") // 参数为当前等号
+	f("41")
 }
 
 // 参数line，为调用此函数所在的行号。

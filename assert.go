@@ -45,10 +45,13 @@ func getCallerInfo() string {
 		funcName := runtime.FuncForPC(pc).Name()
 		index := strings.LastIndex(funcName, ".Test")
 		if -1 == index {
-			continue
+			index = strings.LastIndex(funcName, ".Benchmark")
+			if index == -1 {
+				continue
+			}
 		}
 		funcName = funcName[index+1:]
-		if strings.IndexByte(funcName, '.') > -1 { // Go1.5 之后的匿名函数
+		if strings.IndexByte(funcName, '.') > -1 { // Go1.5 之后的匿名函数为 TestA.func1
 			continue
 		}
 
