@@ -134,12 +134,16 @@ func TestIsEmpty(t *testing.T) {
 		t.Error("IsEmpty(``)")
 	}
 
+	if !IsEmpty([0]int{}) {
+		t.Error("IsEmpty([0]int{})")
+	}
+
 	if !IsEmpty(time.Time{}) {
-		t.Error("IsEmpty(``)")
+		t.Error("IsEmpty(time.Time{})")
 	}
 
 	if !IsEmpty(&time.Time{}) {
-		t.Error("IsEmpty(``)")
+		t.Error("IsEmpty(&time.Time{})")
 	}
 
 	if IsEmpty("  ") {

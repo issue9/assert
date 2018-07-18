@@ -61,7 +61,7 @@ func IsEmpty(expr interface{}) bool {
 	// 长度为 0 的数组也是 empty
 	v := reflect.ValueOf(expr)
 	switch v.Kind() {
-	case reflect.Slice, reflect.Map, reflect.Chan:
+	case reflect.Slice, reflect.Map, reflect.Array, reflect.Chan:
 		return 0 == v.Len()
 	}
 
