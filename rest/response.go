@@ -90,13 +90,24 @@ func (resp *Response) NotHeader(key string, val string, msg ...interface{}) *Res
 
 // Body 报文内容是否与 val 相等
 func (resp *Response) Body(val []byte, msg ...interface{}) *Response {
-	resp.assertion.Equal(resp.body, val)
+	resp.assertion.Equal(resp.body, val, msg...)
 	return resp
 }
 
 // StringBody 报文内容是否与 val 相等
 func (resp *Response) StringBody(val string, msg ...interface{}) *Response {
-	resp.assertion.Equal(resp.body, []byte(val))
+	return resp.Body([]byte(val), msg...)
+}
+
+// BodyNotNil 报文内容是否不为空
+func (resp *Response) BodyNotNil(msg ...interface{}) *Response {
+	resp.assertion.NotNil(resp.body, msg...)
+	return resp
+}
+
+// BodyNil 报文内容是否为空
+func (resp *Response) BodyNil(msg ...interface{}) *Response {
+	resp.assertion.Nil(resp.body, msg...)
 	return resp
 }
 
