@@ -94,6 +94,12 @@ func (resp *Response) Body(val []byte, msg ...interface{}) *Response {
 	return resp
 }
 
+// StringBody 报文内容是否与 val 相等
+func (resp *Response) StringBody(val string, msg ...interface{}) *Response {
+	resp.assertion.Equal(resp.body, []byte(val))
+	return resp
+}
+
 // JSONBody 将 val 转换成 JSON 对象，并与 body 作对比
 func (resp *Response) JSONBody(val interface{}) *Response {
 	j, err := json.Marshal(val)
