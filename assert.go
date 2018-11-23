@@ -152,7 +152,7 @@ func NotEmpty(t testing.TB, expr interface{}, args ...interface{}) {
 // 传递未初始化的 error 值(var err error = nil)，将断言失败
 func Error(t testing.TB, expr interface{}, args ...interface{}) {
 	if IsNil(expr) { // 空值，必定没有错误
-		assert(t, false, args, []interface{}{"Error 失败，未初始化的类型[%T]", expr})
+		assert(t, false, args, []interface{}{"Error 失败，实际值为 Nil：[%T]", expr})
 		return
 	}
 
@@ -164,7 +164,7 @@ func Error(t testing.TB, expr interface{}, args ...interface{}) {
 // 传递未初始化的 error 值(var err error = nil)，将断言失败
 func ErrorString(t testing.TB, expr interface{}, str string, args ...interface{}) {
 	if IsNil(expr) { // 空值，必定没有错误
-		assert(t, false, args, []interface{}{"ErrorString 失败，未初始化的类型[%T]", expr})
+		assert(t, false, args, []interface{}{"ErrorString 失败，实际值为 Nil：[%T]", expr})
 		return
 	}
 
@@ -178,7 +178,7 @@ func ErrorString(t testing.TB, expr interface{}, str string, args ...interface{}
 // 传递未初始化的 error 值(var err error = nil)，将断言失败
 func ErrorType(t testing.TB, expr interface{}, typ error, args ...interface{}) {
 	if IsNil(expr) { // 空值，必定没有错误
-		assert(t, false, args, []interface{}{"ErrorType 失败，未初始化的类型[%T]", expr})
+		assert(t, false, args, []interface{}{"ErrorType 失败，实际值为 Nil：[%T]", expr})
 		return
 	}
 
