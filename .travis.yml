@@ -7,8 +7,8 @@ os:
 go:
   - tip
   - 1.11
-  - "1.10"
 
-script: env GO111MODULE=on go test -v -coverprofile=coverage.txt -covermode=atomic $(go list ./...)
+script:
+  - GO111MODULE=on go test -v -coverprofile=coverage.txt -covermode=atomic ./...
 
 after_success: bash <(curl -s https://codecov.io/bash)
