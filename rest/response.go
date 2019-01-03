@@ -96,7 +96,8 @@ func (resp *Response) Body(val []byte, msg ...interface{}) *Response {
 
 // StringBody 报文内容是否与 val 相等
 func (resp *Response) StringBody(val string, msg ...interface{}) *Response {
-	return resp.Body([]byte(val), msg...)
+	resp.assertion.Equal(string(resp.body), val, msg...)
+	return resp
 }
 
 // BodyNotNil 报文内容是否不为空
