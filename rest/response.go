@@ -21,21 +21,21 @@ type Response struct {
 
 // Do 执行请求操作
 func (req *Request) Do() *Response {
-	r, err := http.NewRequest(req.method, req.srv.server.URL+req.buildPath(), req.body)
-	req.srv.assertion.NotError(err).NotNil(r)
+	r, err := http.NewRequest(req.method, req.prefix+req.buildPath(), req.body)
+	req.assertion.NotError(err).NotNil(r)
 
 	for k, v := range req.headers {
 		r.Header.Add(k, v)
 	}
 
-	resp, err := req.srv.client.Do(r)
-	req.srv.assertion.NotError(err).NotNil(resp)
+	resp, err := req.client.Do(r)
+	req.assertion.NotError(err).NotNil(resp)
 
 	bs, err := ioutil.ReadAll(resp.Body)
-	req.srv.assertion.NotError(err).NotNil(bs)
-	req.srv.assertion.NotError(resp.Body.Close())
+	req.assertion.NotError(err).NotNil(bs)
+	req.assertion.NotError(resp.Body.Close())
 	return &Response{
-		assertion: req.srv.assertion,
+		assertion: req.assertion,
 		resp:      resp,
 		body:      bs,
 	}

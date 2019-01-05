@@ -8,28 +8,48 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
+	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/issue9/assert"
 )
 
 // Request 请求的参数封装
 type Request struct {
-	path    string
-	method  string
-	body    io.Reader
-	queries url.Values
-	params  map[string]string
-	headers map[string]string
+	path      string
+	method    string
+	body      io.Reader
+	queries   url.Values
+	params    map[string]string
+	headers   map[string]string
+	assertion *assert.Assertion
 
-	srv *Server
+	client *http.Client
+	prefix string // 地址前缀
 }
 
 // NewRequest 获取一条请求的结果
 func (srv *Server) NewRequest(method, path string) *Request {
+	req := NewRequest(srv.assertion, srv.client, method, path)
+	req.prefix = srv.server.URL
+
+	return req
+}
+
+// NewRequest 创建新的请求实例
+//
+// client 如果为空，则会采用 http.DefaultClient 作为其值。
+func NewRequest(a *assert.Assertion, client *http.Client, method, path string) *Request {
+	if client == nil {
+		client = http.DefaultClient
+	}
+
 	return &Request{
-		path:   path,
-		method: method,
-		srv:    srv,
+		assertion: a,
+		client:    client,
+		method:    method,
+		path:      path,
 	}
 }
 
@@ -75,7 +95,7 @@ func (req *Request) Body(body []byte) *Request {
 // JSONBody 指定一个 JSON 格式的 body
 func (req *Request) JSONBody(obj interface{}) *Request {
 	data, err := json.Marshal(obj)
-	req.srv.assertion.NotError(err).NotNil(data)
+	req.assertion.NotError(err).NotNil(data)
 	return req.Body(data)
 }
 
