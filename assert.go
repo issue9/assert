@@ -23,9 +23,8 @@ func getCallerInfo() string {
 			break
 		}
 
-		basename := path.Base(file)
-
 		// 定位以 _test.go 结尾的文件。
+		basename := path.Base(file)
 		if !strings.HasSuffix(basename, "_test.go") {
 			continue
 		}
@@ -75,6 +74,10 @@ func formatMessage(msg1 []interface{}, msg2 []interface{}) string {
 
 	if len(msg1) == 0 {
 		return "<未提供任何错误信息>"
+	}
+
+	if len(msg1) == 1 {
+		return fmt.Sprint(msg1[0])
 	}
 
 	format := ""

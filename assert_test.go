@@ -55,6 +55,8 @@ func TestFormatMsg(t *testing.T) {
 	msg2 := []interface{}{[]rune("msg:%v"), 2}
 	msg3 := []interface{}{"msg:%v", 3}
 	msg4 := []interface{}{123, 456}
+	msg5 := []interface{}{123}
+	msg6 := []interface{}{errors.New("123")}
 
 	str := formatMessage(msg1, msg2)
 	if str != "msg:2" {
@@ -79,6 +81,16 @@ func TestFormatMsg(t *testing.T) {
 	str = formatMessage(nil, msg4)
 	if str != "<无法正确转换错误提示信息>" {
 		t.Errorf("formatMessage(nil,nil)返回信息错误:[%v]", str)
+	}
+
+	str = formatMessage(nil, msg5)
+	if str != "123" {
+		t.Errorf("formatMessage(nil,msg5)返回信息错误:[%v]", str)
+	}
+
+	str = formatMessage(nil, msg6)
+	if str != "123" {
+		t.Errorf("formatMessage(nil,msg5)返回信息错误:[%v]", str)
 	}
 }
 
