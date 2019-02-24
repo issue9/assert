@@ -217,7 +217,10 @@ func FileExists(t testing.TB, path string, args ...interface{}) {
 // FileNotExists 断言文件不存在，否则输出错误信息
 func FileNotExists(t testing.TB, path string, args ...interface{}) {
 	_, err := os.Stat(path)
-	assert(t, os.IsNotExist(err), args, []interface{}{"FileExists 发生以下错误：%v", err.Error()})
+
+	if err == nil || os.IsExist(err) {
+		assert(t, false, args, []interface{}{"FileExists 发生以下错误：%v", err.Error()})
+	}
 }
 
 // Panic 断言函数会发生 panic，否则输出错误信息。
