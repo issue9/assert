@@ -6,6 +6,7 @@ package rest
 
 import (
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"net/http"
 
@@ -118,4 +119,11 @@ func (resp *Response) JSONBody(val interface{}) *Response {
 	resp.assertion.NotError(err).NotNil(j)
 
 	return resp.Body(j, val)
+}
+
+// ReadBody 读取 Body 的内容到 w
+func (resp *Response) ReadBody(w io.Writer) *Response {
+	n, err := w.Write(resp.body)
+	resp.assertion.NotError(err).Equal(n, len(resp.body))
+	return resp
 }

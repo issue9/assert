@@ -5,6 +5,7 @@
 package rest
 
 import (
+	"bytes"
 	"net/http"
 	"testing"
 
@@ -45,6 +46,9 @@ func TestResponse_Body(t *testing.T) {
 	assert.NotNil(t, srv)
 	defer srv.Close()
 
+	w1 := new(bytes.Buffer)
+	w2 := new(bytes.Buffer)
+
 	srv.NewRequest(http.MethodGet, "/body").
 		Header("content-type", "application/json").
 		Query("page", "5").
@@ -53,5 +57,10 @@ func TestResponse_Body(t *testing.T) {
 		Status(http.StatusCreated).
 		Header("content-type", "application/json;charset=utf-8").
 		NotHeader("content-type", "invalid value").
-		JSONBody(&bodyTest{ID: 6})
+		ReadBody(w1).
+		ReadBody(w2).
+		JSONBody(&bodyTest{ID: 6}).
+		BodyNotNil()
+
+	assert.Equal(t, w1.String(), w2.String())
 }
