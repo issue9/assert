@@ -30,11 +30,43 @@ type Request struct {
 }
 
 // NewRequest 获取一条请求的结果
+//
+// method 表示请求方法
+// path 表示请求的路径，可以通过 {} 指定参数，比如：
+//  r := NewRequest(http.MethodGet, "/users/{id}")
+// 之后就可以使用 Params 指定 id 的具体值，达到复用的目的：
+//  resp1 := r.Param("id", "1").Do()
+//  resp2 := r.Param("id", "2").Do()
 func (srv *Server) NewRequest(method, path string) *Request {
 	req := NewRequest(srv.assertion, srv.client, method, path)
 	req.prefix = srv.server.URL
 
 	return req
+}
+
+// Get 相当于 NewRequest(http.MethodGet, path)
+func (srv *Server) Get(path string) *Request {
+	return srv.NewRequest(http.MethodGet, path)
+}
+
+// Put 相当于 NewRequest(http.MethodPut, path).Body()
+func (srv *Server) Put(path string, body []byte) *Request {
+	return srv.NewRequest(http.MethodPut, path).Body(body)
+}
+
+// Post 相当于 NewRequest(http.MethodPost, path).Body()
+func (srv *Server) Post(path string, body []byte) *Request {
+	return srv.NewRequest(http.MethodPost, path).Body(body)
+}
+
+// Patch 相当于 NewRequest(http.MethodPatch, path).Body()
+func (srv *Server) Patch(path string, body []byte) *Request {
+	return srv.NewRequest(http.MethodPatch, path).Body(body)
+}
+
+// Delete 相当于 NewRequest(http.MethodDelete, path).Body()
+func (srv *Server) Delete(path string) *Request {
+	return srv.NewRequest(http.MethodDelete, path)
 }
 
 // NewRequest 创建新的请求实例
