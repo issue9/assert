@@ -1,3 +1,3 @@
 module github.com/issue9/assert
 
-go 1.12
+go 1.11
