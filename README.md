@@ -1,6 +1,5 @@
 assert
 [![Build Status](https://travis-ci.org/issue9/assert.svg?branch=master)](https://travis-ci.org/issue9/assert)
-[![Build status](https://ci.appveyor.com/api/projects/status/0gw3ybo5kgu3ij0y?svg=true)](https://ci.appveyor.com/project/caixw/assert)
 [![license](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://opensource.org/licenses/MIT)
 [![codecov](https://codecov.io/gh/issue9/assert/branch/master/graph/badge.svg)](https://codecov.io/gh/issue9/assert)
 [![Go version](https://img.shields.io/badge/Go-1.5-brightgreen.svg?style=flat)](https://golang.org)
