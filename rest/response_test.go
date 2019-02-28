@@ -26,22 +26,7 @@ func TestRequest_Do(t *testing.T) {
 		Fail()
 }
 
-func TestResponse_Status(t *testing.T) {
-	srv := NewServer(t, h, nil)
-	assert.NotNil(t, srv)
-	defer srv.Close()
-
-	srv.NewRequest(http.MethodGet, "/get").
-		Do().
-		Status(http.StatusCreated)
-
-	srv.NewRequest(http.MethodGet, "/not-exists").
-		Do().
-		NotStatus(http.StatusCreated).
-		Status(http.StatusNotFound)
-}
-
-func TestResponse_Body(t *testing.T) {
+func TestResponse(t *testing.T) {
 	srv := NewServer(t, h, nil)
 	assert.NotNil(t, srv)
 	defer srv.Close()
@@ -55,12 +40,21 @@ func TestResponse_Body(t *testing.T) {
 		JSONBody(&bodyTest{ID: 5}).
 		Do().
 		Status(http.StatusCreated).
+		NotStatus(http.StatusNotFound).
 		Header("content-type", "application/json;charset=utf-8").
 		NotHeader("content-type", "invalid value").
 		ReadBody(w1).
 		ReadBody(w2).
 		JSONBody(&bodyTest{ID: 6}).
-		BodyNotNil()
-
+		BodyNotNil().
+		BodyNotEmpty()
 	assert.Equal(t, w1.String(), w2.String())
+
+	srv.NewRequest(http.MethodGet, "/get").
+		Query("page", "5").
+		Do().
+		Status(http.StatusCreated).
+		NotHeader("content-type", "invalid value").
+		BodyNotNil().
+		BodyEmpty()
 }

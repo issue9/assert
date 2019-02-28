@@ -101,15 +101,27 @@ func (resp *Response) StringBody(val string, msg ...interface{}) *Response {
 	return resp
 }
 
-// BodyNotNil 报文内容是否不为空
+// BodyNotNil 报文内容是否不为 nil
 func (resp *Response) BodyNotNil(msg ...interface{}) *Response {
 	resp.assertion.NotNil(resp.body, msg...)
 	return resp
 }
 
-// BodyNil 报文内容是否为空
+// BodyNil 报文内容是否为 nil
 func (resp *Response) BodyNil(msg ...interface{}) *Response {
 	resp.assertion.Nil(resp.body, msg...)
+	return resp
+}
+
+// BodyNotEmpty 报文内容是否不为空
+func (resp *Response) BodyNotEmpty(msg ...interface{}) *Response {
+	resp.assertion.NotEmpty(resp.body, msg...)
+	return resp
+}
+
+// BodyEmpty 报文内容是否为空
+func (resp *Response) BodyEmpty(msg ...interface{}) *Response {
+	resp.assertion.Empty(resp.body, msg...)
 	return resp
 }
 
