@@ -17,6 +17,8 @@ import (
 
 // 定位错误信息的触发函数。输出格式为：TestXxx(xxx_test.go:17)。
 func getCallerInfo() string {
+	var info string
+
 	for i := 0; ; i++ {
 		pc, file, line, ok := runtime.Caller(i)
 		if !ok {
@@ -50,14 +52,28 @@ func getCallerInfo() string {
 			}
 		}
 		funcName = funcName[index+1:]
-		if strings.IndexByte(funcName, '.') > -1 { // Go1.5 之后的匿名函数为 TestA.func1
+
+		// Go1.5 之后的匿名函数为 TestA.func1
+		// 包含以下几种情况：
+		// 调用函数内的匿名函数；
+		// 采用 go func(){} 的形式调用函数内的匿名函数；
+		// 采用 go func(){} 的形式调用外部函数；
+		//
+		// 但是无法处理 go xx() 的情况，该情况直接开启一个新的堆栈信息，无法定位当前函数中的调用位置。
+		if index := strings.IndexByte(funcName, '.'); index > -1 {
+			funcName = funcName[:index]
+			info = funcName + "(" + basename + ":" + strconv.Itoa(line) + ")"
 			continue
 		}
 
-		return funcName + "(" + basename + ":" + strconv.Itoa(line) + ")"
+		info = funcName + "(" + basename + ":" + strconv.Itoa(line) + ")"
+		break
 	}
 
-	return "<无法获取调用者信息>"
+	if info == "" {
+		info = "<无法获取调用者信息>"
+	}
+	return info
 }
 
 // 格式化错误提示信息。
