@@ -30,25 +30,19 @@ func Benchmark1(b *testing.B) {
 func TestHTTP( t *testing.T) {
     a := assert.New(t)
 
-	srv := rest.NewServer(a, h, nil)
-	a.NotNil(srv)
-	defer srv.Close()
+    srv := rest.NewServer(a, h, nil)
+    a.NotNil(srv)
+    defer srv.Close()
 
-	srv.NewRequest(http.MethodGet, "/body").
-		Header("content-type", "application/json").
-		Query("page", "5").
-		JSONBody(&bodyTest{ID: 5}).
-		Do().
-		Status(http.StatusCreated).
-		Header("content-type", "application/json;charset=utf-8").
+    srv.NewRequest(http.MethodGet, "/body").
+        Header("content-type", "application/json").
+        Query("page", "5").
+        JSONBody(&bodyTest{ID: 5}).
+        Do().
+        Status(http.StatusCreated).
+        Header("content-type", "application/json;charset=utf-8").
         JSONBody(&bodyTest{ID: 6})
 }
-```
-
-### 安装
-
-```shell
-go get github.com/issue9/assert
 ```
 
 
