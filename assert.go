@@ -84,20 +84,21 @@ func getCallerInfo() string {
 // msg2 参数格式与 msg1 完全相同，在 msg1 为空的情况下，会使用 msg2 的内容，
 // 否则 msg2 不会启作用。
 func formatMessage(msg1 []interface{}, msg2 []interface{}) string {
-	if len(msg1) == 0 {
-		msg1 = msg2
+	msg := msg1
+	if len(msg) == 0 {
+		msg = msg2
 	}
 
-	if len(msg1) == 0 {
+	if len(msg) == 0 {
 		return "<未提供任何错误信息>"
 	}
 
-	if len(msg1) == 1 {
-		return fmt.Sprint(msg1[0])
+	if len(msg) == 1 {
+		return fmt.Sprint(msg[0])
 	}
 
 	format := ""
-	switch v := msg1[0].(type) {
+	switch v := msg[0].(type) {
 	case []byte:
 		format = string(v)
 	case []rune:
@@ -107,10 +108,10 @@ func formatMessage(msg1 []interface{}, msg2 []interface{}) string {
 	case fmt.Stringer:
 		format = v.String()
 	default:
-		return "<无法正确转换错误提示信息>"
+		return fmt.Sprintln(msg...)
 	}
 
-	return fmt.Sprintf(format, msg1[1:]...)
+	return fmt.Sprintf(format, msg[1:]...)
 }
 
 // 当 expr 条件不成立时，输出错误信息。

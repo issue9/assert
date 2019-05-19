@@ -105,7 +105,7 @@ func TestFormatMsg(t *testing.T) {
 	}
 
 	str = formatMessage(nil, msg4)
-	if str != "<无法正确转换错误提示信息>" {
+	if str != "123 456\n" {
 		t.Errorf("formatMessage(nil,nil)返回信息错误:[%v]", str)
 	}
 
