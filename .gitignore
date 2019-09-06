@@ -28,3 +28,6 @@ _testmain.go
 
 # osx
 .DS_Store
+
+.vscode
+.idea

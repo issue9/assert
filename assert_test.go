@@ -24,7 +24,7 @@ func TestGetCallerInfo(t *testing.T) {
 	str := getCallerInfo()
 	// NOTE:注意这里涉及到调用函数的行号信息
 	if str != "TestGetCallerInfo(assert_test.go:24)" {
-		t.Errorf("getCallerInfo返回的信息不正确，其返回值为：%v", str)
+		t.Errorf("getCallerInfo 返回的信息不正确，其返回值为：%v", str)
 	}
 
 	// 嵌套调用，第二个参数为当前的行号
@@ -35,7 +35,7 @@ func TestGetCallerInfo(t *testing.T) {
 	f := func(line string) {
 		str := getCallerInfo()
 		if str != "TestGetCallerInfo(assert_test.go:"+line+")" {
-			t.Errorf("getCallerInfo返回的信息不正确，其返回值为：%v", str)
+			t.Errorf("getCallerInfo 返回的信息不正确，其返回值为：%v", str)
 		}
 	}
 
@@ -46,9 +46,9 @@ func TestGetCallerInfo(t *testing.T) {
 		testGetCallerInfo(t, "46")
 	}()
 
-	// NOTE: 无法处理的情况
-	//go f("49")
-	//go testGetCallerInfo(t, "50")
+	// bug: 无法处理的情况，go 会新开协程，无法获取当前的行号
+	//go f("50")
+	//go testGetCallerInfo(t, "51")
 
 	f("53") // 参数为当前等号
 	f("54")
@@ -68,7 +68,7 @@ func TestGetCallerInfo(t *testing.T) {
 	time.Sleep(500 * time.Microsecond)
 }
 
-// 参数line，为调用此函数所在的行号。
+// 参数 line，为调用此函数所在的行号。
 func testGetCallerInfo(t *testing.T, line string) {
 	str := getCallerInfo()
 	if str != "TestGetCallerInfo(assert_test.go:"+line+")" {
@@ -122,64 +122,64 @@ func TestFormatMsg(t *testing.T) {
 
 func TestTrue(t *testing.T) {
 	True(t, true)
-	True(t, 1 == 1, "True(1==1) falid")
+	True(t, 1 == 1, "True(1==1) failed")
 }
 
 func TestFalse(t *testing.T) {
-	False(t, false, "False falid")
-	False(t, 1 == 2, "False(1==2) falid")
+	False(t, false, "False failed")
+	False(t, 1 == 2, "False(1==2) failed")
 }
 
 func TestNil(t *testing.T) {
-	Nil(t, nil, "Nil falid")
+	Nil(t, nil, "Nil failed")
 
 	var v interface{}
-	Nil(t, v, "Nil(v) falid")
+	Nil(t, v, "Nil(v) failed")
 }
 
 func TestNotNil(t *testing.T) {
-	NotNil(t, 5, "NotNil falid")
+	NotNil(t, 5, "NotNil failed")
 
 	var v interface{} = 5
-	NotNil(t, v, "NotNil falid")
+	NotNil(t, v, "NotNil failed")
 }
 
 func TestEqual(t *testing.T) {
-	Equal(t, 5, 5, "Equal(5,5) falid")
+	Equal(t, 5, 5, "Equal(5,5) failed")
 
 	var v1, v2 interface{}
 	v1 = 5
 	v2 = 5
 
 	Equal(t, 5, v1)
-	Equal(t, v1, v2, "Equal(v1,v2) falid")
+	Equal(t, v1, v2, "Equal(v1,v2) failed")
 	Equal(t, int8(126), 126)
 	Equal(t, int64(126), int8(126))
 	Equal(t, uint(7), int(7))
 }
 
 func TestNotEqual(t *testing.T) {
-	NotEqual(t, 5, 6, "NotEqual(5,6) falid")
+	NotEqual(t, 5, 6, "NotEqual(5,6) failed")
 
 	var v1, v2 interface{} = 5, 6
 
-	NotEqual(t, 5, v2, "NotEqual(5,v2) falid")
-	NotEqual(t, v1, v2, "NotEqual(v1,v2) falid")
+	NotEqual(t, 5, v2, "NotEqual(5,v2) failed")
+	NotEqual(t, v1, v2, "NotEqual(v1,v2) failed")
 	NotEqual(t, 128, int8(127))
 }
 
 func TestEmpty(t *testing.T) {
-	Empty(t, 0, "Empty(0) falid")
-	Empty(t, "", "Empty(``) falid")
-	Empty(t, false, "Empty(false) falid")
-	Empty(t, []string{}, "Empty(slice{}) falid")
-	Empty(t, []int{}, "Empty(slice{}) falid")
+	Empty(t, 0, "Empty(0) failed")
+	Empty(t, "", "Empty(``) failed")
+	Empty(t, false, "Empty(false) failed")
+	Empty(t, []string{}, "Empty(slice{}) failed")
+	Empty(t, []int{}, "Empty(slice{}) failed")
 }
 
 func TestNotEmpty(t *testing.T) {
-	NotEmpty(t, 1, "NotEmpty(1) falid")
-	NotEmpty(t, true, "NotEmpty(true) falid")
-	NotEmpty(t, []string{"ab"}, "NotEmpty(slice(abc)) falid")
+	NotEmpty(t, 1, "NotEmpty(1) failed")
+	NotEmpty(t, true, "NotEmpty(true) failed")
+	NotEmpty(t, []string{"ab"}, "NotEmpty(slice(abc)) failed")
 }
 
 type ErrorImpl struct {
@@ -192,18 +192,18 @@ func (err *ErrorImpl) Error() string {
 
 func TestError(t *testing.T) {
 	err1 := errors.New("test")
-	Error(t, err1, "Error(err) falid")
+	Error(t, err1, "Error(err) failed")
 
 	err2 := &ErrorImpl{msg: "msg"}
-	Error(t, err2, "Error(ErrorImpl) falid")
+	Error(t, err2, "Error(ErrorImpl) failed")
 }
 
 func TestErrorString(t *testing.T) {
 	err1 := errors.New("test")
-	ErrorString(t, err1, "test", "Error(err1) falid")
+	ErrorString(t, err1, "test", "Error(err1) failed")
 
 	err2 := &ErrorImpl{msg: "msg"}
-	Error(t, err2, "msg", "Error(ErrorImpl) falid")
+	Error(t, err2, "msg", "Error(ErrorImpl) failed")
 }
 
 func TestErrorType(t *testing.T) {
@@ -213,23 +213,23 @@ func TestErrorType(t *testing.T) {
 }
 
 func TestNotError(t *testing.T) {
-	NotError(t, "123", "NotError(123) falid")
+	NotError(t, "123", "NotError(123) failed")
 
 	var err1 error
-	NotError(t, err1, "var err1 error falid")
+	NotError(t, err1, "var err1 error failed")
 
 	err2 := &ErrorImpl{msg: "msg"}
-	Error(t, err2, "Error(ErrorImpl) falid")
+	Error(t, err2, "Error(ErrorImpl) failed")
 }
 
 func TestFileExists(t *testing.T) {
-	FileExists(t, "./assert.go", "FileExists() falid")
-	FileExists(t, "./", "FileExists() falid")
+	FileExists(t, "./assert.go", "FileExists() failed")
+	FileExists(t, "./", "FileExists() failed")
 }
 
 func TestFileNotExists(t *testing.T) {
-	FileNotExists(t, "c:/win", "FileNotExists() falid")
-	FileNotExists(t, "./abcefg/", "FileNotExists() falid")
+	FileNotExists(t, "c:/win", "FileNotExists() failed")
+	FileNotExists(t, "./abcefg/", "FileNotExists() failed")
 }
 
 func TestPanic(t *testing.T) {
@@ -245,7 +245,7 @@ func TestPanicString(t *testing.T) {
 		panic("panic")
 	}
 
-	PanicString(t, f1, "pani")
+	PanicString(t, f1, "panic")
 }
 
 func TestPanicType(t *testing.T) {
