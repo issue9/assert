@@ -227,7 +227,7 @@ func FileExists(t testing.TB, path string, args ...interface{}) {
 	_, err := os.Stat(path)
 
 	if err != nil && !os.IsExist(err) {
-		assert(t, false, args, []interface{}{"FileExists发生以下错误：%v", err.Error()})
+		assert(t, false, args, []interface{}{"FileExists 失败，且附带以下错误：%v", err})
 	}
 }
 
@@ -235,8 +235,11 @@ func FileExists(t testing.TB, path string, args ...interface{}) {
 func FileNotExists(t testing.TB, path string, args ...interface{}) {
 	_, err := os.Stat(path)
 
-	if err == nil || os.IsExist(err) {
-		assert(t, false, args, []interface{}{"FileExists 发生以下错误：%v", err.Error()})
+	if err == nil {
+		assert(t, false, args, []interface{}{"FileNotExists 失败"})
+	}
+	if os.IsExist(err) {
+		assert(t, false, args, []interface{}{"FileNotExists 失败，且返回以下错误信息：%v", err})
 	}
 }
 
