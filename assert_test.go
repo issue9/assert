@@ -21,13 +21,13 @@ func BenchmarkGetCallerInfo(b *testing.B) {
 func TestGetCallerInfo(t *testing.T) {
 	str := getCallerInfo()
 	// NOTE:注意这里涉及到调用函数的行号信息
-	if str != "TestGetCallerInfo(assert_test.go:24)" {
+	if str != "TestGetCallerInfo(assert_test.go:22)" {
 		t.Errorf("getCallerInfo 返回的信息不正确，其返回值为：%v", str)
 	}
 
 	// 嵌套调用，第二个参数为当前的行号
-	testGetCallerInfo(t, "31")
-	testGetCallerInfo(t, "32")
+	testGetCallerInfo(t, "29")
+	testGetCallerInfo(t, "30")
 
 	// 闭合函数，line 为调用所在的行号。
 	f := func(line string) {
@@ -38,24 +38,24 @@ func TestGetCallerInfo(t *testing.T) {
 	}
 
 	go func() {
-		f("43")
+		f("41")
 	}()
 	go func() {
-		testGetCallerInfo(t, "46")
+		testGetCallerInfo(t, "44")
 	}()
 
 	// bug: 无法处理的情况，go 会新开协程，无法获取当前的行号
 	//go f("50")
 	//go testGetCallerInfo(t, "51")
 
-	f("53") // 参数为当前等号
-	f("54")
+	f("51") // 参数为当前等号
+	f("52")
 
 	ff := func(line string) {
 		f(line)
 	}
 	go func() {
-		ff("60")
+		ff("58")
 	}()
 
 	// NOTE: 无法处理的情况
