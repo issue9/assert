@@ -148,12 +148,12 @@ func NotNil(t testing.TB, expr interface{}, args ...interface{}) {
 
 // Equal 断言 v1 与 v2 两个值相等，否则输出错误信息
 func Equal(t testing.TB, v1, v2 interface{}, args ...interface{}) {
-	assert(t, IsEqual(v1, v2), args, []interface{}{"Equal 失败，实际值为v1=[%T:%[1]v];v2=[%T:%[2]v]", v1, v2})
+	assert(t, IsEqual(v1, v2), args, []interface{}{"Equal 失败，实际值为\nv1=[%T:%[1]v]\nv2=[%T:%[2]v]", v1, v2})
 }
 
 // NotEqual 断言 v1 与 v2 两个值不相等，否则输出错误信息
 func NotEqual(t testing.TB, v1, v2 interface{}, args ...interface{}) {
-	assert(t, !IsEqual(v1, v2), args, []interface{}{"NotEqual 失败，实际值为v1=[%T:%[1]v];v2=[%T:%[2]v]", v1, v2})
+	assert(t, !IsEqual(v1, v2), args, []interface{}{"NotEqual 失败，实际值为\nv1=[%T:%[1]v]\nv2=[%T:%[2]v]", v1, v2})
 }
 
 // Empty 断言 expr 的值为空(nil,"",0,false)，否则输出错误信息
