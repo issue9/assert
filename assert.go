@@ -128,42 +128,42 @@ func assert(t testing.TB, expr bool, msg1 []interface{}, msg2 []interface{}) {
 // args 对应 fmt.Printf() 函数中的参数，其中 args[0] 对应第一个参数 format，依次类推，
 // 具体可参数 formatMessage() 函数的介绍。其它断言函数的 args 参数，功能与此相同。
 func True(t testing.TB, expr bool, args ...interface{}) {
-	assert(t, expr, args, []interface{}{"True 失败，实际值为[%T:%[1]v]", expr})
+	assert(t, expr, args, []interface{}{"True 失败，实际值为 %#v", expr})
 }
 
 // False 断言表达式 expr 为 false，否则输出错误信息
 func False(t testing.TB, expr bool, args ...interface{}) {
-	assert(t, !expr, args, []interface{}{"False 失败，实际值为[%T:%[1]v]", expr})
+	assert(t, !expr, args, []interface{}{"False 失败，实际值为 %#v", expr})
 }
 
 // Nil 断言表达式 expr 为 nil，否则输出错误信息
 func Nil(t testing.TB, expr interface{}, args ...interface{}) {
-	assert(t, IsNil(expr), args, []interface{}{"Nil 失败，实际值为[%T:%[1]v]", expr})
+	assert(t, IsNil(expr), args, []interface{}{"Nil 失败，实际值为 %#v", expr})
 }
 
 // NotNil 断言表达式 expr 为非 nil 值，否则输出错误信息
 func NotNil(t testing.TB, expr interface{}, args ...interface{}) {
-	assert(t, !IsNil(expr), args, []interface{}{"NotNil 失败，实际值为[%T:%[1]v]", expr})
+	assert(t, !IsNil(expr), args, []interface{}{"NotNil 失败，实际值为 %#v", expr})
 }
 
 // Equal 断言 v1 与 v2 两个值相等，否则输出错误信息
 func Equal(t testing.TB, v1, v2 interface{}, args ...interface{}) {
-	assert(t, IsEqual(v1, v2), args, []interface{}{"Equal 失败，实际值为\nv1=[%T:%[1]v]\nv2=[%T:%[2]v]", v1, v2})
+	assert(t, IsEqual(v1, v2), args, []interface{}{"Equal 失败，实际值为\nv1=%#v\nv2=%#v", v1, v2})
 }
 
 // NotEqual 断言 v1 与 v2 两个值不相等，否则输出错误信息
 func NotEqual(t testing.TB, v1, v2 interface{}, args ...interface{}) {
-	assert(t, !IsEqual(v1, v2), args, []interface{}{"NotEqual 失败，实际值为\nv1=[%T:%[1]v]\nv2=[%T:%[2]v]", v1, v2})
+	assert(t, !IsEqual(v1, v2), args, []interface{}{"NotEqual 失败，实际值为\nv1=%#v\nv2=%#v", v1, v2})
 }
 
 // Empty 断言 expr 的值为空(nil,"",0,false)，否则输出错误信息
 func Empty(t testing.TB, expr interface{}, args ...interface{}) {
-	assert(t, IsEmpty(expr), args, []interface{}{"Empty 失败，实际值为[%T:%[1]v]", expr})
+	assert(t, IsEmpty(expr), args, []interface{}{"Empty 失败，实际值为 %#v", expr})
 }
 
 // NotEmpty 断言 expr 的值为非空(除 nil,"",0,false之外)，否则输出错误信息
 func NotEmpty(t testing.TB, expr interface{}, args ...interface{}) {
-	assert(t, !IsEmpty(expr), args, []interface{}{"NotEmpty 失败，实际值为[%T:%[1]v]", expr})
+	assert(t, !IsEmpty(expr), args, []interface{}{"NotEmpty 失败，实际值为 %#v", expr})
 }
 
 // Error 断言有错误发生，否则输出错误信息。
