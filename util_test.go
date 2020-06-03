@@ -41,24 +41,24 @@ func TestIsEqual(t *testing.T) {
 	// 比较两个元素类型可相互转换的数组
 	eq(
 		[][]int{
-			[]int{1, 2},
-			[]int{3, 4},
+			{1, 2},
+			{3, 4},
 		},
 		[][]int8{
-			[]int8{1, 2},
-			[]int8{3, 4},
+			{1, 2},
+			{3, 4},
 		},
 	)
 
 	// 比较两个元素类型可转换的map
 	eq(
 		[]map[int]int{
-			map[int]int{1: 1, 2: 2},
-			map[int]int{3: 3, 4: 4},
+			{1: 1, 2: 2},
+			{3: 3, 4: 4},
 		},
 		[]map[int]int8{
-			map[int]int8{1: 1, 2: 2},
-			map[int]int8{3: 3, 4: 4},
+			{1: 1, 2: 2},
+			{3: 3, 4: 4},
 		},
 	)
 	eq(map[string]int{"1": 1, "2": 2}, map[string]int8{"1": 1, "2": 2})
@@ -253,12 +253,12 @@ func TestIsContains(t *testing.T) {
 	fn(true, map[string]int{"1": 1, "2": 2}, map[string]int8{"1": 1})
 	fn(true,
 		map[string][]int{
-			"1": []int{1, 2, 3},
-			"2": []int{4, 5, 6},
+			"1": {1, 2, 3},
+			"2": {4, 5, 6},
 		},
 		map[string][]int8{
-			"1": []int8{1, 2, 3},
-			"2": []int8{4, 5, 6},
+			"1": {1, 2, 3},
+			"2": {4, 5, 6},
 		},
 	)
 
