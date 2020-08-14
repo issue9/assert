@@ -240,10 +240,10 @@ func TestPanic(t *testing.T) {
 
 func TestPanicString(t *testing.T) {
 	f1 := func() {
-		panic("panic")
+		panic("panic message")
 	}
 
-	PanicString(t, f1, "panic")
+	PanicString(t, f1, "panic message")
 }
 
 func TestPanicType(t *testing.T) {
