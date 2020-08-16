@@ -50,7 +50,7 @@ func TestHTTP( t *testing.T) {
 ----
 
 [![Go Walker](https://gowalker.org/api/v1/badge)](https://gowalker.org/github.com/issue9/assert)
-[![GoDoc](https://godoc.org/github.com/issue9/assert?status.svg)](https://godoc.org/github.com/issue9/assert)
+[![PkgGoDev](https://pkg.go.dev/badge/issue9/assert)](https://pkg.go.dev/issue9/assert)
 
 版权
 ----
