@@ -2,7 +2,9 @@
 
 package assert
 
-import "testing"
+import (
+	"testing"
+)
 
 // Assertion 是对 testing.TB 进行了简单的封装。
 // 可以以对象的方式调用包中的各个断言函数。
@@ -89,6 +91,14 @@ func (a *Assertion) ErrorType(expr interface{}, typ error, msg ...interface{}) *
 // NotError 参照 assert.NotError() 函数
 func (a *Assertion) NotError(expr interface{}, msg ...interface{}) *Assertion {
 	NotError(a.t, expr, msg...)
+	return a
+}
+
+// ErrorIs 断言 expr 为 target 类型
+//
+// 相当于 a.True(errors.Is(expr, target))
+func (a *Assertion) ErrorIs(expr, target error, msg ...interface{}) *Assertion {
+	ErrorIs(a.t, expr, target, msg...)
 	return a
 }
 

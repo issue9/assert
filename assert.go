@@ -3,6 +3,7 @@
 package assert
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -196,7 +197,9 @@ func ErrorString(t testing.TB, expr interface{}, str string, args ...interface{}
 
 // ErrorType 断言有错误发生且错误的类型与 typ 的类型相同
 //
-// 传递未初始化的 error 值(var err error = nil)，将断言失败
+// 传递未初始化的 error 值(var err error = nil)，将断言失败。
+//
+// 仅对 expr 是否与 typ 为同一类型作简单判断，如果要检测是否是包含关系，可以使用 errors.Is 检测。
 func ErrorType(t testing.TB, expr interface{}, typ error, args ...interface{}) {
 	if IsNil(expr) { // 空值，必定没有错误
 		assert(t, false, args, []interface{}{"ErrorType 失败，实际值为 Nil：[%T]", expr})
@@ -221,6 +224,13 @@ func NotError(t testing.TB, expr interface{}, args ...interface{}) {
 	}
 	err, ok := expr.(error)
 	assert(t, !ok, args, []interface{}{"NotError 失败，错误信息为[%v]", err})
+}
+
+// ErrorIs 断言 expr 为 target 类型
+//
+// 相当于 True(t, errors.Is(expr, target))
+func ErrorIs(t testing.TB, expr, target error, args ...interface{}) {
+	assert(t, errors.Is(expr, target), args, []interface{}{"ErrorIs 失败，expr 不是且不包含 target。"})
 }
 
 // FileExists 断言文件存在
