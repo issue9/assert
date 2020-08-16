@@ -229,8 +229,11 @@ func NotError(t testing.TB, expr interface{}, args ...interface{}) {
 // ErrorIs 断言 expr 为 target 类型
 //
 // 相当于 True(t, errors.Is(expr, target))
-func ErrorIs(t testing.TB, expr, target error, args ...interface{}) {
-	assert(t, errors.Is(expr, target), args, []interface{}{"ErrorIs 失败，expr 不是且不包含 target。"})
+func ErrorIs(t testing.TB, expr interface{}, target error, args ...interface{}) {
+	err, ok := expr.(error)
+	assert(t, !ok, args, []interface{}{"ErrorIs 失败，expr 无法转换成 error。"})
+
+	assert(t, errors.Is(err, target), args, []interface{}{"ErrorIs 失败，expr 不是且不包含 target。"})
 }
 
 // FileExists 断言文件存在
