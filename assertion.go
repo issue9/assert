@@ -2,9 +2,7 @@
 
 package assert
 
-import (
-	"testing"
-)
+import "testing"
 
 // Assertion 是对 testing.TB 进行了简单的封装。
 // 可以以对象的方式调用包中的各个断言函数。
