@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-// Package assert 是对 testing 包的一些简单包装。
-// 方便在测试包里少写一点代码。
+// Package assert 是对 testing 包的一些简单包装
 //
 // 提供了两种操作方式：直接调用包函数；或是使用 Assertion 对象。
 // 两种方式完全等价，可以根据自己需要，选择一种。

@@ -4,6 +4,7 @@ package assert
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 )
 
@@ -54,4 +55,8 @@ func TestAssertion(t *testing.T) {
 
 	a.FileExists("./assert.go", "a.FileExists(c:/windows) failed").
 		FileNotExists("c:/win", "a.FileNotExists(c:/win) failed")
+
+	err1 := errors.New("err1")
+	err2 := fmt.Errorf("err2 with %w", err1)
+	a.ErrorIs(err2, err1)
 }
