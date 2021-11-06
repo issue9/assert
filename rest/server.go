@@ -34,7 +34,7 @@ func NewTLSServer(t testing.TB, h http.Handler, client *http.Client) *Server {
 
 func newServer(t testing.TB, srv *httptest.Server, client *http.Client) *Server {
 	if client == nil {
-		client = http.DefaultClient
+		client = &http.Client{}
 	}
 
 	return &Server{
