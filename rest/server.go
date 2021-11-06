@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
 
-// Package rest 简单的 API 测试库
 package rest
 
 import (
@@ -45,6 +44,6 @@ func newServer(t testing.TB, srv *httptest.Server, client *http.Client) *Server 
 }
 
 // Close 停止服务
-func (srv *Server) Close() {
-	srv.server.Close()
-}
+func (srv *Server) Close() { srv.server.Close() }
+
+func (srv *Server) Assertion() *assert.Assertion { return srv.assertion }
