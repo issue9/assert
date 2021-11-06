@@ -62,6 +62,7 @@ func TestAssertion(t *testing.T) {
 	a.ErrorIs(err2, err1)
 
 	// zero
+
 	a.Zero(0)
 	a.Zero(nil)
 	a.Zero(time.Time{})
@@ -71,4 +72,19 @@ func TestAssertion(t *testing.T) {
 	a.NotZero([]int{0, 0})
 	a.NotZero([]int{})
 	a.NotZero(&time.Time{})
+
+	// length
+
+	a.Length([]int{1, 2}, 2)
+	a.Length([3]int{1, 2, 3}, 3)
+	a.NotLength([3]int{1, 2, 3}, 2)
+	a.Length(map[string]string{"1": "1", "2": "2"}, 2)
+	a.NotLength(map[string]string{"1": "1", "2": "2"}, 3)
+	slices := []rune{'a', 'b', 'c'}
+	ps := &slices
+	pps := &ps
+	a.Length(pps, 3)
+	a.NotLength(pps, 2)
+	a.Length("abcde", 5)
+	a.NotLength("abcde", 4)
 }

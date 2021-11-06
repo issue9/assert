@@ -327,3 +327,26 @@ func NotZero(t testing.TB, v interface{}, args ...interface{}) {
 	isZero := v == nil || reflect.ValueOf(v).IsZero()
 	assert(t, !isZero, args, []interface{}{"%#v 为零值", v})
 }
+
+func Length(t testing.TB, v interface{}, l int, args ...interface{}) {
+	rl := getLen(v)
+	assert(t, rl == l, args, []interface{}{"并非预期的长度，元素长度：%d, 期望的长度：%d", rl, l})
+}
+
+func NotLength(t testing.TB, v interface{}, l int, args ...interface{}) {
+	rl := getLen(v)
+	assert(t, rl != l, args, []interface{}{"长度均为 %d", rl})
+}
+
+func getLen(v interface{}) int {
+	r := reflect.ValueOf(v)
+	for r.Kind() == reflect.Ptr {
+		r = r.Elem()
+	}
+
+	switch r.Kind() {
+	case reflect.Array, reflect.String, reflect.Slice, reflect.Map:
+		return r.Len()
+	}
+	return -1
+}

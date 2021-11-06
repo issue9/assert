@@ -163,3 +163,13 @@ func (a *Assertion) NotZero(v interface{}, msg ...interface{}) *Assertion {
 	NotZero(a.t, v, msg...)
 	return a
 }
+
+func (a *Assertion) Length(v interface{}, l int, msg ...interface{}) *Assertion {
+	Length(a.t, v, l, msg)
+	return a
+}
+
+func (a *Assertion) NotLength(v interface{}, l int, msg ...interface{}) *Assertion {
+	NotLength(a.t, v, l, msg)
+	return a
+}
