@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"testing"
+	"time"
 )
 
 func TestAssertion(t *testing.T) {
@@ -59,4 +60,15 @@ func TestAssertion(t *testing.T) {
 	err1 := errors.New("err1")
 	err2 := fmt.Errorf("err2 with %w", err1)
 	a.ErrorIs(err2, err1)
+
+	// zero
+	a.Zero(0)
+	a.Zero(nil)
+	a.Zero(time.Time{})
+	a.Zero(v5)
+	a.Zero([2]int{0, 0})
+	a.Zero([0]int{})
+	a.NotZero([]int{0, 0})
+	a.NotZero([]int{})
+	a.NotZero(&time.Time{})
 }

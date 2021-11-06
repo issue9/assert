@@ -277,3 +277,9 @@ func TestContains(t *testing.T) {
 func TestNotContains(t *testing.T) {
 	NotContains(t, []int{1, 2, 3}, []int8{1, 3})
 }
+
+func TestZero(t *testing.T) {
+	Zero(t, 0)
+	Zero(t, time.Time{})
+	NotZero(t, &time.Time{})
+}

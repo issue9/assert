@@ -33,7 +33,7 @@ func getCallerInfo() string {
 		// 定位函数名为 Test 开头的行。
 		// 为什么要定位到 TestXxx 函数，是因为考虑以下情况：
 		//  func isOK(val interface{}, t *testing.T) {
-		//      // do somthing
+		//      // do something
 		//      assert.True(t, val)  // (1
 		//  }
 		//
@@ -310,4 +310,20 @@ func Contains(t testing.TB, container, item interface{}, args ...interface{}) {
 func NotContains(t testing.TB, container, item interface{}, args ...interface{}) {
 	assert(t, !IsContains(container, item), args,
 		[]interface{}{"container:[%v]包含item[%v]", container, item})
+}
+
+// Zero 断言是否为零值
+//
+// 最终调用的是 reflect.Value.IsZero 进行判断
+func Zero(t testing.TB, v interface{}, args ...interface{}) {
+	isZero := v == nil || reflect.ValueOf(v).IsZero()
+	assert(t, isZero, args, []interface{}{"%#v 为非零值", v})
+}
+
+// NotZero 断言是否为非零值
+//
+// 最终调用的是 reflect.Value.IsZero 进行判断
+func NotZero(t testing.TB, v interface{}, args ...interface{}) {
+	isZero := v == nil || reflect.ValueOf(v).IsZero()
+	assert(t, !isZero, args, []interface{}{"%#v 为零值", v})
 }

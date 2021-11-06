@@ -259,7 +259,7 @@ func IsContains(container, item interface{}) bool {
 	case []rune:
 		switch i := iv.Interface().(type) {
 		case string:
-			return strings.Contains(string(c), string(i))
+			return strings.Contains(string(c), i)
 		case []byte:
 			return strings.Contains(string(c), string(i))
 		case []rune:

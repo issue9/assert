@@ -147,3 +147,19 @@ func (a *Assertion) NotContains(container, item interface{}, msg ...interface{})
 	NotContains(a.t, container, item, msg...)
 	return a
 }
+
+// Zero 断言是否为零值
+//
+// 最终调用的是 reflect.Value.IsZero 进行判断
+func (a *Assertion) Zero(v interface{}, msg ...interface{}) *Assertion {
+	Zero(a.t, v, msg...)
+	return a
+}
+
+// NotZero 断言是否为非零值
+//
+// 最终调用的是 reflect.Value.IsZero 进行判断
+func (a *Assertion) NotZero(v interface{}, msg ...interface{}) *Assertion {
+	NotZero(a.t, v, msg...)
+	return a
+}
