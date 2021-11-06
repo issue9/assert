@@ -89,6 +89,12 @@ func TestIsEqual(t *testing.T) {
 	neq(true, "1")
 	// 判断包含不同键名的两个map
 	neq(map[int]int{1: 1, 2: 2}, map[int]int{5: 5, 6: 6})
+
+	// time
+	loc := time.FixedZone("utf+8", 8*3600)
+	now := time.Now()
+	eq(time.Time{}, time.Time{})
+	neq(now.In(loc), now.In(time.UTC)) // 时区不同
 }
 
 func TestIsEmpty(t *testing.T) {
