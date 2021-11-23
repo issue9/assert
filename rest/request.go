@@ -5,6 +5,7 @@ package rest
 import (
 	"bytes"
 	"encoding/json"
+	"encoding/xml"
 	"io"
 	"net/http"
 	"net/url"
@@ -15,13 +16,13 @@ import (
 
 // Request 请求的参数封装
 type Request struct {
-	path      string
-	method    string
-	body      io.Reader
-	queries   url.Values
-	params    map[string]string
-	headers   map[string]string
-	assertion *assert.Assertion
+	path    string
+	method  string
+	body    io.Reader
+	queries url.Values
+	params  map[string]string
+	headers map[string]string
+	a       *assert.Assertion
 
 	client *http.Client
 	prefix string // 地址前缀
@@ -30,13 +31,13 @@ type Request struct {
 // NewRequest 获取一条请求的结果
 //
 // method 表示请求方法
-// path 表示请求的路径，可以通过 {} 指定参数，比如：
+// path 表示请求的路径，域名部分无须填定。可以通过 {} 指定参数，比如：
 //  r := NewRequest(http.MethodGet, "/users/{id}")
 // 之后就可以使用 Params 指定 id 的具体值，达到复用的目的：
 //  resp1 := r.Param("id", "1").Do()
 //  resp2 := r.Param("id", "2").Do()
 func (srv *Server) NewRequest(method, path string) *Request {
-	req := NewRequest(srv.assertion, srv.client, method, path)
+	req := NewRequest(srv.a, srv.client, method, path)
 	req.prefix = srv.server.URL
 
 	return req
@@ -70,16 +71,17 @@ func (srv *Server) Delete(path string) *Request {
 // NewRequest 创建新的请求实例
 //
 // client 如果为空，则会采用 &http.Client{} 作为其值。
+// path 访问地址，需要包含域名部分，比如采用 httptest.Server.URL 的值。
 func NewRequest(a *assert.Assertion, client *http.Client, method, path string) *Request {
 	if client == nil {
 		client = &http.Client{}
 	}
 
 	return &Request{
-		assertion: a,
-		client:    client,
-		method:    method,
-		path:      path,
+		a:      a,
+		client: client,
+		method: method,
+		path:   path,
 	}
 }
 
@@ -122,11 +124,27 @@ func (req *Request) Body(body []byte) *Request {
 	return req
 }
 
-// JSONBody 指定一个 JSON 格式的 body
-func (req *Request) JSONBody(obj interface{}) *Request {
-	data, err := json.Marshal(obj)
-	req.assertion.NotError(err).NotNil(data)
+// BodyFunc 指定一个未编码的对象
+//
+// marshal 对 obj 的编码函数，比如 json.Marshal 等。
+func (req *Request) BodyFunc(obj interface{}, marshal func(interface{}) ([]byte, error)) *Request {
+	data, err := marshal(obj)
+	req.a.NotError(err).NotNil(data)
 	return req.Body(data)
+}
+
+// JSONBody 指定一个 JSON 格式的 body
+//
+// NOTE: 此函并不会设置 content-type 报头。
+func (req *Request) JSONBody(obj interface{}) *Request {
+	return req.BodyFunc(obj, json.Marshal)
+}
+
+// XMLBody 指定一个 XML 格式的 body
+//
+// NOTE: 此函并不会设置 content-type 报头。
+func (req *Request) XMLBody(obj interface{}) *Request {
+	return req.BodyFunc(obj, xml.Marshal)
 }
 
 func (req *Request) buildPath() string {

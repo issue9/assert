@@ -12,9 +12,9 @@ import (
 
 // Server 测试服务
 type Server struct {
-	assertion *assert.Assertion
-	server    *httptest.Server
-	client    *http.Client
+	a      *assert.Assertion
+	server *httptest.Server
+	client *http.Client
 }
 
 // NewServer 声明新的测试服务
@@ -37,13 +37,13 @@ func newServer(t testing.TB, srv *httptest.Server, client *http.Client) *Server 
 	}
 
 	return &Server{
-		assertion: assert.New(t),
-		server:    srv,
-		client:    client,
+		a:      assert.New(t),
+		server: srv,
+		client: client,
 	}
 }
 
 // Close 停止服务
 func (srv *Server) Close() { srv.server.Close() }
 
-func (srv *Server) Assertion() *assert.Assertion { return srv.assertion }
+func (srv *Server) Assertion() *assert.Assertion { return srv.a }
