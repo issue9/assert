@@ -128,6 +128,8 @@ func (req *Request) Body(body []byte) *Request {
 //
 // marshal 对 obj 的编码函数，比如 json.Marshal 等。
 func (req *Request) BodyFunc(obj interface{}, marshal func(interface{}) ([]byte, error)) *Request {
+	req.a.TB().Helper()
+
 	data, err := marshal(obj)
 	req.a.NotError(err).NotNil(data)
 	return req.Body(data)

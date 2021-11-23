@@ -6,74 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path"
 	"reflect"
-	"runtime"
-	"strconv"
 	"strings"
 	"testing"
 )
-
-// 定位错误信息的触发函数。输出格式为：TestXxx(xxx_test.go:17)。
-func getCallerInfo() string {
-	var info string
-
-	for i := 0; ; i++ {
-		pc, file, line, ok := runtime.Caller(i)
-		if !ok {
-			break
-		}
-
-		// 定位以 _test.go 结尾的文件。
-		basename := path.Base(file)
-		if !strings.HasSuffix(basename, "_test.go") {
-			continue
-		}
-
-		// 定位函数名为 Test 开头的行。
-		// 为什么要定位到 TestXxx 函数，是因为考虑以下情况：
-		//  func isOK(val interface{}, t *testing.T) {
-		//      // do something
-		//      assert.True(t, val)  // (1
-		//  }
-		//
-		//  func TestOK(t *testing.T) {
-		//      isOK("123", t)       // (2
-		//      isOK(123, t)         // (3
-		//  }
-		// 以上这段代码，定位到 (2、(3 的位置比总是定位到 (1 的位置更直观！
-		funcName := runtime.FuncForPC(pc).Name()
-		index := strings.LastIndex(funcName, ".Test")
-		if -1 == index {
-			index = strings.LastIndex(funcName, ".Benchmark")
-			if index == -1 {
-				continue
-			}
-		}
-		funcName = funcName[index+1:]
-
-		// Go1.5 之后的匿名函数为 TestA.func1
-		// 包含以下几种情况：
-		// 调用函数内的匿名函数；
-		// 采用 go func(){} 的形式调用函数内的匿名函数；
-		// 采用 go func(){} 的形式调用外部函数；
-		//
-		// 但是无法处理 go xx() 的情况，该情况直接开启一个新的堆栈信息，无法定位当前函数中的调用位置。
-		if index := strings.IndexByte(funcName, '.'); index > -1 {
-			funcName = funcName[:index]
-			info = funcName + "(" + basename + ":" + strconv.Itoa(line) + ")"
-			continue
-		}
-
-		info = funcName + "(" + basename + ":" + strconv.Itoa(line) + ")"
-		break
-	}
-
-	if info == "" {
-		info = "<无法获取调用者信息>"
-	}
-	return info
-}
 
 // 格式化错误提示信息
 //
@@ -122,8 +58,9 @@ func formatMessage(msg1 []interface{}, msg2 []interface{}) string {
 // 直接使用 True 断言效果是一样的，之所以提供该函数，
 // 主要供库调用，可以提供一个默认的错误信息。
 func Assert(t testing.TB, expr bool, msg1 []interface{}, msg2 []interface{}) {
+	t.Helper()
 	if !expr {
-		t.Error(formatMessage(msg1, msg2) + "@" + getCallerInfo())
+		t.Error(formatMessage(msg1, msg2))
 	}
 }
 
@@ -132,41 +69,49 @@ func Assert(t testing.TB, expr bool, msg1 []interface{}, msg2 []interface{}) {
 // args 对应 fmt.Printf() 函数中的参数，其中 args[0] 对应第一个参数 format，依次类推，
 // 具体可参数 formatMessage() 函数的介绍。其它断言函数的 args 参数，功能与此相同。
 func True(t testing.TB, expr bool, args ...interface{}) {
+	t.Helper()
 	Assert(t, expr, args, []interface{}{"True 失败，实际值为 %#v", expr})
 }
 
 // False 断言表达式 expr 为 false
 func False(t testing.TB, expr bool, args ...interface{}) {
+	t.Helper()
 	Assert(t, !expr, args, []interface{}{"False 失败，实际值为 %#v", expr})
 }
 
 // Nil 断言表达式 expr 为 nil
 func Nil(t testing.TB, expr interface{}, args ...interface{}) {
+	t.Helper()
 	Assert(t, IsNil(expr), args, []interface{}{"Nil 失败，实际值为 %#v", expr})
 }
 
 // NotNil 断言表达式 expr 为非 nil 值
 func NotNil(t testing.TB, expr interface{}, args ...interface{}) {
+	t.Helper()
 	Assert(t, !IsNil(expr), args, []interface{}{"NotNil 失败，实际值为 %#v", expr})
 }
 
 // Equal 断言 v1 与 v2 两个值相等
 func Equal(t testing.TB, v1, v2 interface{}, args ...interface{}) {
+	t.Helper()
 	Assert(t, IsEqual(v1, v2), args, []interface{}{"Equal 失败，实际值为\nv1=%#v\nv2=%#v", v1, v2})
 }
 
 // NotEqual 断言 v1 与 v2 两个值不相等
 func NotEqual(t testing.TB, v1, v2 interface{}, args ...interface{}) {
+	t.Helper()
 	Assert(t, !IsEqual(v1, v2), args, []interface{}{"NotEqual 失败，实际值为\nv1=%#v\nv2=%#v", v1, v2})
 }
 
 // Empty 断言 expr 的值为空(nil,"",0,false)，否则输出错误信息
 func Empty(t testing.TB, expr interface{}, args ...interface{}) {
+	t.Helper()
 	Assert(t, IsEmpty(expr), args, []interface{}{"Empty 失败，实际值为 %#v", expr})
 }
 
 // NotEmpty 断言 expr 的值为非空(除 nil,"",0,false之外)，否则输出错误信息
 func NotEmpty(t testing.TB, expr interface{}, args ...interface{}) {
+	t.Helper()
 	Assert(t, !IsEmpty(expr), args, []interface{}{"NotEmpty 失败，实际值为 %#v", expr})
 }
 
@@ -174,6 +119,8 @@ func NotEmpty(t testing.TB, expr interface{}, args ...interface{}) {
 //
 // 传递未初始化的 error 值(var err error = nil)，将断言失败
 func Error(t testing.TB, expr interface{}, args ...interface{}) {
+	t.Helper()
+
 	if IsNil(expr) { // 空值，必定没有错误
 		Assert(t, false, args, []interface{}{"Error 失败，实际值为 Nil：[%T]", expr})
 		return
@@ -187,6 +134,8 @@ func Error(t testing.TB, expr interface{}, args ...interface{}) {
 //
 // 传递未初始化的 error 值(var err error = nil)，将断言失败
 func ErrorString(t testing.TB, expr interface{}, str string, args ...interface{}) {
+	t.Helper()
+
 	if IsNil(expr) { // 空值，必定没有错误
 		Assert(t, false, args, []interface{}{"ErrorString 失败，实际值为 Nil：[%T]", expr})
 		return
@@ -209,6 +158,8 @@ func ErrorString(t testing.TB, expr interface{}, str string, args ...interface{}
 // 返回的 err 是一个 os.PathError 类型，用 ErrorType(err, &os.PathError{}) 断方正常；
 // 而 ErrorIs(err, &os.PathError{}) 则会断言失败。
 func ErrorType(t testing.TB, expr interface{}, typ error, args ...interface{}) {
+	t.Helper()
+
 	if IsNil(expr) { // 空值，必定没有错误
 		Assert(t, false, args, []interface{}{"ErrorType 失败，实际值为 Nil：[%T]", expr})
 		return
@@ -226,6 +177,8 @@ func ErrorType(t testing.TB, expr interface{}, typ error, args ...interface{}) {
 
 // NotError 断言没有错误发生
 func NotError(t testing.TB, expr interface{}, args ...interface{}) {
+	t.Helper()
+
 	if IsNil(expr) { // 空值必定没有错误
 		Assert(t, true, args, []interface{}{"NotError 失败，实际类型为[%T]", expr})
 		return
@@ -238,6 +191,8 @@ func NotError(t testing.TB, expr interface{}, args ...interface{}) {
 //
 // 相当于 True(t, errors.Is(expr, target))
 func ErrorIs(t testing.TB, expr interface{}, target error, args ...interface{}) {
+	t.Helper()
+
 	err, ok := expr.(error)
 	Assert(t, ok, args, []interface{}{"ErrorIs 失败，expr 无法转换成 error。"})
 
@@ -246,8 +201,9 @@ func ErrorIs(t testing.TB, expr interface{}, target error, args ...interface{}) 
 
 // FileExists 断言文件存在
 func FileExists(t testing.TB, path string, args ...interface{}) {
-	_, err := os.Stat(path)
+	t.Helper()
 
+	_, err := os.Stat(path)
 	if err != nil && !os.IsExist(err) {
 		Assert(t, false, args, []interface{}{"FileExists 失败，且附带以下错误：%v", err})
 	}
@@ -255,8 +211,9 @@ func FileExists(t testing.TB, path string, args ...interface{}) {
 
 // FileNotExists 断言文件不存在
 func FileNotExists(t testing.TB, path string, args ...interface{}) {
-	_, err := os.Stat(path)
+	t.Helper()
 
+	_, err := os.Stat(path)
 	if err == nil {
 		Assert(t, false, args, []interface{}{"FileNotExists 失败"})
 	}
@@ -267,12 +224,16 @@ func FileNotExists(t testing.TB, path string, args ...interface{}) {
 
 // Panic 断言函数会发生 panic
 func Panic(t testing.TB, fn func(), args ...interface{}) {
+	t.Helper()
+
 	has, _ := HasPanic(fn)
 	Assert(t, has, args, []interface{}{"并未发生 panic"})
 }
 
 // PanicString 断言函数会发生 panic 且 panic 信息中包含指定的字符串内容
 func PanicString(t testing.TB, fn func(), str string, args ...interface{}) {
+	t.Helper()
+
 	if has, msg := HasPanic(fn); has {
 		index := strings.Index(fmt.Sprint(msg), str)
 		Assert(t, index >= 0, args, []interface{}{"panic 中并未包含 %s", str})
@@ -284,6 +245,8 @@ func PanicString(t testing.TB, fn func(), str string, args ...interface{}) {
 
 // PanicType 断言函数会发生 panic 且抛出指定的类型
 func PanicType(t testing.TB, fn func(), typ interface{}, args ...interface{}) {
+	t.Helper()
+
 	has, msg := HasPanic(fn)
 	if !has {
 		return
@@ -297,6 +260,8 @@ func PanicType(t testing.TB, fn func(), typ interface{}, args ...interface{}) {
 
 // NotPanic 断言函数不会发生 panic
 func NotPanic(t testing.TB, fn func(), args ...interface{}) {
+	t.Helper()
+
 	has, msg := HasPanic(fn)
 	Assert(t, !has, args, []interface{}{"发生了 panic，其信息为[%v]", msg})
 }
@@ -305,12 +270,16 @@ func NotPanic(t testing.TB, fn func(), args ...interface{}) {
 //
 // 具体函数说明可参考 IsContains()
 func Contains(t testing.TB, container, item interface{}, args ...interface{}) {
+	t.Helper()
+
 	Assert(t, IsContains(container, item), args,
 		[]interface{}{"container:[%v]并未包含item[%v]", container, item})
 }
 
 // NotContains 断言 container 不包含 item 的或是不包含 item 中的所有项
 func NotContains(t testing.TB, container, item interface{}, args ...interface{}) {
+	t.Helper()
+
 	Assert(t, !IsContains(container, item), args,
 		[]interface{}{"container:[%v]包含item[%v]", container, item})
 }
@@ -319,6 +288,8 @@ func NotContains(t testing.TB, container, item interface{}, args ...interface{})
 //
 // 最终调用的是 reflect.Value.IsZero 进行判断
 func Zero(t testing.TB, v interface{}, args ...interface{}) {
+	t.Helper()
+
 	isZero := v == nil || reflect.ValueOf(v).IsZero()
 	Assert(t, isZero, args, []interface{}{"%#v 为非零值", v})
 }
@@ -327,16 +298,22 @@ func Zero(t testing.TB, v interface{}, args ...interface{}) {
 //
 // 最终调用的是 reflect.Value.IsZero 进行判断
 func NotZero(t testing.TB, v interface{}, args ...interface{}) {
+	t.Helper()
+
 	isZero := v == nil || reflect.ValueOf(v).IsZero()
 	Assert(t, !isZero, args, []interface{}{"%#v 为零值", v})
 }
 
 func Length(t testing.TB, v interface{}, l int, args ...interface{}) {
+	t.Helper()
+
 	rl := getLen(v)
 	Assert(t, rl == l, args, []interface{}{"并非预期的长度，元素长度：%d, 期望的长度：%d", rl, l})
 }
 
 func NotLength(t testing.TB, v interface{}, l int, args ...interface{}) {
+	t.Helper()
+
 	rl := getLen(v)
 	Assert(t, rl != l, args, []interface{}{"长度均为 %d", rl})
 }

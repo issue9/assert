@@ -8,72 +8,6 @@ import (
 	"time"
 )
 
-func BenchmarkGetCallerInfo(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		str := getCallerInfo()
-
-		if str != "BenchmarkGetCallerInfo(assert_test.go:15)" {
-			b.Errorf("getCallerInfo 返回的信息不正确，其返回值为：%v", str)
-		}
-	}
-}
-
-func TestGetCallerInfo(t *testing.T) {
-	str := getCallerInfo()
-	// NOTE:注意这里涉及到调用函数的行号信息
-	if str != "TestGetCallerInfo(assert_test.go:22)" {
-		t.Errorf("getCallerInfo 返回的信息不正确，其返回值为：%v", str)
-	}
-
-	// 嵌套调用，第二个参数为当前的行号
-	testGetCallerInfo(t, "29")
-	testGetCallerInfo(t, "30")
-
-	// 闭合函数，line 为调用所在的行号。
-	f := func(line string) {
-		str := getCallerInfo()
-		if str != "TestGetCallerInfo(assert_test.go:"+line+")" {
-			t.Errorf("getCallerInfo 返回的信息不正确，其返回值为：%v", str)
-		}
-	}
-
-	go func() {
-		f("41")
-	}()
-	go func() {
-		testGetCallerInfo(t, "44")
-	}()
-
-	// bug: 无法处理的情况，go 会新开协程，无法获取当前的行号
-	//go f("50")
-	//go testGetCallerInfo(t, "51")
-
-	f("51") // 参数为当前等号
-	f("52")
-
-	ff := func(line string) {
-		f(line)
-	}
-	go func() {
-		ff("58")
-	}()
-
-	// NOTE: 无法处理的情况
-	/*go func() {
-		go ff("63")
-	}()*/
-
-	time.Sleep(500 * time.Microsecond)
-}
-
-// 参数 line，为调用此函数所在的行号。
-func testGetCallerInfo(t *testing.T, line string) {
-	str := getCallerInfo()
-	if str != "TestGetCallerInfo(assert_test.go:"+line+")" {
-		t.Errorf("getCallerInfo返回的信息不正确，其返回值为：%v", str)
-	}
-}
-
 func TestFormatMsg(t *testing.T) {
 	msg1 := []interface{}{}
 	msg2 := []interface{}{[]rune("msg:%v"), 2}
@@ -118,14 +52,9 @@ func TestFormatMsg(t *testing.T) {
 	}
 }
 
-func TestTrue(t *testing.T) {
+func TestBool(t *testing.T) {
 	True(t, true)
-	True(t, 1 == 1, "True(1==1) failed")
-}
-
-func TestFalse(t *testing.T) {
 	False(t, false, "False failed")
-	False(t, 1 == 2, "False(1==2) failed")
 }
 
 func TestNil(t *testing.T) {
