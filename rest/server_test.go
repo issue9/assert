@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/issue9/assert"
+	"github.com/issue9/assert/v2"
 )
 
 func TestNew(t *testing.T) {

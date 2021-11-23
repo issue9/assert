@@ -6,7 +6,7 @@ package rest
 import (
 	"net/http"
 
-	"github.com/issue9/assert"
+	"github.com/issue9/assert/v2"
 )
 
 // BuildHandler 生成用于测试的 http.Handler 对象

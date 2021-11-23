@@ -8,7 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/issue9/assert"
+	"github.com/issue9/assert/v2"
 )
 
 // Response 测试请求的返回结构

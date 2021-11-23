@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/issue9/assert"
+	"github.com/issue9/assert/v2"
 )
 
 func TestRequest_Do(t *testing.T) {
