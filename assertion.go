@@ -45,11 +45,11 @@ func New(tb testing.TB, fatal bool) *Assertion {
 // NewWithEnv 以指定的环境变量初始化 *Assertion 对象
 //
 // 最后会以 t.Setenv 的形式调用。
-func NewWithEnv(t testing.TB, env map[string]string) *Assertion {
+func NewWithEnv(tb testing.TB, fatal bool, env map[string]string) *Assertion {
 	for k, v := range env {
-		t.Setenv(k, v)
+		tb.Setenv(k, v)
 	}
-	return New(t)
+	return New(tb, fatal)
 }
 
 // Assert 断言 expr 条件成立
