@@ -113,7 +113,7 @@ func formatMessage(msg1 []interface{}, msg2 []interface{}) string {
 	return fmt.Sprintf(format, msg[1:]...)
 }
 
-// 当 expr 条件不成立时
+// 断言 expr 条件成立
 //
 // expr 返回结果值为bool类型的表达式；
 // msg1,msg2 输出的错误信息，之所以提供两组信息，是方便在用户没有提供的情况下，

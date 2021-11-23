@@ -6,84 +6,85 @@ import "testing"
 
 // Assertion 可以以对象的方式调用包中的各个断言函数
 type Assertion struct {
-	t testing.TB
+	tb    testing.TB
+	suite suite
 }
 
 // New 返回 Assertion 对象。
-func New(t testing.TB) *Assertion { return &Assertion{t: t} }
+func New(tb testing.TB) *Assertion { return &Assertion{tb: tb} }
 
 // TB 返回 testing.TB 接口
-func (a *Assertion) TB() testing.TB { return a.t }
+func (a *Assertion) TB() testing.TB { return a.tb }
 
 // True 参照 assert.True() 函数
 func (a *Assertion) True(expr bool, msg ...interface{}) *Assertion {
-	True(a.t, expr, msg...)
+	True(a.tb, expr, msg...)
 	return a
 }
 
 // False 参照 assert.False() 函数
 func (a *Assertion) False(expr bool, msg ...interface{}) *Assertion {
-	False(a.t, expr, msg...)
+	False(a.tb, expr, msg...)
 	return a
 }
 
 // Nil 参照 assert.Nil() 函数
 func (a *Assertion) Nil(expr interface{}, msg ...interface{}) *Assertion {
-	Nil(a.t, expr, msg...)
+	Nil(a.tb, expr, msg...)
 	return a
 }
 
 // NotNil 参照 assert.NotNil() 函数
 func (a *Assertion) NotNil(expr interface{}, msg ...interface{}) *Assertion {
-	NotNil(a.t, expr, msg...)
+	NotNil(a.tb, expr, msg...)
 	return a
 }
 
 // Equal 参照 assert.Equal() 函数
 func (a *Assertion) Equal(v1, v2 interface{}, msg ...interface{}) *Assertion {
-	Equal(a.t, v1, v2, msg...)
+	Equal(a.tb, v1, v2, msg...)
 	return a
 }
 
 // NotEqual 参照 assert.NotEqual() 函数
 func (a *Assertion) NotEqual(v1, v2 interface{}, msg ...interface{}) *Assertion {
-	NotEqual(a.t, v1, v2, msg...)
+	NotEqual(a.tb, v1, v2, msg...)
 	return a
 }
 
 // Empty 参照 assert.Empty() 函数
 func (a *Assertion) Empty(expr interface{}, msg ...interface{}) *Assertion {
-	Empty(a.t, expr, msg...)
+	Empty(a.tb, expr, msg...)
 	return a
 }
 
 // NotEmpty 参照 assert.NotEmpty() 函数
 func (a *Assertion) NotEmpty(expr interface{}, msg ...interface{}) *Assertion {
-	NotEmpty(a.t, expr, msg...)
+	NotEmpty(a.tb, expr, msg...)
 	return a
 }
 
 // Error 参照 assert.Error() 函数
 func (a *Assertion) Error(expr interface{}, msg ...interface{}) *Assertion {
-	Error(a.t, expr, msg...)
+	Error(a.tb, expr, msg...)
 	return a
 }
 
 // ErrorString 参照 assert.ErrorString() 函数
 func (a *Assertion) ErrorString(expr interface{}, str string, msg ...interface{}) *Assertion {
-	ErrorString(a.t, expr, str, msg...)
+	ErrorString(a.tb, expr, str, msg...)
 	return a
 }
 
 // ErrorType 参照 assert.ErrorType() 函数
 func (a *Assertion) ErrorType(expr interface{}, typ error, msg ...interface{}) *Assertion {
-	ErrorType(a.t, expr, typ, msg...)
+	ErrorType(a.tb, expr, typ, msg...)
 	return a
 }
 
 // NotError 参照 assert.NotError() 函数
 func (a *Assertion) NotError(expr interface{}, msg ...interface{}) *Assertion {
-	NotError(a.t, expr, msg...)
+	NotError(a.tb, expr, msg...)
 	return a
 }
 
@@ -91,55 +92,55 @@ func (a *Assertion) NotError(expr interface{}, msg ...interface{}) *Assertion {
 //
 // 相当于 a.True(errors.Is(expr, target))
 func (a *Assertion) ErrorIs(expr interface{}, target error, msg ...interface{}) *Assertion {
-	ErrorIs(a.t, expr, target, msg...)
+	ErrorIs(a.tb, expr, target, msg...)
 	return a
 }
 
 // FileExists 参照 assert.FileExists() 函数
 func (a *Assertion) FileExists(path string, msg ...interface{}) *Assertion {
-	FileExists(a.t, path, msg...)
+	FileExists(a.tb, path, msg...)
 	return a
 }
 
 // FileNotExists 参照 assert.FileNotExists() 函数
 func (a *Assertion) FileNotExists(path string, msg ...interface{}) *Assertion {
-	FileNotExists(a.t, path, msg...)
+	FileNotExists(a.tb, path, msg...)
 	return a
 }
 
 // Panic 参照 assert.Panic() 函数
 func (a *Assertion) Panic(fn func(), msg ...interface{}) *Assertion {
-	Panic(a.t, fn, msg...)
+	Panic(a.tb, fn, msg...)
 	return a
 }
 
 // PanicString 参照 assert.PanicString() 函数
 func (a *Assertion) PanicString(fn func(), str string, msg ...interface{}) *Assertion {
-	PanicString(a.t, fn, str, msg...)
+	PanicString(a.tb, fn, str, msg...)
 	return a
 }
 
 // PanicType 参照 assert.PanicType() 函数
 func (a *Assertion) PanicType(fn func(), typ interface{}, msg ...interface{}) *Assertion {
-	PanicType(a.t, fn, typ, msg...)
+	PanicType(a.tb, fn, typ, msg...)
 	return a
 }
 
 // NotPanic 参照 assert.NotPanic() 函数
 func (a *Assertion) NotPanic(fn func(), msg ...interface{}) *Assertion {
-	NotPanic(a.t, fn, msg...)
+	NotPanic(a.tb, fn, msg...)
 	return a
 }
 
 // Contains 参照 assert.Contains() 函数
 func (a *Assertion) Contains(container, item interface{}, msg ...interface{}) *Assertion {
-	Contains(a.t, container, item, msg...)
+	Contains(a.tb, container, item, msg...)
 	return a
 }
 
 // NotContains 参照 assert.NotContains() 函数
 func (a *Assertion) NotContains(container, item interface{}, msg ...interface{}) *Assertion {
-	NotContains(a.t, container, item, msg...)
+	NotContains(a.tb, container, item, msg...)
 	return a
 }
 
@@ -147,7 +148,7 @@ func (a *Assertion) NotContains(container, item interface{}, msg ...interface{})
 //
 // 最终调用的是 reflect.Value.IsZero 进行判断
 func (a *Assertion) Zero(v interface{}, msg ...interface{}) *Assertion {
-	Zero(a.t, v, msg...)
+	Zero(a.tb, v, msg...)
 	return a
 }
 
@@ -155,16 +156,16 @@ func (a *Assertion) Zero(v interface{}, msg ...interface{}) *Assertion {
 //
 // 最终调用的是 reflect.Value.IsZero 进行判断
 func (a *Assertion) NotZero(v interface{}, msg ...interface{}) *Assertion {
-	NotZero(a.t, v, msg...)
+	NotZero(a.tb, v, msg...)
 	return a
 }
 
 func (a *Assertion) Length(v interface{}, l int, msg ...interface{}) *Assertion {
-	Length(a.t, v, l, msg)
+	Length(a.tb, v, l, msg)
 	return a
 }
 
 func (a *Assertion) NotLength(v interface{}, l int, msg ...interface{}) *Assertion {
-	NotLength(a.t, v, l, msg)
+	NotLength(a.tb, v, l, msg)
 	return a
 }
