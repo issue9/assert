@@ -128,33 +128,23 @@ func (a *Assertion) NotEmpty(expr interface{}, msg ...interface{}) *Assertion {
 // Error 断言有错误发生
 //
 // 传递未初始化的 error 值(var err error = nil)，将断言失败
-func (a *Assertion) Error(expr interface{}, msg ...interface{}) *Assertion {
+func (a *Assertion) Error(expr error, msg ...interface{}) *Assertion {
 	a.TB().Helper()
-
-	if IsNil(expr) { // 空值，必定没有错误
-		return a.Assert(false, msg, []interface{}{"Error 失败，实际值为 Nil：%T", expr})
-	}
-
-	_, ok := expr.(error)
-	return a.Assert(ok, msg, []interface{}{"Error 失败，实际类型为 %T", expr})
+	return a.Assert(!IsNil(expr), msg, []interface{}{"Error 失败，实际值为 Nil：%T", expr})
 }
 
 // ErrorString 断言有错误发生且错误信息中包含指定的字符串 str
 //
 // 传递未初始化的 error 值(var err error = nil)，将断言失败
-func (a *Assertion) ErrorString(expr interface{}, str string, msg ...interface{}) *Assertion {
+func (a *Assertion) ErrorString(expr error, str string, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
 	if IsNil(expr) { // 空值，必定没有错误
 		return a.Assert(false, msg, []interface{}{"ErrorString 失败，实际值为 Nil：%T", expr})
 	}
 
-	if err, ok := expr.(error); ok {
-		index := strings.Index(err.Error(), str)
-		return a.Assert(index >= 0, msg, []interface{}{"Error 失败，实际类型为%T", expr})
-	}
-
-	return a
+	index := strings.Index(expr.Error(), str)
+	return a.Assert(index >= 0, msg, []interface{}{"Error 失败，实际类型为%T", expr})
 }
 
 // ErrorType 断言有错误发生且错误的类型与 typ 的类型相同
@@ -165,17 +155,13 @@ func (a *Assertion) ErrorString(expr interface{}, str string, msg ...interface{}
 //
 // ErrorType 与 ErrorIs 有本质的区别：ErrorIs 检测是否是包含关系，而 ErrorType 检测是否类型相同。比如：
 //  err := os.WriteFile(...)
-// 返回的 err 是一个 os.PathError 类型，用 ErrorType(err, &os.PathError{}) 断方正常；
+// 返回的 err 是一个 os.PathError 类型，用 ErrorType(err, &os.PathError{}) 判断为正常；
 // 而 ErrorIs(err, &os.PathError{}) 则会断言失败。
-func (a *Assertion) ErrorType(expr interface{}, typ error, msg ...interface{}) *Assertion {
+func (a *Assertion) ErrorType(expr, typ error, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
 	if IsNil(expr) { // 空值，必定没有错误
 		return a.Assert(false, msg, []interface{}{"ErrorType 失败，实际值为 Nil：%T", expr})
-	}
-
-	if _, ok := expr.(error); !ok {
-		return a.Assert(false, msg, []interface{}{"ErrorType 失败，实际类型为：%T，且无法转换成 error 接口", expr})
 	}
 
 	t1 := reflect.TypeOf(expr)
@@ -183,27 +169,17 @@ func (a *Assertion) ErrorType(expr interface{}, typ error, msg ...interface{}) *
 	return a.Assert(t1 == t2, msg, []interface{}{"ErrorType 失败，v1[%T]为一个错误类型，但与v2[%T]的类型不相同", t1, t2})
 }
 
-func (a *Assertion) NotError(expr interface{}, msg ...interface{}) *Assertion {
-	a.TB().Helper()
-
-	if IsNil(expr) { // 空值必定没有错误
-		return a.Assert(true, msg, []interface{}{"NotError 失败，实际类型为：%T", expr})
-	}
-	err, ok := expr.(error)
-	return a.Assert(!ok, msg, []interface{}{"NotError 失败，错误信息为：%v", err})
-}
-
 // ErrorIs 断言 expr 为 target 类型
 //
 // 相当于 a.True(errors.Is(expr, target))
-func (a *Assertion) ErrorIs(expr interface{}, target error, msg ...interface{}) *Assertion {
+func (a *Assertion) ErrorIs(expr, target error, msg ...interface{}) *Assertion {
 	a.TB().Helper()
+	return a.Assert(errors.Is(expr, target), msg, []interface{}{"ErrorIs 失败，expr 不是且不包含 target。"})
+}
 
-	err, ok := expr.(error)
-	if !ok {
-		return a.Assert(false, msg, []interface{}{"ErrorIs 失败，expr 无法转换成 error。"})
-	}
-	return a.Assert(errors.Is(err, target), msg, []interface{}{"ErrorIs 失败，expr 不是且不包含 target。"})
+func (a *Assertion) NotError(expr error, msg ...interface{}) *Assertion {
+	a.TB().Helper()
+	return a.Assert(IsNil(expr), msg, []interface{}{"NotError 失败，实际类型为：%T", expr})
 }
 
 func (a *Assertion) FileExists(path string, msg ...interface{}) *Assertion {

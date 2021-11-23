@@ -66,7 +66,7 @@ func TestAssertion_Error(t *testing.T) {
 	a := New(t, false)
 
 	err := errors.New("test")
-	a.Error(err, "a.Error(v9) failed")
+	a.Error(err, "a.Error(err) failed")
 	a.ErrorString(err, "test", "ErrorString(err) failed")
 	a.ErrorType(err, errors.New("def"), "ErrorType:errors.New(test) != errors.New(def)")
 
@@ -75,7 +75,6 @@ func TestAssertion_Error(t *testing.T) {
 	a.ErrorString(err2, "msg", "ErrorString(errorImpl) failed")
 	a.ErrorType(&errorImpl{msg: "abc"}, &errorImpl{}, "ErrorType:&errorImpl{} != &errorImpl{}")
 
-	a.NotError("123", "NotError(123) failed")
 	var err3 error
 	a.NotError(err3, "var err1 error failed")
 
