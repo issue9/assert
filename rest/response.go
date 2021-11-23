@@ -20,6 +20,8 @@ type Response struct {
 
 // Do 执行请求操作
 func (req *Request) Do() *Response {
+	req.a.TB().Helper()
+
 	r, err := http.NewRequest(req.method, req.prefix+req.buildPath(), req.body)
 	req.a.NotError(err).NotNil(r)
 
@@ -31,8 +33,9 @@ func (req *Request) Do() *Response {
 	req.a.NotError(err).NotNil(resp)
 
 	bs, err := ioutil.ReadAll(resp.Body)
-	req.a.NotError(err).NotNil(bs)
+	req.a.NotError(err)
 	req.a.NotError(resp.Body.Close())
+
 	return &Response{
 		a:    req.a,
 		resp: resp,
