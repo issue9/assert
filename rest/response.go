@@ -40,36 +40,38 @@ func (req *Request) Do() *Response {
 	}
 }
 
+func (resp *Response) assert(expr bool, msg1, msg2 []interface{}) *Response {
+	resp.a.TB().Helper()
+	resp.a.Assert(expr, msg1, msg2)
+	return resp
+}
+
 // Success 状态码是否在 100-399 之间
 func (resp *Response) Success(msg ...interface{}) *Response {
 	resp.a.TB().Helper()
-
-	resp.a.Assert(resp.resp.StatusCode >= 100 && resp.resp.StatusCode < 400, []interface{}{"当前状态码为 %d", resp.resp.StatusCode}, msg)
-	return resp
+	succ := resp.resp.StatusCode >= 100 && resp.resp.StatusCode < 400
+	return resp.assert(succ, msg, []interface{}{"当前状态码为 %d", resp.resp.StatusCode})
 }
 
 // Fail 状态码是否大于 399
 func (resp *Response) Fail(msg ...interface{}) *Response {
 	resp.a.TB().Helper()
-
-	resp.a.Assert(resp.resp.StatusCode >= 400, []interface{}{"当前状态为 %d", resp.resp.StatusCode}, msg)
-	return resp
+	fail := resp.resp.StatusCode >= 400
+	return resp.assert(fail, msg, []interface{}{"当前状态为 %d", resp.resp.StatusCode})
 }
 
 // Status 判断状态码是否与 status 相等
 func (resp *Response) Status(status int, msg ...interface{}) *Response {
 	resp.a.TB().Helper()
-
-	resp.a.Assert(resp.resp.StatusCode == status, []interface{}{"实际状态为 %d，与期望值 %d 不符合", resp.resp.StatusCode, status}, msg)
-	return resp
+	eq := resp.resp.StatusCode == status
+	return resp.assert(eq, msg, []interface{}{"实际状态为 %d，与期望值 %d 不符合", resp.resp.StatusCode, status})
 }
 
 // NotStatus 判断状态码是否与 status 不相等
 func (resp *Response) NotStatus(status int, msg ...interface{}) *Response {
 	resp.a.TB().Helper()
-
-	resp.a.Assert(resp.resp.StatusCode != status, []interface{}{"状态码 %d 与期望值是相同的", resp.resp.StatusCode}, msg)
-	return resp
+	neq := resp.resp.StatusCode != status
+	return resp.assert(neq, msg, []interface{}{"状态码 %d 与期望值是相同的", resp.resp.StatusCode})
 }
 
 // Header 判断指定的报头是否与 val 相同
@@ -77,25 +79,20 @@ func (resp *Response) NotStatus(status int, msg ...interface{}) *Response {
 // msg 可以为空，会返回一个默认的错误提示信息
 func (resp *Response) Header(key string, val string, msg ...interface{}) *Response {
 	resp.a.TB().Helper()
-
 	h := resp.resp.Header.Get(key)
-	resp.a.Assert(h == val, []interface{}{"报头 %s 的值 %s 与期望值 %s 不同", key, h, val}, msg)
-	return resp
+	return resp.assert(h == val, msg, []interface{}{"报头 %s 的值 %s 与期望值 %s 不同", key, h, val})
 }
 
 // NotHeader 指定的报头必定不与 val 相同。
 func (resp *Response) NotHeader(key string, val string, msg ...interface{}) *Response {
 	resp.a.TB().Helper()
-
 	h := resp.resp.Header.Get(key)
-	resp.a.Assert(h != val, []interface{}{"报头 %s 与期望值 %s 相等", key, h}, msg)
-	return resp
+	return resp.assert(h != val, msg, []interface{}{"报头 %s 与期望值 %s 相等", key, h})
 }
 
 // Body 报文内容是否与 val 相等
 func (resp *Response) Body(val []byte, msg ...interface{}) *Response {
 	resp.a.TB().Helper()
-
 	return resp.BodyFunc(func(a *assert.Assertion, body []byte) {
 		a.Equal(body, val, msg...)
 	})
@@ -163,7 +160,6 @@ func (resp *Response) JSONBody(val interface{}) *Response {
 // BodyFunc 指定对 body 内容的断言方式
 func (resp *Response) BodyFunc(f func(a *assert.Assertion, body []byte)) *Response {
 	resp.a.TB().Helper()
-
 	f(resp.a, resp.body)
 	return resp
 }
