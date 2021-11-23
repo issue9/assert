@@ -346,3 +346,16 @@ func IsContains(container, item interface{}) bool {
 
 	return false
 }
+
+func getLen(v interface{}) int {
+	r := reflect.ValueOf(v)
+	for r.Kind() == reflect.Ptr {
+		r = r.Elem()
+	}
+
+	switch r.Kind() {
+	case reflect.Array, reflect.String, reflect.Slice, reflect.Map:
+		return r.Len()
+	}
+	return -1
+}

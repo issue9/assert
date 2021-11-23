@@ -5,7 +5,7 @@ package assert
 import "testing"
 
 func TestTSuite(t *testing.T) {
-	a := New(t)
+	a := New(t, false)
 
 	a.Run("r=1", func(a *Assertion) {
 		a.True(true)

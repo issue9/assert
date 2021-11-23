@@ -10,11 +10,13 @@ type (
 	}
 
 	tSuite struct {
-		t *testing.T
+		fatal bool
+		t     *testing.T
 	}
 
 	bSuite struct {
-		b *testing.B
+		fatal bool
+		b     *testing.B
 	}
 )
 
@@ -23,9 +25,9 @@ func (a *Assertion) Run(name string, f func(a *Assertion)) *Assertion {
 	if a.suite == nil {
 		switch obj := a.TB().(type) {
 		case *testing.T:
-			a.suite = &tSuite{t: obj}
+			a.suite = &tSuite{t: obj, fatal: a.fatal}
 		case *testing.B:
-			a.suite = &bSuite{b: obj}
+			a.suite = &bSuite{b: obj, fatal: a.fatal}
 		default:
 			panic("只有 *testing.T 和 *testing.B 支持 Run 功能")
 		}
@@ -35,14 +37,14 @@ func (a *Assertion) Run(name string, f func(a *Assertion)) *Assertion {
 	return a
 }
 
-func (s *tSuite) run(name string, f func(a *Assertion)) {
+func (s *tSuite) run(name string, f func(*Assertion)) {
 	s.t.Run(name, func(t *testing.T) {
-		f(New(t))
+		f(New(t, s.fatal))
 	})
 }
 
-func (s *bSuite) run(name string, f func(a *Assertion)) {
+func (s *bSuite) run(name string, f func(*Assertion)) {
 	s.b.Run(name, func(b *testing.B) {
-		f(New(b))
+		f(New(b, s.fatal))
 	})
 }

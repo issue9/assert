@@ -9,18 +9,30 @@ import (
 	"time"
 )
 
-func TestAssertion(t *testing.T) {
-	a := New(t)
+type errorImpl struct {
+	msg string
+}
+
+func (err *errorImpl) Error() string {
+	return err.msg
+}
+
+func TestAssertion_True_False(t *testing.T) {
+	a := New(t, false)
 
 	if t != a.TB() {
 		t.Error("a.T与t不相等")
 	}
 
 	a.True(true)
-	a.True(5 == 5, "a.True(5==5 failed")
+	a.True(true, "a.True(5==5 failed")
 
 	a.False(false, "a.False(false) failed")
-	a.False(4 == 5, "a.False(4==5) failed")
+	a.False(false, "a.False(4==5) failed")
+}
+
+func TestAssertion_Equal_NotEqual_Nil_NotNil(t *testing.T) {
+	a := New(t, false)
 
 	v1 := 4
 	v2 := 4
@@ -48,32 +60,79 @@ func TestAssertion(t *testing.T) {
 
 	a.NotNil(v7, "a.Nil(v7) failed").
 		NotNil(v6, "a.NotNil(v6) failed")
+}
 
-	v9 := errors.New("test")
-	a.Error(v9, "a.Error(v9) failed")
+func TestAssertion_Error(t *testing.T) {
+	a := New(t, false)
 
-	a.NotError("abc", "a.NotError failed")
+	err := errors.New("test")
+	a.Error(err, "a.Error(v9) failed")
+	a.ErrorString(err, "test", "ErrorString(err) failed")
+	a.ErrorType(err, errors.New("def"), "ErrorType:errors.New(test) != errors.New(def)")
+
+	err2 := &errorImpl{msg: "msg"}
+	a.Error(err2, "ErrorString(errorImpl) failed")
+	a.ErrorString(err2, "msg", "ErrorString(errorImpl) failed")
+	a.ErrorType(&errorImpl{msg: "abc"}, &errorImpl{}, "ErrorType:&errorImpl{} != &errorImpl{}")
+
+	a.NotError("123", "NotError(123) failed")
+	var err3 error
+	a.NotError(err3, "var err1 error failed")
+
+	err4 := errors.New("err4")
+	err5 := fmt.Errorf("err5 with %w", err4)
+	a.ErrorIs(err5, err4)
+}
+
+func TestAssertion_FileExists_FileNotExists(t *testing.T) {
+	a := New(t, false)
 
 	a.FileExists("./assert.go", "a.FileExists(c:/windows) failed").
 		FileNotExists("c:/win", "a.FileNotExists(c:/win) failed")
+}
 
-	err1 := errors.New("err1")
-	err2 := fmt.Errorf("err2 with %w", err1)
-	a.ErrorIs(err2, err1)
+func TestAssertion_Panic(t *testing.T) {
+	a := New(t, false)
 
-	// zero
+	f1 := func() {
+		panic("panic message")
+	}
 
+	a.Panic(f1)
+	a.PanicString(f1, "panic message")
+	a.PanicType(f1, "abc")
+
+	f1 = func() {
+		panic(errors.New("panic"))
+	}
+	a.PanicType(f1, errors.New("abc"))
+
+	f1 = func() {
+		panic(&errorImpl{msg: "panic"})
+	}
+	a.PanicType(f1, &errorImpl{msg: "abc"})
+
+	f1 = func() {}
+	a.NotPanic(f1)
+}
+
+func TestAssertion_Zero_NotZero(t *testing.T) {
+	a := New(t, false)
+
+	var v interface{}
 	a.Zero(0)
 	a.Zero(nil)
 	a.Zero(time.Time{})
-	a.Zero(v5)
+	a.Zero(v)
 	a.Zero([2]int{0, 0})
 	a.Zero([0]int{})
 	a.NotZero([]int{0, 0})
 	a.NotZero([]int{})
 	a.NotZero(&time.Time{})
+}
 
-	// length
+func TestAssertion_Length_NotLength(t *testing.T) {
+	a := New(t, false)
 
 	a.Length([]int{1, 2}, 2)
 	a.Length([3]int{1, 2, 3}, 3)
@@ -85,6 +144,13 @@ func TestAssertion(t *testing.T) {
 	pps := &ps
 	a.Length(pps, 3)
 	a.NotLength(pps, 2)
-	a.Length("abcde", 5)
-	a.NotLength("abcde", 4)
+	a.Length("string", 6)
+	a.NotLength("string", 4)
+}
+
+func TestAssertion_Contains(t *testing.T) {
+	a := New(t, false)
+
+	a.Contains([]int{1, 2, 3}, []int8{1, 2}).
+		NotContains([]int{1, 2, 3}, []int8{1, 3})
 }

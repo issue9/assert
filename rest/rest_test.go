@@ -11,7 +11,7 @@ import (
 )
 
 func TestBuildHandler(t *testing.T) {
-	a := assert.New(t)
+	a := assert.New(t, false)
 
 	h := BuildHandler(a, 201, "body", map[string]string{"k1": "v1"})
 	w := httptest.NewRecorder()

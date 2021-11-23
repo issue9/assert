@@ -2,129 +2,195 @@
 
 package assert
 
-import "testing"
+import (
+	"errors"
+	"fmt"
+	"os"
+	"reflect"
+	"strings"
+	"testing"
+)
 
 // Assertion 可以以对象的方式调用包中的各个断言函数
 type Assertion struct {
-	tb    testing.TB
+	tb testing.TB
+
+	fatal  bool
+	print  func(...interface{})
+	printf func(string, ...interface{})
+
 	suite suite
 }
 
-// New 返回 Assertion 对象。
-func New(tb testing.TB) *Assertion { return &Assertion{tb: tb} }
+// New 返回 Assertion 对象
+func New(tb testing.TB, fatal bool) *Assertion {
+	p := tb.Error
+	pf := tb.Errorf
+	if fatal {
+		p = tb.Fatal
+		pf = tb.Fatalf
+	}
+
+	return &Assertion{
+		tb: tb,
+
+		fatal:  fatal,
+		print:  p,
+		printf: pf,
+	}
+}
 
 // Assert 断言 expr 条件成立
 //
 // expr 返回结果值为 bool 类型的表达式；
 // msg1,msg2 输出的错误信息，之所以提供两组信息，是方便在用户没有提供的情况下，
 // 可以使用系统内部提供的信息，优先使用 msg1 中的信息，若不存在，则使用 msg2 的内容。
+// msg1 和 msg2 格式完全相同，如果它们的第一个元素为字符串，则将第一个参作为 format，
+// 其余的作为 v 传递给 TB.Errorf，否则所有元素传递给 TB.Error。
 //
 // 直接使用 True 断言效果是一样的，之所以提供该函数，
 // 主要供库调用，可以提供一个默认的错误信息。
 func (a *Assertion) Assert(expr bool, msg1, msg2 []interface{}) *Assertion {
+	if expr {
+		return a
+	}
+
 	a.TB().Helper()
 
-	Assert(a.TB(), expr, msg1, msg2)
+	if len(msg1) == 0 {
+		msg1 = msg2
+	}
+	if len(msg1) == 0 {
+		panic("未提供任何错误信息")
+	}
+
+	if len(msg1) == 1 {
+		a.print(msg1...)
+		return a
+	}
+
+	if format, ok := msg1[0].(string); ok {
+		a.printf(format, msg1[1:])
+	} else {
+		a.print(msg1...)
+	}
+
 	return a
 }
 
 // TB 返回 testing.TB 接口
 func (a *Assertion) TB() testing.TB { return a.tb }
 
-// True 参照 assert.True() 函数
+// True 断言表达式 expr 为 true
+//
+// args 对应 fmt.Printf() 函数中的参数，其中 args[0] 对应第一个参数 format，依次类推，
+// 具体可参数 formatMessage() 函数的介绍。其它断言函数的 args 参数，功能与此相同。
 func (a *Assertion) True(expr bool, msg ...interface{}) *Assertion {
 	a.TB().Helper()
-
-	True(a.tb, expr, msg...)
-	return a
+	return a.Assert(expr, msg, []interface{}{"True 失败"})
 }
 
-// False 参照 assert.False() 函数
 func (a *Assertion) False(expr bool, msg ...interface{}) *Assertion {
 	a.TB().Helper()
-
-	False(a.tb, expr, msg...)
-	return a
+	return a.Assert(!expr, msg, []interface{}{"False 失败"})
 }
 
-// Nil 参照 assert.Nil() 函数
 func (a *Assertion) Nil(expr interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
-
-	Nil(a.tb, expr, msg...)
-	return a
+	return a.Assert(IsNil(expr), msg, []interface{}{"Nil 失败，实际值为 %#v", expr})
 }
 
-// NotNil 参照 assert.NotNil() 函数
 func (a *Assertion) NotNil(expr interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
-
-	NotNil(a.tb, expr, msg...)
-	return a
+	return a.Assert(!IsNil(expr), msg, []interface{}{"NotNil 失败，实际值为 %#v", expr})
 }
 
-// Equal 参照 assert.Equal() 函数
 func (a *Assertion) Equal(v1, v2 interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
-
-	Equal(a.tb, v1, v2, msg...)
-	return a
+	return a.Assert(IsEqual(v1, v2), msg, []interface{}{"Equal 失败，实际值为\nv1=%#v\nv2=%#v", v1, v2})
 }
 
-// NotEqual 参照 assert.NotEqual() 函数
 func (a *Assertion) NotEqual(v1, v2 interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
-
-	NotEqual(a.tb, v1, v2, msg...)
-	return a
+	return a.Assert(!IsEqual(v1, v2), msg, []interface{}{"NotEqual 失败，实际值为\nv1=%#v\nv2=%#v", v1, v2})
 }
 
-// Empty 参照 assert.Empty() 函数
 func (a *Assertion) Empty(expr interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
-
-	Empty(a.tb, expr, msg...)
-	return a
+	return a.Assert(IsEmpty(expr), msg, []interface{}{"Empty 失败，实际值为 %#v", expr})
 }
 
-// NotEmpty 参照 assert.NotEmpty() 函数
 func (a *Assertion) NotEmpty(expr interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
-
-	NotEmpty(a.tb, expr, msg...)
-	return a
+	return a.Assert(!IsEmpty(expr), msg, []interface{}{"NotEmpty 失败，实际值为 %#v", expr})
 }
 
-// Error 参照 assert.Error() 函数
+// Error 断言有错误发生
+//
+// 传递未初始化的 error 值(var err error = nil)，将断言失败
 func (a *Assertion) Error(expr interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
-	Error(a.tb, expr, msg...)
-	return a
+	if IsNil(expr) { // 空值，必定没有错误
+		return a.Assert(false, msg, []interface{}{"Error 失败，实际值为 Nil：%T", expr})
+	}
+
+	_, ok := expr.(error)
+	return a.Assert(ok, msg, []interface{}{"Error 失败，实际类型为 %T", expr})
 }
 
-// ErrorString 参照 assert.ErrorString() 函数
+// ErrorString 断言有错误发生且错误信息中包含指定的字符串 str
+//
+// 传递未初始化的 error 值(var err error = nil)，将断言失败
 func (a *Assertion) ErrorString(expr interface{}, str string, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
-	ErrorString(a.tb, expr, str, msg...)
+	if IsNil(expr) { // 空值，必定没有错误
+		return a.Assert(false, msg, []interface{}{"ErrorString 失败，实际值为 Nil：%T", expr})
+	}
+
+	if err, ok := expr.(error); ok {
+		index := strings.Index(err.Error(), str)
+		return a.Assert(index >= 0, msg, []interface{}{"Error 失败，实际类型为%T", expr})
+	}
+
 	return a
 }
 
-// ErrorType 参照 assert.ErrorType() 函数
+// ErrorType 断言有错误发生且错误的类型与 typ 的类型相同
+//
+// 传递未初始化的 error 值(var err error = nil)，将断言失败。
+//
+// 仅对 expr 是否与 typ 为同一类型作简单判断，如果要检测是否是包含关系，可以使用 errors.Is 检测。
+//
+// ErrorType 与 ErrorIs 有本质的区别：ErrorIs 检测是否是包含关系，而 ErrorType 检测是否类型相同。比如：
+//  err := os.WriteFile(...)
+// 返回的 err 是一个 os.PathError 类型，用 ErrorType(err, &os.PathError{}) 断方正常；
+// 而 ErrorIs(err, &os.PathError{}) 则会断言失败。
 func (a *Assertion) ErrorType(expr interface{}, typ error, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
-	ErrorType(a.tb, expr, typ, msg...)
-	return a
+	if IsNil(expr) { // 空值，必定没有错误
+		return a.Assert(false, msg, []interface{}{"ErrorType 失败，实际值为 Nil：%T", expr})
+	}
+
+	if _, ok := expr.(error); !ok {
+		return a.Assert(false, msg, []interface{}{"ErrorType 失败，实际类型为：%T，且无法转换成 error 接口", expr})
+	}
+
+	t1 := reflect.TypeOf(expr)
+	t2 := reflect.TypeOf(typ)
+	return a.Assert(t1 == t2, msg, []interface{}{"ErrorType 失败，v1[%T]为一个错误类型，但与v2[%T]的类型不相同", t1, t2})
 }
 
-// NotError 参照 assert.NotError() 函数
 func (a *Assertion) NotError(expr interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
-	NotError(a.tb, expr, msg...)
-	return a
+	if IsNil(expr) { // 空值必定没有错误
+		return a.Assert(true, msg, []interface{}{"NotError 失败，实际类型为：%T", expr})
+	}
+	err, ok := expr.(error)
+	return a.Assert(!ok, msg, []interface{}{"NotError 失败，错误信息为：%v", err})
 }
 
 // ErrorIs 断言 expr 为 target 类型
@@ -133,72 +199,85 @@ func (a *Assertion) NotError(expr interface{}, msg ...interface{}) *Assertion {
 func (a *Assertion) ErrorIs(expr interface{}, target error, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
-	ErrorIs(a.tb, expr, target, msg...)
-	return a
+	err, ok := expr.(error)
+	if !ok {
+		return a.Assert(false, msg, []interface{}{"ErrorIs 失败，expr 无法转换成 error。"})
+	}
+	return a.Assert(errors.Is(err, target), msg, []interface{}{"ErrorIs 失败，expr 不是且不包含 target。"})
 }
 
-// FileExists 参照 assert.FileExists() 函数
 func (a *Assertion) FileExists(path string, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
-	FileExists(a.tb, path, msg...)
+	if _, err := os.Stat(path); err != nil && !os.IsExist(err) {
+		return a.Assert(false, msg, []interface{}{"FileExists 失败，且附带以下错误：%v", err})
+	}
 	return a
 }
 
-// FileNotExists 参照 assert.FileNotExists() 函数
 func (a *Assertion) FileNotExists(path string, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
-	FileNotExists(a.tb, path, msg...)
+	_, err := os.Stat(path)
+	if err == nil {
+		return a.Assert(false, msg, []interface{}{"FileNotExists 失败"})
+	}
+	if os.IsExist(err) {
+		return a.Assert(false, msg, []interface{}{"FileNotExists 失败，且返回以下错误信息：%v", err})
+	}
+
 	return a
 }
 
-// Panic 参照 assert.Panic() 函数
 func (a *Assertion) Panic(fn func(), msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
-	Panic(a.tb, fn, msg...)
-	return a
+	has, _ := HasPanic(fn)
+	return a.Assert(has, msg, []interface{}{"并未发生 panic"})
 }
 
-// PanicString 参照 assert.PanicString() 函数
+// PanicString 断言函数会发生 panic 且 panic 信息中包含指定的字符串内容
 func (a *Assertion) PanicString(fn func(), str string, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
-	PanicString(a.tb, fn, str, msg...)
-	return a
+	if has, m := HasPanic(fn); has {
+		index := strings.Index(fmt.Sprint(m), str)
+		return a.Assert(index >= 0, msg, []interface{}{"panic 中并未包含 %s", str})
+	}
+	return a.Assert(false, msg, []interface{}{"并未发生 panic"})
 }
 
-// PanicType 参照 assert.PanicType() 函数
+// PanicType 断言函数会发生 panic 且抛出指定的类型
 func (a *Assertion) PanicType(fn func(), typ interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
-	PanicType(a.tb, fn, typ, msg...)
+	if has, m := HasPanic(fn); has {
+		t1 := reflect.TypeOf(m)
+		t2 := reflect.TypeOf(typ)
+		return a.Assert(t1 == t2, msg, []interface{}{"PanicType 失败，v1[%v] 的类型与 v2[%v] 的类型不相同", t1, t2})
+	}
 	return a
 }
 
-// NotPanic 参照 assert.NotPanic() 函数
 func (a *Assertion) NotPanic(fn func(), msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
-	NotPanic(a.tb, fn, msg...)
-	return a
+	has, m := HasPanic(fn)
+	return a.Assert(!has, msg, []interface{}{"发生了 panic，其信息为 %v", m})
 }
 
-// Contains 参照 assert.Contains() 函数
+// Contains 断言 container 包含 item 的或是包含 item 中的所有项
+//
+// 具体函数说明可参考 IsContains()
 func (a *Assertion) Contains(container, item interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
-
-	Contains(a.tb, container, item, msg...)
-	return a
+	return a.Assert(IsContains(container, item), msg, []interface{}{"Contains 失败，%v 并未包含 %v", container, item})
 }
 
-// NotContains 参照 assert.NotContains() 函数
+// NotContains 断言 container 不包含 item 的或是不包含 item 中的所有项
 func (a *Assertion) NotContains(container, item interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
-
-	NotContains(a.tb, container, item, msg...)
-	return a
+	return a.Assert(!IsContains(container, item), msg, []interface{}{"NotContains 失败，%v 包含 %v", container, item})
 }
 
 // Zero 断言是否为零值
@@ -207,8 +286,8 @@ func (a *Assertion) NotContains(container, item interface{}, msg ...interface{})
 func (a *Assertion) Zero(v interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
-	Zero(a.tb, v, msg...)
-	return a
+	isZero := v == nil || reflect.ValueOf(v).IsZero()
+	return a.Assert(isZero, msg, []interface{}{"%#v 为非零值", v})
 }
 
 // NotZero 断言是否为非零值
@@ -217,20 +296,20 @@ func (a *Assertion) Zero(v interface{}, msg ...interface{}) *Assertion {
 func (a *Assertion) NotZero(v interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
-	NotZero(a.tb, v, msg...)
-	return a
+	isZero := v == nil || reflect.ValueOf(v).IsZero()
+	return a.Assert(!isZero, msg, []interface{}{"%#v 为零值", v})
 }
 
 func (a *Assertion) Length(v interface{}, l int, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
-	Length(a.tb, v, l, msg)
-	return a
+	rl := getLen(v)
+	return a.Assert(rl == l, msg, []interface{}{"并非预期的长度，元素长度：%d, 期望的长度：%d", rl, l})
 }
 
 func (a *Assertion) NotLength(v interface{}, l int, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
-	NotLength(a.tb, v, l, msg)
-	return a
+	rl := getLen(v)
+	return a.Assert(rl != l, msg, []interface{}{"长度均为 %d", rl})
 }

@@ -11,8 +11,7 @@ import (
 )
 
 func TestRequest_Do(t *testing.T) {
-	srv := NewServer(t, h, nil)
-	assert.NotNil(t, srv)
+	srv := NewServer(assert.New(t, false), h, nil)
 	defer srv.Close()
 
 	srv.NewRequest(http.MethodGet, "/get").
@@ -25,8 +24,7 @@ func TestRequest_Do(t *testing.T) {
 }
 
 func TestResponse(t *testing.T) {
-	srv := NewServer(t, h, nil)
-	assert.NotNil(t, srv)
+	srv := NewServer(assert.New(t, false), h, nil)
 	defer srv.Close()
 
 	w1 := new(bytes.Buffer)
@@ -46,7 +44,7 @@ func TestResponse(t *testing.T) {
 		JSONBody(&bodyTest{ID: 6}).
 		BodyNotNil().
 		BodyNotEmpty()
-	assert.Equal(t, w1.String(), w2.String())
+	srv.Assertion().Equal(w1.String(), w2.String())
 
 	srv.NewRequest(http.MethodGet, "/get").
 		Query("page", "5").
