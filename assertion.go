@@ -13,6 +13,19 @@ type Assertion struct {
 // New 返回 Assertion 对象。
 func New(tb testing.TB) *Assertion { return &Assertion{tb: tb} }
 
+// Assert 断言 expr 条件成立
+//
+// expr 返回结果值为 bool 类型的表达式；
+// msg1,msg2 输出的错误信息，之所以提供两组信息，是方便在用户没有提供的情况下，
+// 可以使用系统内部提供的信息，优先使用 msg1 中的信息，若不存在，则使用 msg2 的内容。
+//
+// 直接使用 True 断言效果是一样的，之所以提供该函数，
+// 主要供库调用，可以提供一个默认的错误信息。
+func (a *Assertion) Assert(expr bool, msg1, msg2 []interface{}) *Assertion {
+	Assert(a.TB(), expr, msg1, msg2)
+	return a
+}
+
 // TB 返回 testing.TB 接口
 func (a *Assertion) TB() testing.TB { return a.tb }
 
