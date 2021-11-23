@@ -14,10 +14,10 @@
 //
 //      // 以 Assertion 对象方式使用
 //      a := assert.New(t)
-//      a.True(v==5, "v的值[%v]不等于5", v)
-//      a.Equal(5, v, "v的值[%v]不等于5", v)
-//      a.Nil(v)
-//      a.TB().Log("success")
+//      a.True(v==5, "v的值[%v]不等于5", v).
+//          Equal(5, v, "v的值[%v]不等于5", v).
+//          Nil(v).
+//          TB().Log("success")
 //
 //      // 以函数链的形式调用 Assertion 对象的方法
 //      a.True(false).Equal(5,6)

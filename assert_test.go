@@ -264,8 +264,7 @@ func TestPanicType(t *testing.T) {
 }
 
 func TestNotPanic(t *testing.T) {
-	f1 := func() {
-	}
+	f1 := func() {}
 
 	NotPanic(t, f1)
 }

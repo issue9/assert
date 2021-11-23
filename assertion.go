@@ -4,21 +4,16 @@ package assert
 
 import "testing"
 
-// Assertion 是对 testing.TB 进行了简单的封装。
-// 可以以对象的方式调用包中的各个断言函数。
+// Assertion 可以以对象的方式调用包中的各个断言函数
 type Assertion struct {
 	t testing.TB
 }
 
 // New 返回 Assertion 对象。
-func New(t testing.TB) *Assertion {
-	return &Assertion{t: t}
-}
+func New(t testing.TB) *Assertion { return &Assertion{t: t} }
 
 // TB 返回 testing.TB 接口
-func (a *Assertion) TB() testing.TB {
-	return a.t
-}
+func (a *Assertion) TB() testing.TB { return a.t }
 
 // True 参照 assert.True() 函数
 func (a *Assertion) True(expr bool, msg ...interface{}) *Assertion {
