@@ -10,6 +10,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/http/httptest"
 	"reflect"
 
 	"github.com/issue9/assert/v2"
@@ -23,7 +24,13 @@ type Response struct {
 }
 
 // Do 执行请求操作
-func (req *Request) Do() *Response {
+//
+// h 默认为空，如果不为空，则表示当前请求忽略 http.Client，而是访问 h.ServeHTTP 的内容。
+func (req *Request) Do(h http.Handler) *Response {
+	if req.client == nil && h == nil {
+		panic("h 不能为空")
+	}
+
 	req.a.TB().Helper()
 
 	r, err := http.NewRequest(req.method, req.buildPath(), req.body)
@@ -33,12 +40,19 @@ func (req *Request) Do() *Response {
 		r.Header.Add(k, v)
 	}
 
-	resp, err := req.client.Do(r)
-	req.a.NotError(err).NotNil(resp)
+	var resp *http.Response
+	if h != nil {
+		w := httptest.NewRecorder()
+		h.ServeHTTP(w, r)
+		resp = w.Result()
+	} else {
+		resp, err = req.client.Do(r)
+		req.a.NotError(err).NotNil(resp)
+	}
 
 	bs, err := ioutil.ReadAll(resp.Body)
-	req.a.NotError(err)
-	req.a.NotError(resp.Body.Close())
+	req.a.NotError(err).
+		NotError(resp.Body.Close())
 
 	return &Response{
 		a:    req.a,

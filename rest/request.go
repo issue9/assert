@@ -35,7 +35,12 @@ type Request struct {
 //  resp1 := r.Param("id", "1").Do()
 //  resp2 := r.Param("id", "2").Do()
 func (srv *Server) NewRequest(method, path string) *Request {
-	return NewRequest(srv.a, srv.client, method, srv.server.URL+path)
+	return &Request{
+		a:      srv.a,
+		client: srv.client,
+		method: method,
+		path:   srv.server.URL + path,
+	}
 }
 
 // Get 相当于 NewRequest(http.MethodGet, path)
@@ -63,18 +68,13 @@ func (srv *Server) Delete(path string) *Request {
 	return srv.NewRequest(http.MethodDelete, path)
 }
 
-// NewRequest 创建新的请求实例
+// NewRequest 以调用链的方式构建一个访问请求对象
 //
-// client 如果为空，则会采用 http.DefaultClient 作为其值。
-// path 访问地址，需要包含域名部分，比如采用 httptest.Server.URL 的值。
-func NewRequest(a *assert.Assertion, client *http.Client, method, path string) *Request {
-	if client == nil {
-		client = http.DefaultClient
-	}
-
+// NOTE: 通过此函数构建的对象只能访问 http.Handler 的内容，
+// 如果需要访问网络内容，可以采用 Server.NewRequest。
+func NewRequest(a *assert.Assertion, method, path string) *Request {
 	return &Request{
 		a:      a,
-		client: client,
 		method: method,
 		path:   path,
 	}

@@ -71,9 +71,9 @@ func RawHTTP(a *assert.Assertion, client *http.Client, reqRaw, respRaw string) {
 	a.NotError(ret.Body.Close())
 }
 
-// RawHandler 断言 reqRaw 提交到 h 之后返回的数据是否与 respRaw 相同
+// RawHandler 通过原始数据进行比较请求和返回数据是符合要求
 //
-// 功能上与 RawHTTP 相似。
+// 功能上与 RawHTTP 相似，处理方式从 http.Client 变成了 http.Handler。
 func RawHandler(a *assert.Assertion, h http.Handler, reqRaw, respRaw string) {
 	if h == nil {
 		panic("h 不能为空")

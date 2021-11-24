@@ -34,6 +34,7 @@ func newServer(a *assert.Assertion, srv *httptest.Server, client *http.Client) *
 	if client == nil {
 		client = http.DefaultClient
 	}
+
 	a.TB().Cleanup(func() {
 		srv.Close()
 	})
