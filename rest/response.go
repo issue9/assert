@@ -3,10 +3,14 @@
 package rest
 
 import (
+	"bytes"
 	"encoding/json"
+	"encoding/xml"
+	"errors"
 	"io"
 	"io/ioutil"
 	"net/http"
+	"reflect"
 
 	"github.com/issue9/assert/v2"
 )
@@ -101,63 +105,51 @@ func (resp *Response) NotHeader(key string, val string, msg ...interface{}) *Res
 // Body 断言内容与 val 相同
 func (resp *Response) Body(val []byte, msg ...interface{}) *Response {
 	resp.a.TB().Helper()
-	return resp.BodyFunc(func(a *assert.Assertion, body []byte) {
-		a.Equal(body, val, msg...)
-	})
+	return resp.assert(bytes.Equal(resp.body, val), msg, []interface{}{"内容并不相同：\nv1=%s\nv2=%s", string(resp.body), string(val)})
 }
 
 // StringBody 断言内容与 val 相同
 func (resp *Response) StringBody(val string, msg ...interface{}) *Response {
 	resp.a.TB().Helper()
-	return resp.BodyFunc(func(a *assert.Assertion, body []byte) {
-		a.TB().Helper()
-		a.Equal(string(body), val, msg...)
-	})
-}
-
-// BodyNotNil 断言内容不为 nil
-func (resp *Response) BodyNotNil(msg ...interface{}) *Response {
-	resp.a.TB().Helper()
-	return resp.BodyFunc(func(a *assert.Assertion, body []byte) {
-		a.TB().Helper()
-		a.NotNil(body, msg...)
-	})
-}
-
-// BodyNil 报文内容是否为 nil
-func (resp *Response) BodyNil(msg ...interface{}) *Response {
-	resp.a.TB().Helper()
-	return resp.BodyFunc(func(a *assert.Assertion, body []byte) {
-		a.TB().Helper()
-		a.Nil(body, msg...)
-	})
+	b := string(resp.body)
+	return resp.assert(b == val, msg, []interface{}{"内容并不相同：\nv1=%s\nv2=%s", b, val})
 }
 
 // BodyNotEmpty 报文内容是否不为空
 func (resp *Response) BodyNotEmpty(msg ...interface{}) *Response {
 	resp.a.TB().Helper()
-	return resp.BodyFunc(func(a *assert.Assertion, body []byte) {
-		a.TB().Helper()
-		a.NotEmpty(body, msg...)
-	})
+	return resp.assert(len(resp.body) > 0, msg, []interface{}{"内容为空"})
 }
 
 // BodyEmpty 报文内容是否为空
 func (resp *Response) BodyEmpty(msg ...interface{}) *Response {
 	resp.a.TB().Helper()
-	return resp.BodyFunc(func(a *assert.Assertion, body []byte) {
-		a.TB().Helper()
-		a.Empty(body, msg...)
-	})
+	return resp.assert(len(resp.body) == 0, msg, []interface{}{"内容并不为空：%s", string(resp.body)})
 }
 
-// JSONBody 将 val 转换成 JSON 对象，并与 body 作对比
+// JSONBody body 转换成 JSON 对象之后是否等价于 val
 func (resp *Response) JSONBody(val interface{}) *Response {
 	resp.a.TB().Helper()
 	return resp.BodyFunc(func(a *assert.Assertion, body []byte) {
 		a.TB().Helper()
-		j, err := json.Marshal(val)
-		a.NotError(err).NotNil(j).Equal(body, j)
+
+		// NOTE: 应当始终将 body 转换 val 相同的类型，然后再比较对象，
+		// 因为 val 转换成字符串，可能因为空格缩进等原因，未必会与 body 是相同的。
+		b, err := UnmarshalObject(body, val, json.Unmarshal)
+		a.NotError(err).Equal(b, val)
+	})
+}
+
+// XMLBody body 转换成 XML 对象之后是否等价于 val
+func (resp *Response) XMLBody(val interface{}) *Response {
+	resp.a.TB().Helper()
+	return resp.BodyFunc(func(a *assert.Assertion, body []byte) {
+		a.TB().Helper()
+
+		// NOTE: 应当始终将 body 转换 val 相同的类型，然后再比较对象，
+		// 因为 val 转换成字符串，可能因为空格缩进等原因，未必会与 body 是相同的。
+		b, err := UnmarshalObject(body, val, xml.Unmarshal)
+		a.NotError(err).Equal(b, val)
 	})
 }
 
@@ -168,9 +160,18 @@ func (resp *Response) BodyFunc(f func(a *assert.Assertion, body []byte)) *Respon
 	return resp
 }
 
-// ReadBody 读取 Body 的内容到 w
-func (resp *Response) ReadBody(w io.Writer) *Response {
-	n, err := w.Write(resp.body)
-	resp.a.NotError(err).Equal(n, len(resp.body))
-	return resp
+// UnmarshalObject 将 data 以 u 作为转换方式转换成与 val 相同的类型
+//
+// 如果 val 是指针，则会转换成其指向的类型，返回的对象是指针类型。
+func UnmarshalObject(data []byte, val interface{}, u func([]byte, interface{}) error) (interface{}, error) {
+	t := reflect.TypeOf(val)
+	for t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+	bv := reflect.New(t)
+
+	if err := u(data, bv.Interface()); err != nil && !errors.Is(err, io.EOF) {
+		return nil, err
+	}
+	return bv.Interface(), nil
 }

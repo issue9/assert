@@ -70,7 +70,7 @@ func (a *Assertion) Assert(expr bool, msg1, msg2 []interface{}) *Assertion {
 	}
 
 	if format, ok := msg1[0].(string); ok {
-		a.printf(format, msg1[1:])
+		a.printf(format, msg1[1:]...)
 	} else {
 		a.print(msg1...)
 	}
@@ -179,7 +179,7 @@ func (a *Assertion) ErrorIs(expr, target error, msg ...interface{}) *Assertion {
 
 func (a *Assertion) NotError(expr error, msg ...interface{}) *Assertion {
 	a.TB().Helper()
-	return a.Assert(IsNil(expr), msg, []interface{}{"NotError 失败，实际类型为：%T", expr})
+	return a.Assert(IsNil(expr), msg, []interface{}{"NotError 失败，实际值为：%#v", expr})
 }
 
 func (a *Assertion) FileExists(path string, msg ...interface{}) *Assertion {

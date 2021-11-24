@@ -4,6 +4,7 @@ package rest
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"io/ioutil"
 	"net/http"
 	"testing"
@@ -12,7 +13,8 @@ import (
 )
 
 type bodyTest struct {
-	ID int `json:"id" xml:"id"`
+	XMLName struct{} `json:"-" xml:"root"`
+	ID      int      `json:"id" xml:"id"`
 }
 
 var h = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -42,6 +44,31 @@ var h = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			w.Header().Add("content-Type", "application/json;charset=utf-8")
+			w.WriteHeader(http.StatusCreated)
+			w.Write(bs)
+			return
+		}
+
+		if r.Header.Get("content-type") == "application/xml" {
+			b := &bodyTest{}
+			bs, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+
+			if err := xml.Unmarshal(bs, b); err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+
+			b.ID++
+			bs, err = xml.Marshal(b)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			w.Header().Add("content-Type", "application/xml;charset=utf-8")
 			w.WriteHeader(http.StatusCreated)
 			w.Write(bs)
 			return
