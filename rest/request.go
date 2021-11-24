@@ -119,6 +119,11 @@ func (req *Request) Body(body []byte) *Request {
 	return req
 }
 
+func (req *Request) StringBody(body string) *Request {
+	req.body = bytes.NewBufferString(body)
+	return req
+}
+
 // BodyFunc 指定一个未编码的对象
 //
 // marshal 对 obj 的编码函数，比如 json.Marshal 等。
