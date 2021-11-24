@@ -241,7 +241,7 @@ func IsContains(container, item interface{}) bool {
 		case byte:
 			return bytes.IndexByte([]byte(c), i) != -1
 		case rune:
-			return bytes.IndexRune([]byte(c), i) != -1
+			return bytes.ContainsRune([]byte(c), i)
 		}
 	case []byte:
 		switch i := iv.Interface().(type) {
@@ -254,7 +254,7 @@ func IsContains(container, item interface{}) bool {
 		case byte:
 			return bytes.IndexByte(c, i) != -1
 		case rune:
-			return bytes.IndexRune(c, i) != -1
+			return bytes.ContainsRune(c, i)
 		}
 	case []rune:
 		switch i := iv.Interface().(type) {
@@ -267,7 +267,7 @@ func IsContains(container, item interface{}) bool {
 		case byte:
 			return strings.IndexByte(string(c), i) != -1
 		case rune:
-			return strings.IndexRune(string(c), i) != -1
+			return strings.ContainsRune(string(c), i)
 		}
 	}
 

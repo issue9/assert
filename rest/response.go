@@ -43,6 +43,11 @@ func (req *Request) Do() *Response {
 	}
 }
 
+// Resp 返回 http.Response 实例
+//
+// NOTE: http.Response.Body 内容已经被读取且关闭。
+func (resp *Response) Resp() *http.Response { return resp.resp }
+
 func (resp *Response) assert(expr bool, msg1, msg2 []interface{}) *Response {
 	resp.a.TB().Helper()
 	resp.a.Assert(expr, msg1, msg2)
@@ -93,7 +98,7 @@ func (resp *Response) NotHeader(key string, val string, msg ...interface{}) *Res
 	return resp.assert(h != val, msg, []interface{}{"报头 %s 与期望值 %s 相等", key, h})
 }
 
-// Body 报文内容是否与 val 相等
+// Body 断言内容与 val 相同
 func (resp *Response) Body(val []byte, msg ...interface{}) *Response {
 	resp.a.TB().Helper()
 	return resp.BodyFunc(func(a *assert.Assertion, body []byte) {
@@ -101,20 +106,20 @@ func (resp *Response) Body(val []byte, msg ...interface{}) *Response {
 	})
 }
 
-// StringBody 报文内容是否与 val 相等
+// StringBody 断言内容与 val 相同
 func (resp *Response) StringBody(val string, msg ...interface{}) *Response {
 	resp.a.TB().Helper()
-
 	return resp.BodyFunc(func(a *assert.Assertion, body []byte) {
+		a.TB().Helper()
 		a.Equal(string(body), val, msg...)
 	})
 }
 
-// BodyNotNil 报文内容是否不为 nil
+// BodyNotNil 断言内容不为 nil
 func (resp *Response) BodyNotNil(msg ...interface{}) *Response {
 	resp.a.TB().Helper()
-
 	return resp.BodyFunc(func(a *assert.Assertion, body []byte) {
+		a.TB().Helper()
 		a.NotNil(body, msg...)
 	})
 }
@@ -122,7 +127,6 @@ func (resp *Response) BodyNotNil(msg ...interface{}) *Response {
 // BodyNil 报文内容是否为 nil
 func (resp *Response) BodyNil(msg ...interface{}) *Response {
 	resp.a.TB().Helper()
-
 	return resp.BodyFunc(func(a *assert.Assertion, body []byte) {
 		a.TB().Helper()
 		a.Nil(body, msg...)
@@ -132,7 +136,6 @@ func (resp *Response) BodyNil(msg ...interface{}) *Response {
 // BodyNotEmpty 报文内容是否不为空
 func (resp *Response) BodyNotEmpty(msg ...interface{}) *Response {
 	resp.a.TB().Helper()
-
 	return resp.BodyFunc(func(a *assert.Assertion, body []byte) {
 		a.TB().Helper()
 		a.NotEmpty(body, msg...)
@@ -142,7 +145,6 @@ func (resp *Response) BodyNotEmpty(msg ...interface{}) *Response {
 // BodyEmpty 报文内容是否为空
 func (resp *Response) BodyEmpty(msg ...interface{}) *Response {
 	resp.a.TB().Helper()
-
 	return resp.BodyFunc(func(a *assert.Assertion, body []byte) {
 		a.TB().Helper()
 		a.Empty(body, msg...)
@@ -152,7 +154,6 @@ func (resp *Response) BodyEmpty(msg ...interface{}) *Response {
 // JSONBody 将 val 转换成 JSON 对象，并与 body 作对比
 func (resp *Response) JSONBody(val interface{}) *Response {
 	resp.a.TB().Helper()
-
 	return resp.BodyFunc(func(a *assert.Assertion, body []byte) {
 		a.TB().Helper()
 		j, err := json.Marshal(val)
