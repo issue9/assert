@@ -11,7 +11,6 @@ import (
 
 func TestRequest_Do(t *testing.T) {
 	srv := NewServer(assert.New(t, false), h, nil)
-	defer srv.Close()
 
 	srv.NewRequest(http.MethodGet, "/get").
 		Do().
@@ -24,7 +23,6 @@ func TestRequest_Do(t *testing.T) {
 
 func TestResponse(t *testing.T) {
 	srv := NewServer(assert.New(t, false), h, nil)
-	defer srv.Close()
 
 	srv.NewRequest(http.MethodGet, "/body").
 		Header("content-type", "application/json").

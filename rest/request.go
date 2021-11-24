@@ -70,11 +70,11 @@ func (srv *Server) Delete(path string) *Request {
 
 // NewRequest 创建新的请求实例
 //
-// client 如果为空，则会采用 &http.Client{} 作为其值。
+// client 如果为空，则会采用 http.DefaultClient{} 作为其值。
 // path 访问地址，需要包含域名部分，比如采用 httptest.Server.URL 的值。
 func NewRequest(a *assert.Assertion, client *http.Client, method, path string) *Request {
 	if client == nil {
-		client = &http.Client{}
+		client = http.DefaultClient
 	}
 
 	return &Request{

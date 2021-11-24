@@ -34,6 +34,9 @@ func newServer(a *assert.Assertion, srv *httptest.Server, client *http.Client) *
 	if client == nil {
 		client = &http.Client{}
 	}
+	a.TB().Cleanup(func() {
+		srv.Close()
+	})
 
 	return &Server{
 		a:      a,
@@ -42,7 +45,6 @@ func newServer(a *assert.Assertion, srv *httptest.Server, client *http.Client) *
 	}
 }
 
-// Close 停止服务
-func (srv *Server) Close() { srv.server.Close() }
+func (srv *Server) URL() string { return srv.server.URL }
 
 func (srv *Server) Assertion() *assert.Assertion { return srv.a }

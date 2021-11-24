@@ -16,11 +16,9 @@ func TestNew(t *testing.T) {
 	a.NotNil(srv)
 	a.Equal(srv.client, http.DefaultClient)
 	a.True(len(srv.server.URL) > 0)
-	srv.Close()
 
 	client := &http.Client{}
 	srv = NewServer(a, nil, client)
 	a.NotNil(srv)
 	a.Equal(srv.client, client)
-	srv.Close()
 }

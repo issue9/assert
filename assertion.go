@@ -258,6 +258,9 @@ func (a *Assertion) NotZero(v interface{}, msg ...interface{}) *Assertion {
 	return a.Assert(!isZero, msg, []interface{}{"%#v 为零值", v})
 }
 
+// Length 断言长度是否为指定的值
+//
+// v 可以是 amp,string,slice,array
 func (a *Assertion) Length(v interface{}, l int, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
@@ -265,6 +268,9 @@ func (a *Assertion) Length(v interface{}, l int, msg ...interface{}) *Assertion 
 	return a.Assert(rl == l, msg, []interface{}{"并非预期的长度，元素长度：%d, 期望的长度：%d", rl, l})
 }
 
+// Length 断言长度不是指定的值
+//
+// v 可以是 amp,string,slice,array
 func (a *Assertion) NotLength(v interface{}, l int, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
