@@ -161,7 +161,7 @@ func (a *Assertion) ErrorIs(expr, target error, msg ...interface{}) *Assertion {
 // Nil 的特化版本，限定了类型为 error。
 func (a *Assertion) NotError(expr error, msg ...interface{}) *Assertion {
 	a.TB().Helper()
-	return a.Assert(IsNil(expr), msg, []interface{}{"NotError 失败，实际值为：%#v", expr})
+	return a.Assert(IsNil(expr), msg, []interface{}{"NotError 失败，实际值为：%s", expr})
 }
 
 func (a *Assertion) FileExists(path string, msg ...interface{}) *Assertion {
