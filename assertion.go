@@ -23,6 +23,8 @@ type Assertion struct {
 }
 
 // New 返回 Assertion 对象
+//
+// fatal 决定在出错时是调用 tb.Error 还是 tb.Fatal；
 func New(tb testing.TB, fatal bool) *Assertion {
 	p := tb.Error
 	pf := tb.Errorf
@@ -42,14 +44,11 @@ func New(tb testing.TB, fatal bool) *Assertion {
 
 // Assert 断言 expr 条件成立
 //
-// expr 返回结果值为 bool 类型的表达式；
-// msg1,msg2 输出的错误信息，之所以提供两组信息，是方便在用户没有提供的情况下，
-// 可以使用系统内部提供的信息，优先使用 msg1 中的信息，若不存在，则使用 msg2 的内容。
-// msg1 和 msg2 格式完全相同，如果它们的第一个元素为字符串，则将第一个参作为 format，
-// 其余的作为 v 传递给 TB.Errorf，否则所有元素传递给 TB.Error。
+// msg1,msg2 输出的错误信息，优先使用 msg1 中的信息，若不存在，则使用 msg2 的内容。
+// msg1 和 msg2 格式完全相同，根据其每一个元素是否为 string 决定是调用 Error 还是 Errorf。
 //
-// 直接使用 True 断言效果是一样的，之所以提供该函数，
-// 主要供库调用，可以提供一个默认的错误信息。
+// 普通用户直接使用 True 效果是一样的，
+// 之所以提供该函数，主要供库调用，可以提供一个默认的错误信息。
 func (a *Assertion) Assert(expr bool, msg1, msg2 []interface{}) *Assertion {
 	if expr {
 		return a
@@ -84,7 +83,7 @@ func (a *Assertion) TB() testing.TB { return a.tb }
 // True 断言表达式 expr 为 true
 //
 // args 对应 fmt.Printf() 函数中的参数，其中 args[0] 对应第一个参数 format，依次类推，
-// 具体可参数 formatMessage() 函数的介绍。其它断言函数的 args 参数，功能与此相同。
+// 具体可参数 Assert 方法的介绍。其它断言函数的 args 参数，功能与此相同。
 func (a *Assertion) True(expr bool, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 	return a.Assert(expr, msg, []interface{}{"True 失败"})
@@ -128,6 +127,8 @@ func (a *Assertion) NotEmpty(expr interface{}, msg ...interface{}) *Assertion {
 // Error 断言有错误发生
 //
 // 传递未初始化的 error 值(var err error = nil)，将断言失败
+//
+// NotNil 的特化版本，限定了类型为 error。
 func (a *Assertion) Error(expr error, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 	return a.Assert(!IsNil(expr), msg, []interface{}{"Error 失败，实际值为 Nil：%T", expr})
@@ -147,28 +148,6 @@ func (a *Assertion) ErrorString(expr error, str string, msg ...interface{}) *Ass
 	return a.Assert(index >= 0, msg, []interface{}{"Error 失败，实际类型为%T", expr})
 }
 
-// ErrorType 断言有错误发生且错误的类型与 typ 的类型相同
-//
-// 传递未初始化的 error 值(var err error = nil)，将断言失败。
-//
-// 仅对 expr 是否与 typ 为同一类型作简单判断，如果要检测是否是包含关系，可以使用 errors.Is 检测。
-//
-// ErrorType 与 ErrorIs 有本质的区别：ErrorIs 检测是否是包含关系，而 ErrorType 检测是否类型相同。比如：
-//  err := os.WriteFile(...)
-// 返回的 err 是一个 os.PathError 类型，用 ErrorType(err, &os.PathError{}) 判断为正常；
-// 而 ErrorIs(err, &os.PathError{}) 则会断言失败。
-func (a *Assertion) ErrorType(expr, typ error, msg ...interface{}) *Assertion {
-	a.TB().Helper()
-
-	if IsNil(expr) { // 空值，必定没有错误
-		return a.Assert(false, msg, []interface{}{"ErrorType 失败，实际值为 Nil：%T", expr})
-	}
-
-	t1 := reflect.TypeOf(expr)
-	t2 := reflect.TypeOf(typ)
-	return a.Assert(t1 == t2, msg, []interface{}{"ErrorType 失败，v1[%T]为一个错误类型，但与v2[%T]的类型不相同", t1, t2})
-}
-
 // ErrorIs 断言 expr 为 target 类型
 //
 // 相当于 a.True(errors.Is(expr, target))
@@ -177,6 +156,9 @@ func (a *Assertion) ErrorIs(expr, target error, msg ...interface{}) *Assertion {
 	return a.Assert(errors.Is(expr, target), msg, []interface{}{"ErrorIs 失败，expr 不是且不包含 target。"})
 }
 
+// NotError 断言没有错误
+//
+// Nil 的特化版本，限定了类型为 error。
 func (a *Assertion) NotError(expr error, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 	return a.Assert(IsNil(expr), msg, []interface{}{"NotError 失败，实际值为：%#v", expr})
@@ -288,4 +270,30 @@ func (a *Assertion) NotLength(v interface{}, l int, msg ...interface{}) *Asserti
 
 	rl := getLen(v)
 	return a.Assert(rl != l, msg, []interface{}{"长度均为 %d", rl})
+}
+
+// TypeEqual 断言两个值的类型是否相同
+//
+// ptr 如果为 true，则会在对象为指定时，查找其指向的对象。
+func (a *Assertion) TypeEqual(ptr bool, v1, v2 interface{}, msg ...interface{}) *Assertion {
+	if v1 == v2 {
+		return a
+	}
+
+	a.TB().Helper()
+
+	t1 := reflect.TypeOf(v1)
+	t2 := reflect.TypeOf(v2)
+
+	if ptr {
+		for t1.Kind() == reflect.Ptr {
+			t1 = t1.Elem()
+		}
+
+		for t2.Kind() == reflect.Ptr {
+			t2 = t2.Elem()
+		}
+	}
+
+	return a.Assert(t1 == t2, msg, []interface{}{"TypeEqual 失败，v1: %v，v2: %v", t1, t2})
 }
