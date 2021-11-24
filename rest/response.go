@@ -156,7 +156,11 @@ func (resp *Response) XMLBody(val interface{}) *Response {
 // BodyFunc 指定对 body 内容的断言方式
 func (resp *Response) BodyFunc(f func(a *assert.Assertion, body []byte)) *Response {
 	resp.a.TB().Helper()
-	f(resp.a, resp.body)
+
+	b := make([]byte, len(resp.body))
+	copy(b, resp.body)
+	f(resp.a, b)
+
 	return resp
 }
 
