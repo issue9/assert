@@ -32,7 +32,7 @@ func NewTLSServer(a *assert.Assertion, h http.Handler, client *http.Client) *Ser
 
 func newServer(a *assert.Assertion, srv *httptest.Server, client *http.Client) *Server {
 	if client == nil {
-		client = &http.Client{}
+		client = http.DefaultClient
 	}
 	a.TB().Cleanup(func() {
 		srv.Close()
