@@ -26,7 +26,7 @@ type Response struct {
 func (req *Request) Do() *Response {
 	req.a.TB().Helper()
 
-	r, err := http.NewRequest(req.method, req.prefix+req.buildPath(), req.body)
+	r, err := http.NewRequest(req.method, req.buildPath(), req.body)
 	req.a.NotError(err).NotNil(r)
 
 	for k, v := range req.headers {

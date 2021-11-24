@@ -23,9 +23,7 @@ type Request struct {
 	params  map[string]string
 	headers map[string]string
 	a       *assert.Assertion
-
-	client *http.Client
-	prefix string // 地址前缀
+	client  *http.Client
 }
 
 // NewRequest 获取一条请求的结果
@@ -37,10 +35,7 @@ type Request struct {
 //  resp1 := r.Param("id", "1").Do()
 //  resp2 := r.Param("id", "2").Do()
 func (srv *Server) NewRequest(method, path string) *Request {
-	req := NewRequest(srv.a, srv.client, method, path)
-	req.prefix = srv.server.URL
-
-	return req
+	return NewRequest(srv.a, srv.client, method, srv.server.URL+path)
 }
 
 // Get 相当于 NewRequest(http.MethodGet, path)
