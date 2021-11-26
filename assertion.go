@@ -5,6 +5,7 @@ package assert
 import (
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"reflect"
 	"strings"
@@ -175,7 +176,7 @@ func (a *Assertion) NotError(expr error, msg ...interface{}) *Assertion {
 func (a *Assertion) FileExists(path string, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
-	if _, err := os.Stat(path); err != nil && !os.IsExist(err) {
+	if _, err := os.Stat(path); err != nil && !errors.Is(err, fs.ErrExist) {
 		return a.Assert(false, msg, []interface{}{"FileExists 失败，且附带以下错误：%v", err})
 	}
 	return a
@@ -188,8 +189,32 @@ func (a *Assertion) FileNotExists(path string, msg ...interface{}) *Assertion {
 	if err == nil {
 		return a.Assert(false, msg, []interface{}{"FileNotExists 失败"})
 	}
-	if os.IsExist(err) {
+	if errors.Is(err, fs.ErrExist) {
 		return a.Assert(false, msg, []interface{}{"FileNotExists 失败，且返回以下错误信息：%v", err})
+	}
+
+	return a
+}
+
+func (a *Assertion) FileExistsFS(fsys fs.FS, path string, msg ...interface{}) *Assertion {
+	a.TB().Helper()
+
+	if _, err := fs.Stat(fsys, path); err != nil && !errors.Is(err, fs.ErrExist) {
+		return a.Assert(false, msg, []interface{}{"FileExistsFS 失败，且附带以下错误：%v", err})
+	}
+
+	return a
+}
+
+func (a *Assertion) FileNotExistsFS(fsys fs.FS, path string, msg ...interface{}) *Assertion {
+	a.TB().Helper()
+
+	_, err := fs.Stat(fsys, path)
+	if err == nil {
+		return a.Assert(false, msg, []interface{}{"FileNotExistsFS 失败"})
+	}
+	if errors.Is(err, fs.ErrExist) {
+		return a.Assert(false, msg, []interface{}{"FileNotExistsFS 失败，且返回以下错误信息：%v", err})
 	}
 
 	return a

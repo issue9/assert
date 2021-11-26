@@ -5,6 +5,7 @@ package assert
 import (
 	"errors"
 	"fmt"
+	"os"
 	"testing"
 	"time"
 )
@@ -86,6 +87,9 @@ func TestAssertion_FileExists_FileNotExists(t *testing.T) {
 
 	a.FileExists("./assert.go", "a.FileExists(c:/windows) failed").
 		FileNotExists("c:/win", "a.FileNotExists(c:/win) failed")
+
+	a.FileExistsFS(os.DirFS("./"), "assert.go", "a.FileExistsFS(c:/windows) failed").
+		FileNotExistsFS(os.DirFS("c:/"), "win", "a.FileNotExistsFS(c:/win) failed")
 }
 
 func TestAssertion_Panic(t *testing.T) {
