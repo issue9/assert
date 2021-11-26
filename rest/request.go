@@ -80,6 +80,26 @@ func NewRequest(a *assert.Assertion, method, path string) *Request {
 	}
 }
 
+func Get(a *assert.Assertion, path string) *Request {
+	return NewRequest(a, http.MethodGet, path)
+}
+
+func Delete(a *assert.Assertion, path string) *Request {
+	return NewRequest(a, http.MethodDelete, path)
+}
+
+func Post(a *assert.Assertion, path string, body []byte) *Request {
+	return NewRequest(a, http.MethodPost, path).Body(body)
+}
+
+func Put(a *assert.Assertion, path string, body []byte) *Request {
+	return NewRequest(a, http.MethodPut, path).Body(body)
+}
+
+func Patch(a *assert.Assertion, path string, body []byte) *Request {
+	return NewRequest(a, http.MethodPatch, path).Body(body)
+}
+
 // Query 替换一个请求参数
 func (req *Request) Query(key, val string) *Request {
 	if req.queries == nil {
