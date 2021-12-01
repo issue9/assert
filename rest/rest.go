@@ -29,10 +29,10 @@ func BuildHandlerFunc(a *assert.Assertion, code int, body string, headers map[st
 	return func(w http.ResponseWriter, r *http.Request) {
 		a.TB().Helper()
 
-		w.WriteHeader(code)
 		for k, v := range headers {
 			w.Header().Add(k, v)
 		}
+		w.WriteHeader(code)
 
 		if body != "" {
 			_, err := w.Write([]byte(body))

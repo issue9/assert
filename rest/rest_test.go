@@ -95,9 +95,11 @@ func TestBuildHandler(t *testing.T) {
 
 	h := BuildHandler(a, 201, "body", map[string]string{"k1": "v1"})
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, "/", nil)
+	r, err := http.NewRequest(http.MethodGet, "/", nil)
+	a.NotError(err).NotNil(r)
 	h.ServeHTTP(w, r)
-	a.Equal(w.Code, 201)
+	a.Equal(w.Code, 201).
+		Equal(w.Header().Get("k1"), "v1")
 }
 
 var raw = []*struct {
