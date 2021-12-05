@@ -107,32 +107,32 @@ func (a *Assertion) False(expr bool, msg ...interface{}) *Assertion {
 
 func (a *Assertion) Nil(expr interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
-	return a.Assert(IsNil(expr), msg, []interface{}{"Nil 失败，实际值为 %#v", expr})
+	return a.Assert(isNil(expr), msg, []interface{}{"Nil 失败，实际值为 %#v", expr})
 }
 
 func (a *Assertion) NotNil(expr interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
-	return a.Assert(!IsNil(expr), msg, []interface{}{"NotNil 失败，实际值为 %#v", expr})
+	return a.Assert(!isNil(expr), msg, []interface{}{"NotNil 失败，实际值为 %#v", expr})
 }
 
 func (a *Assertion) Equal(v1, v2 interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
-	return a.Assert(IsEqual(v1, v2), msg, []interface{}{"Equal 失败，实际值为\nv1=%#v\nv2=%#v", v1, v2})
+	return a.Assert(isEqual(v1, v2), msg, []interface{}{"Equal 失败，实际值为\nv1=%#v\nv2=%#v", v1, v2})
 }
 
 func (a *Assertion) NotEqual(v1, v2 interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
-	return a.Assert(!IsEqual(v1, v2), msg, []interface{}{"NotEqual 失败，实际值为\nv1=%#v\nv2=%#v", v1, v2})
+	return a.Assert(!isEqual(v1, v2), msg, []interface{}{"NotEqual 失败，实际值为\nv1=%#v\nv2=%#v", v1, v2})
 }
 
 func (a *Assertion) Empty(expr interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
-	return a.Assert(IsEmpty(expr), msg, []interface{}{"Empty 失败，实际值为 %#v", expr})
+	return a.Assert(isEmpty(expr), msg, []interface{}{"Empty 失败，实际值为 %#v", expr})
 }
 
 func (a *Assertion) NotEmpty(expr interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
-	return a.Assert(!IsEmpty(expr), msg, []interface{}{"NotEmpty 失败，实际值为 %#v", expr})
+	return a.Assert(!isEmpty(expr), msg, []interface{}{"NotEmpty 失败，实际值为 %#v", expr})
 }
 
 // Error 断言有错误发生
@@ -142,7 +142,7 @@ func (a *Assertion) NotEmpty(expr interface{}, msg ...interface{}) *Assertion {
 // NotNil 的特化版本，限定了类型为 error。
 func (a *Assertion) Error(expr error, msg ...interface{}) *Assertion {
 	a.TB().Helper()
-	return a.Assert(!IsNil(expr), msg, []interface{}{"Error 失败，实际值为 Nil：%T", expr})
+	return a.Assert(!isNil(expr), msg, []interface{}{"Error 失败，实际值为 Nil：%T", expr})
 }
 
 // ErrorString 断言有错误发生且错误信息中包含指定的字符串 str
@@ -151,7 +151,7 @@ func (a *Assertion) Error(expr error, msg ...interface{}) *Assertion {
 func (a *Assertion) ErrorString(expr error, str string, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
-	if IsNil(expr) { // 空值，必定没有错误
+	if isNil(expr) { // 空值，必定没有错误
 		return a.Assert(false, msg, []interface{}{"ErrorString 失败，实际值为 Nil：%T", expr})
 	}
 	return a.Assert(strings.Contains(expr.Error(), str), msg, []interface{}{"ErrorString 失败，当前值为 %s", expr.Error()})
@@ -170,7 +170,7 @@ func (a *Assertion) ErrorIs(expr, target error, msg ...interface{}) *Assertion {
 // Nil 的特化版本，限定了类型为 error。
 func (a *Assertion) NotError(expr error, msg ...interface{}) *Assertion {
 	a.TB().Helper()
-	return a.Assert(IsNil(expr), msg, []interface{}{"NotError 失败，实际值为：%s", expr})
+	return a.Assert(isNil(expr), msg, []interface{}{"NotError 失败，实际值为：%s", expr})
 }
 
 func (a *Assertion) FileExists(path string, msg ...interface{}) *Assertion {
@@ -223,7 +223,7 @@ func (a *Assertion) FileNotExistsFS(fsys fs.FS, path string, msg ...interface{})
 func (a *Assertion) Panic(fn func(), msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
-	has, _ := HasPanic(fn)
+	has, _ := hasPanic(fn)
 	return a.Assert(has, msg, []interface{}{"并未发生 panic"})
 }
 
@@ -231,7 +231,7 @@ func (a *Assertion) Panic(fn func(), msg ...interface{}) *Assertion {
 func (a *Assertion) PanicString(fn func(), str string, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
-	if has, m := HasPanic(fn); has {
+	if has, m := hasPanic(fn); has {
 		return a.Assert(strings.Contains(fmt.Sprint(m), str), msg, []interface{}{"panic 中并未包含 %s", str})
 	}
 	return a.Assert(false, msg, []interface{}{"并未发生 panic"})
@@ -241,7 +241,7 @@ func (a *Assertion) PanicString(fn func(), str string, msg ...interface{}) *Asse
 func (a *Assertion) PanicType(fn func(), typ interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
-	if has, m := HasPanic(fn); has {
+	if has, m := hasPanic(fn); has {
 		t1, t2 := getType(true, m, typ)
 		return a.Assert(t1 == t2, msg, []interface{}{"PanicType 失败，v1[%v] 的类型与 v2[%v] 的类型不相同", t1, t2})
 	}
@@ -251,22 +251,25 @@ func (a *Assertion) PanicType(fn func(), typ interface{}, msg ...interface{}) *A
 func (a *Assertion) NotPanic(fn func(), msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
-	has, m := HasPanic(fn)
+	has, m := hasPanic(fn)
 	return a.Assert(!has, msg, []interface{}{"发生了 panic，其信息为 %v", m})
 }
 
 // Contains 断言 container 包含 item 的或是包含 item 中的所有项
 //
-// 具体函数说明可参考 IsContains()
+// 若 container 是字符串(string、[]byte 和 []rune，不包含 fmt.Stringer 接口)，
+// 都将会以字符串的形式判断其是否包含 item。
+// 若 container 是个列表(array、slice、map)则判断其元素中是否包含 item 中的
+// 的所有项，或是 item 本身就是 container 中的一个元素。
 func (a *Assertion) Contains(container, item interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
-	return a.Assert(IsContains(container, item), msg, []interface{}{"Contains 失败，%v 并未包含 %v", container, item})
+	return a.Assert(isContains(container, item), msg, []interface{}{"Contains 失败，%v 并未包含 %v", container, item})
 }
 
 // NotContains 断言 container 不包含 item 的或是不包含 item 中的所有项
 func (a *Assertion) NotContains(container, item interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
-	return a.Assert(!IsContains(container, item), msg, []interface{}{"NotContains 失败，%v 包含 %v", container, item})
+	return a.Assert(!isContains(container, item), msg, []interface{}{"NotContains 失败，%v 包含 %v", container, item})
 }
 
 // Zero 断言是否为零值
@@ -327,20 +330,4 @@ func (a *Assertion) TypeEqual(ptr bool, v1, v2 interface{}, msg ...interface{}) 
 
 	t1, t2 := getType(ptr, v1, v2)
 	return a.Assert(t1 == t2, msg, []interface{}{"TypeEqual 失败，v1: %v，v2: %v", t1, t2})
-}
-
-func getType(ptr bool, v1, v2 interface{}) (t1, t2 reflect.Type) {
-	t1 = reflect.TypeOf(v1)
-	t2 = reflect.TypeOf(v2)
-
-	if ptr {
-		for t1.Kind() == reflect.Ptr {
-			t1 = t1.Elem()
-		}
-		for t2.Kind() == reflect.Ptr {
-			t2 = t2.Elem()
-		}
-	}
-
-	return
 }

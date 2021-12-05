@@ -9,13 +9,13 @@ import (
 
 func TestIsEqual(t *testing.T) {
 	eq := func(v1, v2 interface{}) {
-		if !IsEqual(v1, v2) {
+		if !isEqual(v1, v2) {
 			t.Errorf("eq:[%v]!=[%v]", v1, v2)
 		}
 	}
 
 	neq := func(v1, v2 interface{}) {
-		if IsEqual(v1, v2) {
+		if isEqual(v1, v2) {
 			t.Errorf("eq:[%v]==[%v]", v1, v2)
 		}
 	}
@@ -98,76 +98,76 @@ func TestIsEqual(t *testing.T) {
 }
 
 func TestIsEmpty(t *testing.T) {
-	if IsEmpty([]string{""}) {
-		t.Error("IsEmpty([]string{\"\"})")
+	if isEmpty([]string{""}) {
+		t.Error("isEmpty([]string{\"\"})")
 	}
 
-	if !IsEmpty([]string{}) {
-		t.Error("IsEmpty([]string{})")
+	if !isEmpty([]string{}) {
+		t.Error("isEmpty([]string{})")
 	}
 
-	if !IsEmpty([]int{}) {
-		t.Error("IsEmpty([]int{})")
+	if !isEmpty([]int{}) {
+		t.Error("isEmpty([]int{})")
 	}
 
-	if !IsEmpty(map[string]int{}) {
-		t.Error("IsEmpty(map[string]int{})")
+	if !isEmpty(map[string]int{}) {
+		t.Error("isEmpty(map[string]int{})")
 	}
 
-	if !IsEmpty(0) {
-		t.Error("IsEmpty(0)")
+	if !isEmpty(0) {
+		t.Error("isEmpty(0)")
 	}
 
-	if !IsEmpty(int64(0)) {
-		t.Error("IsEmpty(int64(0))")
+	if !isEmpty(int64(0)) {
+		t.Error("isEmpty(int64(0))")
 	}
 
-	if !IsEmpty(uint64(0)) {
-		t.Error("IsEmpty(uint64(0))")
+	if !isEmpty(uint64(0)) {
+		t.Error("isEmpty(uint64(0))")
 	}
 
-	if !IsEmpty(0.0) {
-		t.Error("IsEmpty(0.0)")
+	if !isEmpty(0.0) {
+		t.Error("isEmpty(0.0)")
 	}
 
-	if !IsEmpty(float32(0)) {
-		t.Error("IsEmpty(0.0)")
+	if !isEmpty(float32(0)) {
+		t.Error("isEmpty(0.0)")
 	}
 
-	if !IsEmpty("") {
-		t.Error("IsEmpty(``)")
+	if !isEmpty("") {
+		t.Error("isEmpty(``)")
 	}
 
-	if !IsEmpty([0]int{}) {
-		t.Error("IsEmpty([0]int{})")
+	if !isEmpty([0]int{}) {
+		t.Error("isEmpty([0]int{})")
 	}
 
-	if !IsEmpty(time.Time{}) {
-		t.Error("IsEmpty(time.Time{})")
+	if !isEmpty(time.Time{}) {
+		t.Error("isEmpty(time.Time{})")
 	}
 
-	if !IsEmpty(&time.Time{}) {
-		t.Error("IsEmpty(&time.Time{})")
+	if !isEmpty(&time.Time{}) {
+		t.Error("isEmpty(&time.Time{})")
 	}
 
-	if IsEmpty("  ") {
-		t.Error("IsEmpty(\"  \")")
+	if isEmpty("  ") {
+		t.Error("isEmpty(\"  \")")
 	}
 }
 
 func TestIsNil(t *testing.T) {
-	if !IsNil(nil) {
-		t.Error("IsNil(nil)")
+	if !isNil(nil) {
+		t.Error("isNil(nil)")
 	}
 
 	var v1 []int
-	if !IsNil(v1) {
-		t.Error("IsNil(v1)")
+	if !isNil(v1) {
+		t.Error("isNil(v1)")
 	}
 
 	var v2 map[string]string
-	if !IsNil(v2) {
-		t.Error("IsNil(v2)")
+	if !isNil(v2) {
+		t.Error("isNil(v2)")
 	}
 }
 
@@ -176,7 +176,7 @@ func TestHasPanic(t *testing.T) {
 		panic("panic")
 	}
 
-	if has, _ := HasPanic(f1); !has {
+	if has, _ := hasPanic(f1); !has {
 		t.Error("f1未发生panic")
 	}
 
@@ -184,7 +184,7 @@ func TestHasPanic(t *testing.T) {
 		f1()
 	}
 
-	if has, msg := HasPanic(f2); !has {
+	if has, msg := hasPanic(f2); !has {
 		t.Error("f2未发生panic")
 	} else if msg != "panic" {
 		t.Errorf("f2发生了panic，但返回信息不正确，应为[panic]，但其实返回了%v", msg)
@@ -200,7 +200,7 @@ func TestHasPanic(t *testing.T) {
 		f1()
 	}
 
-	if has, msg := HasPanic(f3); has {
+	if has, msg := hasPanic(f3); has {
 		t.Errorf("f3发生了panic，其信息为:[%v]", msg)
 	}
 
@@ -208,7 +208,7 @@ func TestHasPanic(t *testing.T) {
 		//todo
 	}
 
-	if has, msg := HasPanic(f4); has {
+	if has, msg := hasPanic(f4); has {
 		t.Errorf("f4发生panic，其信息为[%v]", msg)
 	}
 }
@@ -216,8 +216,8 @@ func TestHasPanic(t *testing.T) {
 func TestIsContains(t *testing.T) {
 	fn := func(result bool, container, item interface{}) {
 		t.Helper()
-		if result != IsContains(container, item) {
-			t.Errorf("%v == (IsContains(%v, %v))出错\n", result, container, item)
+		if result != isContains(container, item) {
+			t.Errorf("%v == (isContains(%v, %v))出错\n", result, container, item)
 		}
 	}
 
