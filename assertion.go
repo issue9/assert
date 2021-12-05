@@ -143,9 +143,7 @@ func (a *Assertion) ErrorString(expr error, str string, msg ...interface{}) *Ass
 	if IsNil(expr) { // 空值，必定没有错误
 		return a.Assert(false, msg, []interface{}{"ErrorString 失败，实际值为 Nil：%T", expr})
 	}
-
-	index := strings.Index(expr.Error(), str)
-	return a.Assert(index >= 0, msg, []interface{}{"Error 失败，实际类型为%T", expr})
+	return a.Assert(strings.Contains(expr.Error(), str), msg, []interface{}{"Error 失败，实际类型为%T", expr})
 }
 
 // ErrorIs 断言 expr 为 target 类型
@@ -199,8 +197,7 @@ func (a *Assertion) PanicString(fn func(), str string, msg ...interface{}) *Asse
 	a.TB().Helper()
 
 	if has, m := HasPanic(fn); has {
-		index := strings.Index(fmt.Sprint(m), str)
-		return a.Assert(index >= 0, msg, []interface{}{"panic 中并未包含 %s", str})
+		return a.Assert(strings.Contains(fmt.Sprint(m), str), msg, []interface{}{"panic 中并未包含 %s", str})
 	}
 	return a.Assert(false, msg, []interface{}{"并未发生 panic"})
 }
@@ -210,11 +207,10 @@ func (a *Assertion) PanicType(fn func(), typ interface{}, msg ...interface{}) *A
 	a.TB().Helper()
 
 	if has, m := HasPanic(fn); has {
-		t1 := reflect.TypeOf(m)
-		t2 := reflect.TypeOf(typ)
+		t1, t2 := getType(true, m, typ)
 		return a.Assert(t1 == t2, msg, []interface{}{"PanicType 失败，v1[%v] 的类型与 v2[%v] 的类型不相同", t1, t2})
 	}
-	return a
+	return a.Assert(false, msg, []interface{}{"并未发生 panic"})
 }
 
 func (a *Assertion) NotPanic(fn func(), msg ...interface{}) *Assertion {
@@ -268,7 +264,7 @@ func (a *Assertion) Length(v interface{}, l int, msg ...interface{}) *Assertion 
 	return a.Assert(rl == l, msg, []interface{}{"并非预期的长度，元素长度：%d, 期望的长度：%d", rl, l})
 }
 
-// Length 断言长度不是指定的值
+// NotLength 断言长度不是指定的值
 //
 // v 可以是 amp,string,slice,array
 func (a *Assertion) NotLength(v interface{}, l int, msg ...interface{}) *Assertion {
@@ -288,18 +284,22 @@ func (a *Assertion) TypeEqual(ptr bool, v1, v2 interface{}, msg ...interface{}) 
 
 	a.TB().Helper()
 
-	t1 := reflect.TypeOf(v1)
-	t2 := reflect.TypeOf(v2)
+	t1, t2 := getType(ptr, v1, v2)
+	return a.Assert(t1 == t2, msg, []interface{}{"TypeEqual 失败，v1: %v，v2: %v", t1, t2})
+}
+
+func getType(ptr bool, v1, v2 interface{}) (t1, t2 reflect.Type) {
+	t1 = reflect.TypeOf(v1)
+	t2 = reflect.TypeOf(v2)
 
 	if ptr {
 		for t1.Kind() == reflect.Ptr {
 			t1 = t1.Elem()
 		}
-
 		for t2.Kind() == reflect.Ptr {
 			t2 = t2.Elem()
 		}
 	}
 
-	return a.Assert(t1 == t2, msg, []interface{}{"TypeEqual 失败，v1: %v，v2: %v", t1, t2})
+	return
 }

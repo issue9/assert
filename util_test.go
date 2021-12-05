@@ -215,6 +215,7 @@ func TestHasPanic(t *testing.T) {
 
 func TestIsContains(t *testing.T) {
 	fn := func(result bool, container, item interface{}) {
+		t.Helper()
 		if result != IsContains(container, item) {
 			t.Errorf("%v == (IsContains(%v, %v))出错\n", result, container, item)
 		}
