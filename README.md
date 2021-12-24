@@ -13,9 +13,7 @@ assert 包是对 testing 的一个简单扩展，提供的一系列的断言函�
 ```go
 func TestA(t *testing.T) {
     v := true
-    assert.True(v, false)
-
-    a := assert.New(t)
+    a := assert.New(t, false)
     a.True(v)
 }
 
