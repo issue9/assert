@@ -33,13 +33,8 @@ func (req *Request) Do(h http.Handler) *Response {
 
 	req.a.TB().Helper()
 
-	r, err := http.NewRequest(req.method, req.buildPath(), req.body)
-	req.a.NotError(err).NotNil(r)
-
-	for k, v := range req.headers {
-		r.Header.Add(k, v)
-	}
-
+	r := req.Request()
+	var err error
 	var resp *http.Response
 	if h != nil {
 		w := httptest.NewRecorder()

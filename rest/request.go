@@ -183,3 +183,17 @@ func (req *Request) buildPath() string {
 
 	return path
 }
+
+// Request 返回标准库的 http.Request 实例
+func (req *Request) Request() *http.Request {
+	req.a.TB().Helper()
+
+	r, err := http.NewRequest(req.method, req.buildPath(), req.body)
+	req.a.NotError(err).NotNil(r)
+
+	for k, v := range req.headers {
+		r.Header.Add(k, v)
+	}
+
+	return r
+}
