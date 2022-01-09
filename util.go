@@ -57,14 +57,12 @@ func isEmpty(expr interface{}) bool {
 		return true
 	}
 
-	// 长度为 0 的数组也是 empty
-	v := reflect.ValueOf(expr)
-	switch v.Kind() {
-	case reflect.Slice, reflect.Map, reflect.Array, reflect.Chan:
+	switch v := reflect.ValueOf(expr); v.Kind() {
+	case reflect.Slice, reflect.Map, reflect.Array, reflect.Chan: // 长度为 0 的数组也是 empty
 		return 0 == v.Len()
+	default:
+		return v.IsZero()
 	}
-
-	return false
 }
 
 // isNil 判断一个值是否为 nil。

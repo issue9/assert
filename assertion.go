@@ -20,7 +20,7 @@ type Assertion struct {
 	print  func(...interface{})
 	printf func(string, ...interface{})
 
-	suite suite
+	runner runner
 }
 
 // New 返回 Assertion 对象
