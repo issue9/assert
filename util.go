@@ -40,7 +40,7 @@ func IsEmpty(expr interface{}) bool {
 	case uint64:
 		return 0 == v
 	case string:
-		return len(v) == 0
+		return v == ""
 	case float32:
 		return 0 == v
 	case float64:

@@ -35,12 +35,7 @@ type Request struct {
 //  resp1 := r.Param("id", "1").Do()
 //  resp2 := r.Param("id", "2").Do()
 func (srv *Server) NewRequest(method, path string) *Request {
-	return &Request{
-		a:      srv.a,
-		client: srv.client,
-		method: method,
-		path:   srv.server.URL + path,
-	}
+	return NewRequest(srv.a, method, srv.URL()+path, srv.client)
 }
 
 // Get 相当于 NewRequest(http.MethodGet, path)
@@ -70,34 +65,34 @@ func (srv *Server) Delete(path string) *Request {
 
 // NewRequest 以调用链的方式构建一个访问请求对象
 //
-// NOTE: 通过此函数构建的对象只能访问 http.Handler 的内容，
-// 如果需要访问网络内容，可以采用 Server.NewRequest。
-func NewRequest(a *assert.Assertion, method, path string) *Request {
+// 如果 client 为空那么之后的 Do 必须不能为空。
+func NewRequest(a *assert.Assertion, method, path string, client *http.Client) *Request {
 	return &Request{
 		a:      a,
+		client: client,
 		method: method,
 		path:   path,
 	}
 }
 
-func Get(a *assert.Assertion, path string) *Request {
-	return NewRequest(a, http.MethodGet, path)
+func Get(a *assert.Assertion, path string, client *http.Client) *Request {
+	return NewRequest(a, http.MethodGet, path, client)
 }
 
-func Delete(a *assert.Assertion, path string) *Request {
-	return NewRequest(a, http.MethodDelete, path)
+func Delete(a *assert.Assertion, path string, client *http.Client) *Request {
+	return NewRequest(a, http.MethodDelete, path, client)
 }
 
-func Post(a *assert.Assertion, path string, body []byte) *Request {
-	return NewRequest(a, http.MethodPost, path).Body(body)
+func Post(a *assert.Assertion, path string, client *http.Client, body []byte) *Request {
+	return NewRequest(a, http.MethodPost, path, client).Body(body)
 }
 
-func Put(a *assert.Assertion, path string, body []byte) *Request {
-	return NewRequest(a, http.MethodPut, path).Body(body)
+func Put(a *assert.Assertion, path string, client *http.Client, body []byte) *Request {
+	return NewRequest(a, http.MethodPut, path, client).Body(body)
 }
 
-func Patch(a *assert.Assertion, path string, body []byte) *Request {
-	return NewRequest(a, http.MethodPatch, path).Body(body)
+func Patch(a *assert.Assertion, path string, client *http.Client, body []byte) *Request {
+	return NewRequest(a, http.MethodPatch, path, client).Body(body)
 }
 
 // Query 替换一个请求参数

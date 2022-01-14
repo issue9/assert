@@ -5,8 +5,7 @@
 //  func TestAssert(t *testing.T) {
 //      var v interface{} = 5
 //
-//      // 以 Assertion 对象方式使用
-//      a := assert.New(t)
+//      a := assert.New(t, false)
 //      a.True(v==5, "v的值[%v]不等于5", v).
 //          Equal(5, v, "v的值[%v]不等于5", v).
 //          Nil(v).
