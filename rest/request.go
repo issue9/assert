@@ -38,27 +38,22 @@ func (srv *Server) NewRequest(method, path string) *Request {
 	return NewRequest(srv.a, method, srv.URL()+path, srv.client)
 }
 
-// Get 相当于 NewRequest(http.MethodGet, path)
 func (srv *Server) Get(path string) *Request {
 	return srv.NewRequest(http.MethodGet, path)
 }
 
-// Put 相当于 NewRequest(http.MethodPut, path).Body()
 func (srv *Server) Put(path string, body []byte) *Request {
 	return srv.NewRequest(http.MethodPut, path).Body(body)
 }
 
-// Post 相当于 NewRequest(http.MethodPost, path).Body()
 func (srv *Server) Post(path string, body []byte) *Request {
 	return srv.NewRequest(http.MethodPost, path).Body(body)
 }
 
-// Patch 相当于 NewRequest(http.MethodPatch, path).Body()
 func (srv *Server) Patch(path string, body []byte) *Request {
 	return srv.NewRequest(http.MethodPatch, path).Body(body)
 }
 
-// Delete 相当于 NewRequest(http.MethodDelete, path).Body()
 func (srv *Server) Delete(path string) *Request {
 	return srv.NewRequest(http.MethodDelete, path)
 }
@@ -95,7 +90,7 @@ func Patch(a *assert.Assertion, path string, client *http.Client, body []byte) *
 	return NewRequest(a, http.MethodPatch, path, client).Body(body)
 }
 
-// Query 替换一个请求参数
+// Query 添加一个请求参数
 func (req *Request) Query(key, val string) *Request {
 	if req.queries == nil {
 		req.queries = url.Values{}
