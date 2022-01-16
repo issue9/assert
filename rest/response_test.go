@@ -26,7 +26,7 @@ func TestRequest_Do(t *testing.T) {
 		Do(BuildHandler(a, 202, "", nil)).
 		Status(202)
 
-	r := Get(a, "/get", nil)
+	r := Get(a, "/get")
 	r.Do(BuildHandler(a, 202, "", nil)).Status(202)
 	r.Do(BuildHandler(a, 203, "", nil)).Status(203)
 	a.Panic(func() {

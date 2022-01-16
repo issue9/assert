@@ -35,7 +35,7 @@ type Request struct {
 //  resp1 := r.Param("id", "1").Do()
 //  resp2 := r.Param("id", "2").Do()
 func (srv *Server) NewRequest(method, path string) *Request {
-	return NewRequest(srv.a, method, srv.URL()+path, srv.client)
+	return NewRequest(srv.a, method, srv.URL()+path).Client(srv.client)
 }
 
 func (srv *Server) Get(path string) *Request {
@@ -61,33 +61,40 @@ func (srv *Server) Delete(path string) *Request {
 // NewRequest 以调用链的方式构建一个访问请求对象
 //
 // 如果 client 为空那么之后的 Do 必须不能为空。
-func NewRequest(a *assert.Assertion, method, path string, client *http.Client) *Request {
+func NewRequest(a *assert.Assertion, method, path string) *Request {
 	return &Request{
 		a:      a,
-		client: client,
 		method: method,
 		path:   path,
 	}
 }
 
-func Get(a *assert.Assertion, path string, client *http.Client) *Request {
-	return NewRequest(a, http.MethodGet, path, client)
+func Get(a *assert.Assertion, path string) *Request {
+	return NewRequest(a, http.MethodGet, path)
 }
 
-func Delete(a *assert.Assertion, path string, client *http.Client) *Request {
-	return NewRequest(a, http.MethodDelete, path, client)
+func Delete(a *assert.Assertion, path string) *Request {
+	return NewRequest(a, http.MethodDelete, path)
 }
 
-func Post(a *assert.Assertion, path string, client *http.Client, body []byte) *Request {
-	return NewRequest(a, http.MethodPost, path, client).Body(body)
+func Post(a *assert.Assertion, path string, body []byte) *Request {
+	return NewRequest(a, http.MethodPost, path).Body(body)
 }
 
-func Put(a *assert.Assertion, path string, client *http.Client, body []byte) *Request {
-	return NewRequest(a, http.MethodPut, path, client).Body(body)
+func Put(a *assert.Assertion, path string, body []byte) *Request {
+	return NewRequest(a, http.MethodPut, path).Body(body)
 }
 
-func Patch(a *assert.Assertion, path string, client *http.Client, body []byte) *Request {
-	return NewRequest(a, http.MethodPatch, path, client).Body(body)
+func Patch(a *assert.Assertion, path string, body []byte) *Request {
+	return NewRequest(a, http.MethodPatch, path).Body(body)
+}
+
+// Client 指定采用的客户端实例
+//
+// 可以为空，如果为空，那么在 Do 函数中的参数必不能为空。
+func (req *Request) Client(c *http.Client) *Request {
+	req.client = c
+	return req
 }
 
 // Query 添加一个请求参数
