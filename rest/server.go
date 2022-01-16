@@ -14,6 +14,7 @@ type Server struct {
 	a      *assert.Assertion
 	server *httptest.Server
 	client *http.Client
+	closed bool
 }
 
 // NewServer 声明新的测试服务
@@ -35,17 +36,31 @@ func newServer(a *assert.Assertion, srv *httptest.Server, client *http.Client) *
 		client = http.DefaultClient
 	}
 
-	a.TB().Cleanup(func() {
-		srv.Close()
-	})
-
-	return &Server{
+	s := &Server{
 		a:      a,
 		server: srv,
 		client: client,
 	}
+
+	a.TB().Cleanup(func() {
+		s.Close()
+	})
+
+	return s
 }
 
 func (srv *Server) URL() string { return srv.server.URL }
 
 func (srv *Server) Assertion() *assert.Assertion { return srv.a }
+
+// Close 关闭服务
+//
+// 如果未手动调用，则在 testing.TB.Cleanup 中自动调用。
+func (srv *Server) Close() {
+	if srv.closed {
+		return
+	}
+
+	srv.server.Close()
+	srv.closed = true
+}

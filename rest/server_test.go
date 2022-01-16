@@ -21,4 +21,8 @@ func TestNew(t *testing.T) {
 	srv = NewServer(a, nil, client)
 	a.NotNil(srv)
 	a.Equal(srv.client, client)
+
+	srv.Close()
+	a.True(srv.closed)
+	srv.Close()
 }
