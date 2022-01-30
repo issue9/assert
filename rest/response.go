@@ -45,9 +45,11 @@ func (req *Request) Do(h http.Handler) *Response {
 		req.a.NotError(err).NotNil(resp)
 	}
 
-	bs, err := ioutil.ReadAll(resp.Body)
-	req.a.NotError(err).
-		NotError(resp.Body.Close())
+	var bs []byte
+	if resp.Body != nil {
+		bs, err = ioutil.ReadAll(resp.Body)
+		req.a.NotError(err).NotError(resp.Body.Close())
+	}
 
 	return &Response{
 		a:    req.a,
