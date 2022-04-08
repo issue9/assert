@@ -19,21 +19,21 @@ type Server struct {
 
 // NewServer 声明新的测试服务
 //
-// 如果 client 为 nil，则会采用 http.DefaultClient 作为默认值
+// 如果 client 为 nil，则会采用 &http.Client{} 作为默认值
 func NewServer(a *assert.Assertion, h http.Handler, client *http.Client) *Server {
 	return newServer(a, httptest.NewServer(h), client)
 }
 
 // NewTLSServer 声明新的测试服务
 //
-// 如果 client 为 nil，则会采用 http.DefaultClient 作为默认值
+// 如果 client 为 nil，则会采用 &http.Client{} 作为默认值
 func NewTLSServer(a *assert.Assertion, h http.Handler, client *http.Client) *Server {
 	return newServer(a, httptest.NewTLSServer(h), client)
 }
 
 func newServer(a *assert.Assertion, srv *httptest.Server, client *http.Client) *Server {
 	if client == nil {
-		client = http.DefaultClient
+		client = &http.Client{}
 	}
 
 	s := &Server{

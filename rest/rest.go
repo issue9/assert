@@ -55,7 +55,7 @@ func (srv *Server) RawHTTP(req, resp string) *Server {
 // NOTE: 仅判断状态码、报头和实际内容是否相同，而不是直接比较两个 http.Response 的值。
 func RawHTTP(a *assert.Assertion, client *http.Client, reqRaw, respRaw string) {
 	if client == nil {
-		client = http.DefaultClient
+		client = &http.Client{}
 	}
 	a.TB().Helper()
 

@@ -14,7 +14,7 @@ func TestNew(t *testing.T) {
 
 	srv := NewTLSServer(a, nil, nil)
 	a.NotNil(srv)
-	a.Equal(srv.client, http.DefaultClient)
+	a.Equal(srv.client, &http.Client{})
 	a.True(len(srv.server.URL) > 0)
 
 	client := &http.Client{}

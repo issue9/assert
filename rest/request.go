@@ -59,8 +59,6 @@ func (srv *Server) Delete(path string) *Request {
 }
 
 // NewRequest 以调用链的方式构建一个访问请求对象
-//
-// 如果 client 为空那么之后的 Do 必须不能为空。
 func NewRequest(a *assert.Assertion, method, path string) *Request {
 	return &Request{
 		a:      a,
