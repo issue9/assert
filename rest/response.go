@@ -48,7 +48,10 @@ func (req *Request) Do(h http.Handler) *Response {
 	var bs []byte
 	if resp.Body != nil {
 		bs, err = ioutil.ReadAll(resp.Body)
-		req.a.NotError(err).NotError(resp.Body.Close())
+		if err != io.EOF {
+			req.a.NotError(err)
+		}
+		req.a.NotError(resp.Body.Close())
 	}
 
 	return &Response{

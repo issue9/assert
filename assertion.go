@@ -143,7 +143,7 @@ func (a *Assertion) ErrorString(expr error, str string, msg ...interface{}) *Ass
 	if IsNil(expr) { // 空值，必定没有错误
 		return a.Assert(false, msg, []interface{}{"ErrorString 失败，实际值为 Nil：%T", expr})
 	}
-	return a.Assert(strings.Contains(expr.Error(), str), msg, []interface{}{"Error 失败，实际类型为%T", expr})
+	return a.Assert(strings.Contains(expr.Error(), str), msg, []interface{}{"ErrorString 失败，当前值为 %s", expr.Error()})
 }
 
 // ErrorIs 断言 expr 为 target 类型
