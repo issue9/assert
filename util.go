@@ -4,6 +4,7 @@ package assert
 
 import (
 	"bytes"
+	"fmt"
 	"reflect"
 	"strings"
 	"time"
@@ -347,15 +348,19 @@ func IsContains(container, item interface{}) bool {
 	return false
 }
 
-func getLen(v interface{}) int {
+func getLen(v interface{}) (l int, msg string) {
 	r := reflect.ValueOf(v)
 	for r.Kind() == reflect.Ptr {
 		r = r.Elem()
 	}
 
+	if v == nil {
+		return 0, ""
+	}
+
 	switch r.Kind() {
 	case reflect.Array, reflect.String, reflect.Slice, reflect.Map:
-		return r.Len()
+		return r.Len(), ""
 	}
-	return -1
+	return 0, fmt.Sprintf("无法获取 %s 类型的长度信息", r.Kind())
 }

@@ -131,6 +131,7 @@ func TestAssertion_Zero_NotZero(t *testing.T) {
 func TestAssertion_Length_NotLength(t *testing.T) {
 	a := New(t, false)
 
+	a.Length(nil, 0)
 	a.Length([]int{1, 2}, 2)
 	a.Length([3]int{1, 2, 3}, 3)
 	a.NotLength([3]int{1, 2, 3}, 2)

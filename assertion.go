@@ -260,7 +260,10 @@ func (a *Assertion) NotZero(v interface{}, msg ...interface{}) *Assertion {
 func (a *Assertion) Length(v interface{}, l int, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
-	rl := getLen(v)
+	rl, err := getLen(v)
+	if err != "" {
+		a.Assert(false, msg, []interface{}{err})
+	}
 	return a.Assert(rl == l, msg, []interface{}{"并非预期的长度，元素长度：%d, 期望的长度：%d", rl, l})
 }
 
@@ -270,7 +273,10 @@ func (a *Assertion) Length(v interface{}, l int, msg ...interface{}) *Assertion 
 func (a *Assertion) NotLength(v interface{}, l int, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
-	rl := getLen(v)
+	rl, err := getLen(v)
+	if err != "" {
+		a.Assert(false, msg, []interface{}{err})
+	}
 	return a.Assert(rl != l, msg, []interface{}{"长度均为 %d", rl})
 }
 
