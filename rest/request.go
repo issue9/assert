@@ -185,6 +185,7 @@ func (req *Request) Request() *http.Request {
 
 	r, err := http.NewRequest(req.method, req.buildPath(), req.body)
 	req.a.NotError(err).NotNil(r)
+	r.Close = true
 
 	for k, v := range req.headers {
 		r.Header.Add(k, v)
