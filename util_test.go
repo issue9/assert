@@ -9,12 +9,14 @@ import (
 
 func TestIsEqual(t *testing.T) {
 	eq := func(v1, v2 interface{}) {
+		t.Helper()
 		if !isEqual(v1, v2) {
 			t.Errorf("eq:[%v]!=[%v]", v1, v2)
 		}
 	}
 
 	neq := func(v1, v2 interface{}) {
+		t.Helper()
 		if isEqual(v1, v2) {
 			t.Errorf("eq:[%v]==[%v]", v1, v2)
 		}
@@ -50,7 +52,7 @@ func TestIsEqual(t *testing.T) {
 		},
 	)
 
-	// 比较两个元素类型可转换的map
+	// 比较两个元素类型可转换的 map
 	eq(
 		[]map[int]int{
 			{1: 1, 2: 2},
@@ -63,7 +65,7 @@ func TestIsEqual(t *testing.T) {
 	)
 	eq(map[string]int{"1": 1, "2": 2}, map[string]int8{"1": 1, "2": 2})
 
-	// 比较两个元素类型可转换的map
+	// 比较两个元素类型可转换的 map
 	eq(
 		map[int]string{
 			1: "1",
@@ -87,7 +89,7 @@ func TestIsEqual(t *testing.T) {
 	neq(true, "true")
 	neq(true, 1)
 	neq(true, "1")
-	// 判断包含不同键名的两个map
+	// 判断包含不同键名的两个 map
 	neq(map[int]int{1: 1, 2: 2}, map[int]int{5: 5, 6: 6})
 
 	// time
@@ -95,6 +97,18 @@ func TestIsEqual(t *testing.T) {
 	now := time.Now()
 	eq(time.Time{}, time.Time{})
 	neq(now.In(loc), now.In(time.UTC)) // 时区不同
+	n1 := time.Now()
+	n2 := n1.Add(0)
+	eq(n1, n2)
+
+	// 指针
+	v1 := 5
+	v2 := 5
+	p1 := &v1
+	p2 := &v1
+	eq(p1, p2) // 指针相等
+	p2 = &v2
+	eq(p1, p2) // 指向内容相等
 }
 
 func TestIsEmpty(t *testing.T) {

@@ -78,7 +78,7 @@ func isNil(expr interface{}) bool {
 	return k >= reflect.Chan && k <= reflect.Slice && v.IsNil()
 }
 
-// 判断两个值是否相等。
+// 判断两个值是否相等
 //
 // 除了通过 reflect.DeepEqual() 判断值是否相等之外，一些类似
 // 可转换的数值也能正确判断，比如以下值也将会被判断为相等：
@@ -98,9 +98,8 @@ func isEqual(v1, v2 interface{}) bool {
 	vv1 := reflect.ValueOf(v1)
 	vv2 := reflect.ValueOf(v2)
 
-	// NOTE: 这里返回 false，而不是 true
 	if !vv1.IsValid() || !vv2.IsValid() {
-		return false
+		return vv1.IsValid() == vv2.IsValid()
 	}
 
 	if vv1 == vv2 {
@@ -109,6 +108,10 @@ func isEqual(v1, v2 interface{}) bool {
 
 	vv1Type := vv1.Type()
 	vv2Type := vv2.Type()
+
+	if vv1Type.Comparable() && vv2Type.Comparable() && v1 == v2 {
+		return true
+	}
 
 	// 过滤掉已经在 reflect.DeepEqual() 进行处理的类型
 	switch vv1Type.Kind() {
