@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -29,7 +29,7 @@ var h = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/body" {
 		if r.Header.Get("content-type") == "application/json" {
 			b := &bodyTest{}
-			bs, err := ioutil.ReadAll(r.Body)
+			bs, err := io.ReadAll(r.Body)
 			if err != nil {
 				fmt.Println(err)
 				w.WriteHeader(http.StatusInternalServerError)
@@ -57,7 +57,7 @@ var h = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		if r.Header.Get("content-type") == "application/xml" {
 			b := &bodyTest{}
-			bs, err := ioutil.ReadAll(r.Body)
+			bs, err := io.ReadAll(r.Body)
 			if err != nil {
 				fmt.Println(err)
 				w.WriteHeader(http.StatusInternalServerError)

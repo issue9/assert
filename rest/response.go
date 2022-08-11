@@ -8,7 +8,6 @@ import (
 	"encoding/xml"
 	"errors"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -47,7 +46,7 @@ func (req *Request) Do(h http.Handler) *Response {
 
 	var bs []byte
 	if resp.Body != nil {
-		bs, err = ioutil.ReadAll(resp.Body)
+		bs, err = io.ReadAll(resp.Body)
 		if err != io.EOF {
 			req.a.NotError(err)
 		}
@@ -66,9 +65,9 @@ func (req *Request) Do(h http.Handler) *Response {
 // NOTE: http.Response.Body 内容已经被读取且关闭。
 func (resp *Response) Resp() *http.Response { return resp.resp }
 
-func (resp *Response) assert(expr bool, msg1, msg2 []interface{}) *Response {
+func (resp *Response) assert(expr bool, f *assert.Failure) *Response {
 	resp.a.TB().Helper()
-	resp.a.Assert(expr, msg1, msg2)
+	resp.a.Assert(expr, f)
 	return resp
 }
 
@@ -76,28 +75,28 @@ func (resp *Response) assert(expr bool, msg1, msg2 []interface{}) *Response {
 func (resp *Response) Success(msg ...interface{}) *Response {
 	resp.a.TB().Helper()
 	succ := resp.resp.StatusCode >= 100 && resp.resp.StatusCode < 400
-	return resp.assert(succ, msg, []interface{}{"当前状态码为 %d", resp.resp.StatusCode})
+	return resp.assert(succ, assert.NewFailure("Success", msg, map[string]interface{}{"status": resp.resp.StatusCode}))
 }
 
 // Fail 状态码是否大于 399
 func (resp *Response) Fail(msg ...interface{}) *Response {
 	resp.a.TB().Helper()
 	fail := resp.resp.StatusCode >= 400
-	return resp.assert(fail, msg, []interface{}{"当前状态为 %d", resp.resp.StatusCode})
+	return resp.assert(fail, assert.NewFailure("Fail", msg, map[string]interface{}{"status": resp.resp.StatusCode}))
 }
 
 // Status 判断状态码是否与 status 相等
 func (resp *Response) Status(status int, msg ...interface{}) *Response {
 	resp.a.TB().Helper()
 	eq := resp.resp.StatusCode == status
-	return resp.assert(eq, msg, []interface{}{"实际状态为 %d，与期望值 %d 不符合", resp.resp.StatusCode, status})
+	return resp.assert(eq, assert.NewFailure("Status", msg, map[string]interface{}{"status1": resp.resp.StatusCode, "status2": status}))
 }
 
 // NotStatus 判断状态码是否与 status 不相等
 func (resp *Response) NotStatus(status int, msg ...interface{}) *Response {
 	resp.a.TB().Helper()
 	neq := resp.resp.StatusCode != status
-	return resp.assert(neq, msg, []interface{}{"状态码 %d 与期望值是相同的", resp.resp.StatusCode})
+	return resp.assert(neq, assert.NewFailure("NotStatus", msg, map[string]interface{}{"status": resp.resp.StatusCode}))
 }
 
 // Header 判断指定的报头是否与 val 相同
@@ -106,39 +105,39 @@ func (resp *Response) NotStatus(status int, msg ...interface{}) *Response {
 func (resp *Response) Header(key string, val string, msg ...interface{}) *Response {
 	resp.a.TB().Helper()
 	h := resp.resp.Header.Get(key)
-	return resp.assert(h == val, msg, []interface{}{"报头 %s 的值 %s 与期望值 %s 不同", key, h, val})
+	return resp.assert(h == val, assert.NewFailure("Header", msg, map[string]interface{}{"header": key, "v1": h, "v2": val}))
 }
 
 // NotHeader 指定的报头必定不与 val 相同。
 func (resp *Response) NotHeader(key string, val string, msg ...interface{}) *Response {
 	resp.a.TB().Helper()
 	h := resp.resp.Header.Get(key)
-	return resp.assert(h != val, msg, []interface{}{"报头 %s 与期望值 %s 相等", key, h})
+	return resp.assert(h != val, assert.NewFailure("NotHeader", msg, map[string]interface{}{"header": key, "v": h}))
 }
 
 // Body 断言内容与 val 相同
 func (resp *Response) Body(val []byte, msg ...interface{}) *Response {
 	resp.a.TB().Helper()
-	return resp.assert(bytes.Equal(resp.body, val), msg, []interface{}{"内容并不相同：\nv1=%s\nv2=%s", string(resp.body), string(val)})
+	return resp.assert(bytes.Equal(resp.body, val), assert.NewFailure("Body", msg, map[string]interface{}{"v1": string(resp.body), "v2": string(val)}))
 }
 
 // StringBody 断言内容与 val 相同
 func (resp *Response) StringBody(val string, msg ...interface{}) *Response {
 	resp.a.TB().Helper()
 	b := string(resp.body)
-	return resp.assert(b == val, msg, []interface{}{"内容并不相同：\nv1=%s\nv2=%s", b, val})
+	return resp.assert(b == val, assert.NewFailure("StringBody", msg, map[string]interface{}{"v1": b, "v2": val}))
 }
 
 // BodyNotEmpty 报文内容是否不为空
 func (resp *Response) BodyNotEmpty(msg ...interface{}) *Response {
 	resp.a.TB().Helper()
-	return resp.assert(len(resp.body) > 0, msg, []interface{}{"内容为空"})
+	return resp.assert(len(resp.body) > 0, assert.NewFailure("BodyNotEmpty", msg, nil))
 }
 
 // BodyEmpty 报文内容是否为空
 func (resp *Response) BodyEmpty(msg ...interface{}) *Response {
 	resp.a.TB().Helper()
-	return resp.assert(len(resp.body) == 0, msg, []interface{}{"内容并不为空：%s", string(resp.body)})
+	return resp.assert(len(resp.body) == 0, assert.NewFailure("BodyEmpty", msg, map[string]interface{}{"v": resp.body}))
 }
 
 // JSONBody body 转换成 JSON 对象之后是否等价于 val

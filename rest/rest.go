@@ -7,7 +7,6 @@ import (
 	"bufio"
 	"bytes"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -18,9 +17,9 @@ import (
 // BuildHandler 生成用于测试的 http.Handler 对象
 //
 // 仅是简单地按以下步骤输出内容：
-//  - 输出状态码 code；
-//  - 输出报头 headers，以 Add 方式，而不是 set，不会覆盖原来的数据；
-//  - 输出 body，如果为空字符串，则不会输出；
+//   - 输出状态码 code；
+//   - 输出报头 headers，以 Add 方式，而不是 set，不会覆盖原来的数据；
+//   - 输出 body，如果为空字符串，则不会输出；
 func BuildHandler(a *assert.Assertion, code int, body string, headers map[string]string) http.Handler {
 	return http.HandlerFunc(BuildHandlerFunc(a, code, body, headers))
 }
@@ -116,9 +115,9 @@ func compare(a *assert.Assertion, resp *http.Response, status int, header http.H
 		a.Equal(respV, retV, "compare 断言失败，报头 %s 的期望值 %s 与实际值 %s 不相同", k, respV, retV)
 	}
 
-	retB, err := ioutil.ReadAll(body)
+	retB, err := io.ReadAll(body)
 	a.NotError(err).NotNil(retB)
-	respB, err := ioutil.ReadAll(resp.Body)
+	respB, err := io.ReadAll(resp.Body)
 	a.NotError(err).NotNil(respB)
 	retB = bytes.TrimSpace(retB)
 	respB = bytes.TrimSpace(respB)

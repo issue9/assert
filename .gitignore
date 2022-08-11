@@ -23,11 +23,11 @@ _testmain.go
 *.test
 *.prof
 
-# vim
-*.swp
-
 # osx
 .DS_Store
 
+# ide
 .vscode
 .idea
+.vs
+*.swp
