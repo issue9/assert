@@ -341,7 +341,7 @@ func isSame(v1, v2 interface{}) bool {
 
 func canPointer(k reflect.Kind) bool {
 	switch k {
-	case reflect.Pointer, reflect.Map, reflect.Chan, reflect.Slice, reflect.UnsafePointer, reflect.Func:
+	case reflect.Ptr, reflect.Map, reflect.Chan, reflect.Slice, reflect.UnsafePointer, reflect.Func:
 		return true
 	default:
 		return false
