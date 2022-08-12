@@ -56,12 +56,10 @@ func NewWithEnv(tb testing.TB, fatal bool, env map[string]string) *Assertion {
 // 普通用户直接使用 True 效果是一样的，
 // 之所以提供该函数，主要供库调用，可以提供一个默认的错误信息。
 func (a *Assertion) Assert(expr bool, f *Failure) *Assertion {
-	if expr {
-		return a
+	if !expr {
+		a.TB().Helper()
+		a.print(a.f(f))
 	}
-
-	a.TB().Helper()
-	a.print(a.f(f))
 	return a
 }
 
@@ -315,4 +313,38 @@ func (a *Assertion) TypeEqual(ptr bool, v1, v2 interface{}, msg ...interface{}) 
 
 	t1, t2 := getType(ptr, v1, v2)
 	return a.Assert(t1 == t2, NewFailure("TypeEquaal", msg, map[string]interface{}{"v1": t1, "v2": t2}))
+}
+
+// Same 断言为同一个对象
+func (a *Assertion) Same(v1, v2 interface{}, msg ...interface{}) *Assertion {
+	a.TB().Helper()
+	return a.Assert(isSame(v1, v2), NewFailure("Same", msg, nil))
+}
+
+// NotSame 断言为不是同一个对象
+func (a *Assertion) NotSame(v1, v2 interface{}, msg ...interface{}) *Assertion {
+	a.TB().Helper()
+	return a.Assert(!isSame(v1, v2), NewFailure("NotSame", msg, nil))
+}
+
+func isSame(v1, v2 interface{}) bool {
+	rv1 := reflect.ValueOf(v1)
+	if !canPointer(rv1.Kind()) {
+		return false
+	}
+	rv2 := reflect.ValueOf(v2)
+	if !canPointer(rv2.Kind()) {
+		return false
+	}
+
+	return rv1.Pointer() == rv2.Pointer()
+}
+
+func canPointer(k reflect.Kind) bool {
+	switch k {
+	case reflect.Pointer, reflect.Map, reflect.Chan, reflect.Slice, reflect.UnsafePointer, reflect.Func:
+		return true
+	default:
+		return false
+	}
 }
