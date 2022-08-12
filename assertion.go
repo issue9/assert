@@ -16,12 +16,9 @@ import (
 type Assertion struct {
 	tb testing.TB
 
-	fatal  bool
-	print  func(...interface{})
-	printf func(string, ...interface{})
-	f      FailureSprintFunc
-
-	runner runner
+	fatal bool
+	print func(...interface{})
+	f     FailureSprintFunc
 }
 
 // New 返回 Assertion 对象
@@ -29,19 +26,16 @@ type Assertion struct {
 // fatal 决定在出错时是调用 tb.Error 还是 tb.Fatal；
 func New(tb testing.TB, fatal bool) *Assertion {
 	p := tb.Error
-	pf := tb.Errorf
 	if fatal {
 		p = tb.Fatal
-		pf = tb.Fatalf
 	}
 
 	return &Assertion{
 		tb: tb,
 
-		fatal:  fatal,
-		print:  p,
-		printf: pf,
-		f:      failureSprint,
+		fatal: fatal,
+		print: p,
+		f:     failureSprint,
 	}
 }
 
