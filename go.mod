@@ -1,3 +1,3 @@
-module github.com/issue9/assert/v2
+module github.com/issue9/assert/v3
 
 go 1.17

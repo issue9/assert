@@ -12,7 +12,7 @@ import (
 	"net/http/httptest"
 	"reflect"
 
-	"github.com/issue9/assert/v2"
+	"github.com/issue9/assert/v3"
 )
 
 // Response 测试请求的返回结构

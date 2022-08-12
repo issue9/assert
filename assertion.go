@@ -53,8 +53,7 @@ func NewWithEnv(tb testing.TB, fatal bool, env map[string]string) *Assertion {
 //
 // f 表示在断言失败时输出的信息
 //
-// 普通用户直接使用 True 效果是一样的，
-// 之所以提供该函数，主要供库调用，可以提供一个默认的错误信息。
+// 普通用户直接使用 True 效果是一样的，此函数主要供库调用。
 func (a *Assertion) Assert(expr bool, f *Failure) *Assertion {
 	if !expr {
 		a.TB().Helper()

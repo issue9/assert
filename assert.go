@@ -39,7 +39,7 @@ type Failure struct {
 
 // FailureSprintFunc 将 Failure 转换成文本的函数
 //
-// 可以使用此方法实现对错误信息的本地化。
+// NOTE: 可以使用此方法实现对错误信息的本地化。
 type FailureSprintFunc func(*Failure) string
 
 // SetFailureSprintFunc 设置一个全局的转换方法
@@ -47,7 +47,7 @@ type FailureSprintFunc func(*Failure) string
 // [New] 方法在默认情况下继承由此方法设置的值。
 func SetFailureSprintFunc(f FailureSprintFunc) { failureSprint = f }
 
-// DefaultFailureSprint 默认的 FailureSprintFunc 实现
+// DefaultFailureSprint 默认的 [FailureSprintFunc] 实现
 func DefaultFailureSprint(f *Failure) string {
 	s := strings.Builder{}
 	s.WriteString(f.Action)

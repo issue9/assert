@@ -11,7 +11,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 
-	"github.com/issue9/assert/v2"
+	"github.com/issue9/assert/v3"
 )
 
 // BuildHandler 生成用于测试的 http.Handler 对象
