@@ -206,7 +206,7 @@ func (a *Assertion) PanicString(fn func(), str string, msg ...interface{}) *Asse
 	a.TB().Helper()
 
 	if has, m := hasPanic(fn); has {
-		return a.Assert(strings.Contains(fmt.Sprint(m), str), NewFailure("PanicString", msg, map[string]interface{}{"err": str}))
+		return a.Assert(strings.Contains(fmt.Sprint(m), str), NewFailure("PanicString", msg, map[string]interface{}{"msg": m}))
 	}
 	return a.Assert(false, NewFailure("PanicString", msg, nil))
 }
