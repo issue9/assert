@@ -136,7 +136,7 @@ func (a *Assertion) ErrorString(expr error, str string, msg ...interface{}) *Ass
 // 相当于 a.True(errors.Is(expr, target))
 func (a *Assertion) ErrorIs(expr, target error, msg ...interface{}) *Assertion {
 	a.TB().Helper()
-	return a.Assert(errors.Is(expr, target), NewFailure("ErrorIs", msg, nil))
+	return a.Assert(errors.Is(expr, target), NewFailure("ErrorIs", msg, map[string]interface{}{"err": expr}))
 }
 
 // NotError 断言没有错误
