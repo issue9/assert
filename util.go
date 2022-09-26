@@ -7,62 +7,37 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
-	"time"
 )
 
 // 判断一个值是否为空(0, "", false, 空数组等)。
 // []string{""}空数组里套一个空字符串，不会被判断为空。
 func isEmpty(expr interface{}) bool {
-	if expr == nil {
+	if isZero(expr) {
 		return true
 	}
 
-	switch v := expr.(type) {
-	case bool:
-		return !v
-	case int:
-		return 0 == v
-	case int8:
-		return 0 == v
-	case int16:
-		return 0 == v
-	case int32:
-		return 0 == v
-	case int64:
-		return 0 == v
-	case uint:
-		return 0 == v
-	case uint8:
-		return 0 == v
-	case uint16:
-		return 0 == v
-	case uint32:
-		return 0 == v
-	case uint64:
-		return 0 == v
-	case string:
-		return v == ""
-	case float32:
-		return 0 == v
-	case float64:
-		return 0 == v
-	case time.Time:
-		return v.IsZero()
-	case *time.Time:
-		return v.IsZero()
+	rv := reflect.ValueOf(expr)
+	for rv.Kind() == reflect.Pointer {
+		rv = rv.Elem()
 	}
-
-	// 符合 isNil 条件的，都为 Empty
-	if isNil(expr) {
-		return true
-	}
-
-	switch v := reflect.ValueOf(expr); v.Kind() {
+	switch rv.Kind() {
 	case reflect.Slice, reflect.Map, reflect.Array, reflect.Chan: // 长度为 0 的数组也是 empty
-		return 0 == v.Len()
+		return rv.Len() == 0
 	default:
-		return v.IsZero()
+		return false
 	}
+}
+
+func isZero(v interface{}) bool {
+	if isNil(v) || reflect.ValueOf(v).IsZero() {
+		return true
+	}
+
+	rv := reflect.ValueOf(v)
+	for rv.Kind() == reflect.Pointer {
+		rv = rv.Elem()
+	}
+	return rv.IsZero()
 }
 
 // isNil 判断一个值是否为 nil。
@@ -82,14 +57,15 @@ func isNil(expr interface{}) bool {
 //
 // 除了通过 reflect.DeepEqual() 判断值是否相等之外，一些类似
 // 可转换的数值也能正确判断，比如以下值也将会被判断为相等：
-//  int8(5)                     == int(5)
-//  []int{1,2}                  == []int8{1,2}
-//  []int{1,2}                  == [2]int8{1,2}
-//  []int{1,2}                  == []float32{1,2}
-//  map[string]int{"1":"2":2}   == map[string]int8{"1":1,"2":2}
 //
-//  // map 的键值不同，即使可相互转换也判断不相等。
-//  map[int]int{1:1,2:2}        != map[int8]int{1:1,2:2}
+//	int8(5)                     == int(5)
+//	[]int{1,2}                  == []int8{1,2}
+//	[]int{1,2}                  == [2]int8{1,2}
+//	[]int{1,2}                  == []float32{1,2}
+//	map[string]int{"1":"2":2}   == map[string]int8{"1":1,"2":2}
+//
+//	// map 的键值不同，即使可相互转换也判断不相等。
+//	map[int]int{1:1,2:2}        != map[int8]int{1:1,2:2}
 func isEqual(v1, v2 interface{}) bool {
 	if reflect.DeepEqual(v1, v2) {
 		return true

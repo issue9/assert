@@ -7,6 +7,20 @@ import (
 	"time"
 )
 
+func TestIsZero(t *testing.T) {
+	zero := func(v interface{}) {
+		t.Helper()
+		if !isZero(v) {
+			t.Errorf("zero: %v", v)
+		}
+	}
+
+	zero(nil)
+	zero(struct{}{})
+	zero(time.Time{})
+	zero(&time.Time{})
+}
+
 func TestIsEqual(t *testing.T) {
 	eq := func(v1, v2 interface{}) {
 		t.Helper()

@@ -3,6 +3,7 @@
 package assert
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"os"
@@ -127,9 +128,11 @@ func TestAssertion_Zero_NotZero(t *testing.T) {
 	a.Zero(v)
 	a.Zero([2]int{0, 0})
 	a.Zero([0]int{})
+	a.Zero(&time.Time{})
+	a.Zero(sql.NullTime{})
+
 	a.NotZero([]int{0, 0})
 	a.NotZero([]int{})
-	a.NotZero(&time.Time{})
 }
 
 func TestAssertion_Length_NotLength(t *testing.T) {

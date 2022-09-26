@@ -251,9 +251,7 @@ func (a *Assertion) NotContains(container, item interface{}, msg ...interface{})
 // 最终调用的是 reflect.Value.IsZero 进行判断
 func (a *Assertion) Zero(v interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
-
-	isZero := v == nil || reflect.ValueOf(v).IsZero()
-	return a.Assert(isZero, NewFailure("Zero", msg, map[string]interface{}{"v": v}))
+	return a.Assert(isZero(v), NewFailure("Zero", msg, map[string]interface{}{"v": v}))
 }
 
 // NotZero 断言是否为非零值
@@ -261,9 +259,7 @@ func (a *Assertion) Zero(v interface{}, msg ...interface{}) *Assertion {
 // 最终调用的是 reflect.Value.IsZero 进行判断
 func (a *Assertion) NotZero(v interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
-
-	isZero := v == nil || reflect.ValueOf(v).IsZero()
-	return a.Assert(!isZero, NewFailure("NotZero", msg, map[string]interface{}{"v": v}))
+	return a.Assert(!isZero(v), NewFailure("NotZero", msg, map[string]interface{}{"v": v}))
 }
 
 // Length 断言长度是否为指定的值
