@@ -17,7 +17,7 @@ func isEmpty(expr interface{}) bool {
 	}
 
 	rv := reflect.ValueOf(expr)
-	for rv.Kind() == reflect.Pointer {
+	for rv.Kind() == reflect.Ptr {
 		rv = rv.Elem()
 	}
 	switch rv.Kind() {
@@ -34,7 +34,7 @@ func isZero(v interface{}) bool {
 	}
 
 	rv := reflect.ValueOf(v)
-	for rv.Kind() == reflect.Pointer {
+	for rv.Kind() == reflect.Ptr {
 		rv = rv.Elem()
 	}
 	return rv.IsZero()
