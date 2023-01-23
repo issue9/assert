@@ -53,7 +53,7 @@ func NewWithEnv(tb testing.TB, fatal bool, env map[string]string) *Assertion {
 //
 // f 表示在断言失败时输出的信息
 //
-// 普通用户直接使用 True 效果是一样的，此函数主要供库调用。
+// 普通用户直接使用 [Assertion.True] 效果是一样的，此函数主要供库调用。
 func (a *Assertion) Assert(expr bool, f *Failure) *Assertion {
 	if !expr {
 		a.TB().Helper()
@@ -67,8 +67,8 @@ func (a *Assertion) TB() testing.TB { return a.tb }
 
 // True 断言表达式 expr 为真
 //
-// args 对应 fmt.Printf() 函数中的参数，其中 args[0] 对应第一个参数 format，依次类推，
-// 具体可参数 Assert 方法的介绍。其它断言函数的 args 参数，功能与此相同。
+// args 对应 [fmt.Printf] 函数中的参数，其中 args[0] 对应第一个参数 format，依次类推，
+// 具体可参数 [Assertion.Assert] 方法的介绍。其它断言函数的 args 参数，功能与此相同。
 func (a *Assertion) True(expr bool, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 	return a.Assert(expr, NewFailure("True", msg, nil))
@@ -113,7 +113,7 @@ func (a *Assertion) NotEmpty(expr interface{}, msg ...interface{}) *Assertion {
 //
 // 传递未初始化的 error 值(var err error = nil)，将断言失败
 //
-// NotNil 的特化版本，限定了类型为 error。
+// [Assertion.NotNil] 的特化版本，限定了类型为 error。
 func (a *Assertion) Error(expr error, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 	return a.Assert(!isNil(expr), NewFailure("Error", msg, map[string]interface{}{"v": expr}))
@@ -141,7 +141,7 @@ func (a *Assertion) ErrorIs(expr, target error, msg ...interface{}) *Assertion {
 
 // NotError 断言没有错误
 //
-// Nil 的特化版本，限定了类型为 error。
+// [Assertion.Nil] 的特化版本，限定了类型为 error。
 func (a *Assertion) NotError(expr error, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 	return a.Assert(isNil(expr), NewFailure("NotError", msg, map[string]interface{}{"v": expr}))
@@ -256,7 +256,7 @@ func (a *Assertion) Zero(v interface{}, msg ...interface{}) *Assertion {
 
 // NotZero 断言是否为非零值
 //
-// 最终调用的是 reflect.Value.IsZero 进行判断
+// 最终调用的是 [reflect.Value.IsZero] 进行判断
 func (a *Assertion) NotZero(v interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 	return a.Assert(!isZero(v), NewFailure("NotZero", msg, map[string]interface{}{"v": v}))

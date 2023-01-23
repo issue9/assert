@@ -37,7 +37,7 @@ type Failure struct {
 	User   string                 // 断言出错时用户反馈的额外信息
 }
 
-// FailureSprintFunc 将 Failure 转换成文本的函数
+// FailureSprintFunc 将 [Failure] 转换成文本的函数
 //
 // NOTE: 可以使用此方法实现对错误信息的本地化。
 type FailureSprintFunc func(*Failure) string
