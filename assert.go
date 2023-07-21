@@ -33,7 +33,7 @@ var failureSprint FailureSprintFunc = DefaultFailureSprint
 // Failure 在断言出错时输出的错误信息
 type Failure struct {
 	Action string                 // 操作名称，比如 Equal，NotEqual 等方法名称。
-	Values map[string]interface{} // 断言出错是返回的一些额外参数
+	Values map[string]interface{} // 断言出错时返回的一些额外参数
 	User   string                 // 断言出错时用户反馈的额外信息
 }
 
@@ -79,7 +79,7 @@ func DefaultFailureSprint(f *Failure) string {
 
 // NewFailure 声明 Failure 对象
 //
-// user 表示用户提交的反馈，。其第一个元素如果是 string，那么将调用 fmt.Sprintf(user[0], user[1:]...)
+// user 表示用户提交的反馈，其第一个元素如果是 string，那么将调用 fmt.Sprintf(user[0], user[1:]...)
 // 对数据进行格式化，否则采用 fmt.Sprint(user...) 格式化数据；
 // kv 表示当前错误返回的数据；
 func NewFailure(action string, user []interface{}, kv map[string]interface{}) *Failure {

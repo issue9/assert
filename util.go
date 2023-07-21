@@ -330,7 +330,7 @@ func getLen(v interface{}) (l int, msg string) {
 	}
 
 	switch r.Kind() {
-	case reflect.Array, reflect.String, reflect.Slice, reflect.Map:
+	case reflect.Array, reflect.String, reflect.Slice, reflect.Map, reflect.Chan:
 		return r.Len(), ""
 	}
 	return 0, fmt.Sprintf("无法获取 %s 类型的长度信息", r.Kind())
