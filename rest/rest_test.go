@@ -106,8 +106,7 @@ var raw = []*struct {
 	req, resp string
 }{
 	{
-		req: `GET /get HTTP/1.1
-Host: {host}
+		req: `GET {host}/get HTTP/1.1
 
 `,
 		resp: `HTTP/1.1 201
@@ -115,8 +114,8 @@ Host: {host}
 `,
 	},
 	{
-		req: `POST /body HTTP/1.1
-Host: {host}
+		req: `POST {host}/body HTTP/1.1
+Host: 这行将被忽略
 Content-Type: application/json
 Content-Length: 8
 
@@ -131,8 +130,7 @@ Content-Type: application/json;charset=utf-8
 `,
 	},
 	{
-		req: `DELETE /body?page=5 HTTP/1.0
-Host: {host}
+		req: `DELETE {host}/body?page=5 HTTP/1.0
 Content-Type: application/xml
 Content-Length: 23
 

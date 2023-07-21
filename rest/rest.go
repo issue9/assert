@@ -9,7 +9,6 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 
 	"github.com/issue9/assert/v3"
 )
@@ -48,7 +47,14 @@ func (srv *Server) RawHTTP(req, resp string) *Server {
 
 // RawHTTP 通过原始数据进行比较请求和返回数据是符合要求
 //
-// reqRaw 表示原始的请求数据；
+// reqRaw 表示原始的请求数据。其格式如下：
+//
+//	POST https://example.com/path HTTP/1.1
+//
+//	text
+//
+// 会忽略 HOST 报头，而是应该将主机部分直接写在请求地址中。
+//
 // respRaw 表示返回之后的原始数据；
 //
 // NOTE: 仅判断状态码、报头和实际内容是否相同，而不是直接比较两个 http.Response 的值。
@@ -98,10 +104,7 @@ func readRaw(a *assert.Assertion, reqRaw, respRaw string) (*http.Request, *http.
 
 	r, err := http.ReadRequest(bufio.NewReader(bytes.NewBufferString(reqRaw)))
 	a.NotError(err).NotNil(r)
-	u, err := url.Parse(r.Host + r.URL.String())
-	a.NotError(err).NotNil(u)
-	r.RequestURI = ""
-	r.URL = u
+	r.RequestURI = "" // 作为 client 不需要此值
 
 	return r, resp
 }
