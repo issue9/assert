@@ -24,7 +24,7 @@ type Response struct {
 
 // Do 执行请求操作
 //
-// h 默认为空，如果不为空，则表示当前请求忽略 http.Client，而是访问 h.ServeHTTP 的内容。
+// h 默认为空，如果不为空，则表示当前请求忽略 [http.Client]，而是访问 h.ServeHTTP 的内容。
 func (req *Request) Do(h http.Handler) *Response {
 	if req.client == nil && h == nil {
 		panic("h 不能为空")
@@ -60,7 +60,7 @@ func (req *Request) Do(h http.Handler) *Response {
 	}
 }
 
-// Resp 返回 http.Response 实例
+// Resp 返回 [http.Response] 实例
 //
 // NOTE: http.Response.Body 内容已经被读取且关闭。
 func (resp *Response) Resp() *http.Response { return resp.resp }

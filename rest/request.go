@@ -20,6 +20,7 @@ type Request struct {
 	method  string
 	body    io.Reader
 	queries url.Values
+	cookies []*http.Cookie
 	params  map[string]string
 	headers map[string]string
 	a       *assert.Assertion
@@ -30,10 +31,13 @@ type Request struct {
 //
 // method 表示请求方法
 // path 表示请求的路径，域名部分无须填定。可以通过 {} 指定参数，比如：
-//  r := NewRequest(http.MethodGet, "/users/{id}")
+//
+//	r := NewRequest(http.MethodGet, "/users/{id}")
+//
 // 之后就可以使用 Params 指定 id 的具体值，达到复用的目的：
-//  resp1 := r.Param("id", "1").Do()
-//  resp2 := r.Param("id", "2").Do()
+//
+//	resp1 := r.Param("id", "1").Do()
+//	resp2 := r.Param("id", "2").Do()
 func (srv *Server) NewRequest(method, path string) *Request {
 	return NewRequest(srv.a, method, srv.URL()+path).Client(srv.client)
 }
@@ -103,6 +107,12 @@ func (req *Request) Query(key, val string) *Request {
 
 	req.queries.Add(key, val)
 
+	return req
+}
+
+// Cookie 添加 Cookie
+func (req *Request) Cookie(c *http.Cookie) *Request {
+	req.cookies = append(req.cookies, c)
 	return req
 }
 
@@ -179,7 +189,7 @@ func (req *Request) buildPath() string {
 	return path
 }
 
-// Request 返回标准库的 http.Request 实例
+// Request 生成 [http.Request] 实例
 func (req *Request) Request() *http.Request {
 	req.a.TB().Helper()
 
@@ -189,6 +199,10 @@ func (req *Request) Request() *http.Request {
 
 	for k, v := range req.headers {
 		r.Header.Add(k, v)
+	}
+
+	for _, c := range req.cookies {
+		r.AddCookie(c)
 	}
 
 	return r

@@ -13,7 +13,7 @@ import (
 	"github.com/issue9/assert/v3"
 )
 
-// BuildHandler 生成用于测试的 http.Handler 对象
+// BuildHandler 生成用于测试的 [http.Handler] 对象
 //
 // 仅是简单地按以下步骤输出内容：
 //   - 输出状态码 code；
