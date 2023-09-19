@@ -24,7 +24,7 @@ func BuildHandler(a *assert.Assertion, code int, body string, headers map[string
 }
 
 func BuildHandlerFunc(a *assert.Assertion, code int, body string, headers map[string]string) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, _ *http.Request) {
 		a.TB().Helper()
 
 		for k, v := range headers {

@@ -16,7 +16,6 @@ import (
 type Assertion struct {
 	tb testing.TB
 
-	fatal bool
 	print func(...interface{})
 	f     FailureSprintFunc
 }
@@ -33,7 +32,6 @@ func New(tb testing.TB, fatal bool) *Assertion {
 	return &Assertion{
 		tb: tb,
 
-		fatal: fatal,
 		print: p,
 		f:     failureSprint,
 	}
@@ -231,7 +229,7 @@ func (a *Assertion) NotPanic(fn func(), msg ...interface{}) *Assertion {
 
 // Contains 断言 container 包含 item 或是包含 item 中的所有项
 //
-// 若 container 是字符串(string、[]byte 和 []rune，不包含 fmt.Stringer 接口)，
+// 若 container 是字符串(string、[]byte 和 []rune)，
 // 都将会以字符串的形式判断其是否包含 item。
 // 若 container 是个列表(array、slice、map)则判断其元素中是否包含 item 中的
 // 的所有项，或是 item 本身就是 container 中的一个元素。
@@ -248,7 +246,7 @@ func (a *Assertion) NotContains(container, item interface{}, msg ...interface{})
 
 // Zero 断言是否为零值
 //
-// 最终调用的是 reflect.Value.IsZero 进行判断
+// 最终调用的是 [reflect.Value.IsZero] 进行判断
 func (a *Assertion) Zero(v interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 	return a.Assert(isZero(v), NewFailure("Zero", msg, map[string]interface{}{"v": v}))
