@@ -141,6 +141,8 @@ func (resp *Response) BodyEmpty(msg ...interface{}) *Response {
 }
 
 // JSONBody body 转换成 JSON 对象之后是否等价于 val
+//
+// Deprecated: 下个版本将会被删除。
 func (resp *Response) JSONBody(val interface{}) *Response {
 	resp.a.TB().Helper()
 	return resp.BodyFunc(func(a *assert.Assertion, body []byte) {
@@ -154,6 +156,8 @@ func (resp *Response) JSONBody(val interface{}) *Response {
 }
 
 // XMLBody body 转换成 XML 对象之后是否等价于 val
+//
+// Deprecated: 下个版本将会被删除。
 func (resp *Response) XMLBody(val interface{}) *Response {
 	resp.a.TB().Helper()
 	return resp.BodyFunc(func(a *assert.Assertion, body []byte) {

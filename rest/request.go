@@ -163,6 +163,8 @@ func (req *Request) BodyFunc(obj interface{}, marshal func(interface{}) ([]byte,
 // JSONBody 指定一个 JSON 格式的 body
 //
 // NOTE: 此函并不会设置 content-type 报头。
+//
+// Deprecated: 下个版本将会被删除。
 func (req *Request) JSONBody(obj interface{}) *Request {
 	return req.BodyFunc(obj, json.Marshal)
 }
@@ -170,6 +172,8 @@ func (req *Request) JSONBody(obj interface{}) *Request {
 // XMLBody 指定一个 XML 格式的 body
 //
 // NOTE: 此函并不会设置 content-type 报头。
+//
+// Deprecated: 下个版本将会被删除。
 func (req *Request) XMLBody(obj interface{}) *Request {
 	return req.BodyFunc(obj, xml.Marshal)
 }

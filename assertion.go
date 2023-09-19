@@ -39,7 +39,7 @@ func New(tb testing.TB, fatal bool) *Assertion {
 
 // NewWithEnv 以指定的环境变量初始化 *Assertion 对象
 //
-// env 是以 t.Setenv 的形式调用。
+// env 是以 [testing.TB.Setenv] 的形式调用。
 func NewWithEnv(tb testing.TB, fatal bool, env map[string]string) *Assertion {
 	for k, v := range env {
 		tb.Setenv(k, v)
@@ -51,7 +51,7 @@ func NewWithEnv(tb testing.TB, fatal bool, env map[string]string) *Assertion {
 //
 // f 表示在断言失败时输出的信息
 //
-// 普通用户直接使用 [Assertion.True] 效果是一样的，此函数主要供库调用。
+// 普通用户直接使用 [Assertion.True] 效果是一样的，此函数主要供 [Assertion] 自身调用。
 func (a *Assertion) Assert(expr bool, f *Failure) *Assertion {
 	if !expr {
 		a.TB().Helper()
@@ -66,7 +66,7 @@ func (a *Assertion) TB() testing.TB { return a.tb }
 // True 断言表达式 expr 为真
 //
 // args 对应 [fmt.Printf] 函数中的参数，其中 args[0] 对应第一个参数 format，依次类推，
-// 具体可参数 [Assertion.Assert] 方法的介绍。其它断言函数的 args 参数，功能与此相同。
+// 其它断言函数的 args 参数，功能与此相同。
 func (a *Assertion) True(expr bool, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 	return a.Assert(expr, NewFailure("True", msg, nil))
@@ -229,7 +229,7 @@ func (a *Assertion) NotPanic(fn func(), msg ...interface{}) *Assertion {
 
 // Contains 断言 container 包含 item 或是包含 item 中的所有项
 //
-// 若 container 是字符串(string、[]byte 和 []rune)，
+// 若 container string、[]byte 和 []rune 类型，
 // 都将会以字符串的形式判断其是否包含 item。
 // 若 container 是个列表(array、slice、map)则判断其元素中是否包含 item 中的
 // 的所有项，或是 item 本身就是 container 中的一个元素。
