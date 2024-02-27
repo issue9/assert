@@ -222,9 +222,9 @@ func (a *Assertion) PanicType(fn func(), typ interface{}, msg ...interface{}) *A
 	return a.Assert(false, NewFailure("PanicType", msg, nil))
 }
 
+// NotPanic 断言 fn 不会 panic
 func (a *Assertion) NotPanic(fn func(), msg ...interface{}) *Assertion {
 	a.TB().Helper()
-
 	has, m := hasPanic(fn)
 	return a.Assert(!has, NewFailure("NotPanic", msg, map[string]interface{}{"err": m}))
 }
@@ -307,7 +307,7 @@ func (a *Assertion) TypeEqual(ptr bool, v1, v2 interface{}, msg ...interface{}) 
 	a.TB().Helper()
 
 	t1, t2 := getType(ptr, v1, v2)
-	return a.Assert(t1 == t2, NewFailure("TypeEquaal", msg, map[string]interface{}{"v1": t1, "v2": t2}))
+	return a.Assert(t1 == t2, NewFailure("TypeEqual", msg, map[string]interface{}{"v1": t1, "v2": t2}))
 }
 
 // Same 断言为同一个对象
@@ -358,8 +358,6 @@ func (a *Assertion) Match(reg *regexp.Regexp, v interface{}, msg ...interface{})
 }
 
 // NotMatch 断言 v 是否不匹配正则表达式 reg
-//
-// reg 可以是 [regexp.Regexp] 或是正则表达式的字符串。
 func (a *Assertion) NotMatch(reg *regexp.Regexp, v interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 	switch val := v.(type) {
