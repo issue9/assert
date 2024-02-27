@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/issue9/assert/v3"
+	"github.com/issue9/assert/v4"
 )
 
 func TestRequest_Do(t *testing.T) {
@@ -42,13 +42,12 @@ func TestResponse(t *testing.T) {
 	srv.NewRequest(http.MethodGet, "/body").
 		Header("content-type", "application/json").
 		Query("page", "5").
-		JSONBody(&bodyTest{ID: 5}).
+		StringBody(`{"id":5}`).
 		Do(nil).
 		Status(http.StatusCreated).
 		NotStatus(http.StatusNotFound).
 		Header("content-type", "application/json;charset=utf-8").
 		NotHeader("content-type", "invalid value").
-		JSONBody(&bodyTest{ID: 6}).
 		Body([]byte(`{"id":6}`)).
 		StringBody(`{"id":6}`).
 		BodyNotEmpty()
@@ -59,14 +58,4 @@ func TestResponse(t *testing.T) {
 		Status(http.StatusCreated).
 		NotHeader("content-type", "invalid value").
 		BodyEmpty()
-
-	// xml
-
-	srv.NewRequest(http.MethodGet, "/body").
-		Header("content-type", "application/xml").
-		XMLBody(&bodyTest{ID: 5}).
-		Do(nil).
-		Success(http.StatusCreated).
-		Header("content-type", "application/xml;charset=utf-8").
-		XMLBody(&bodyTest{ID: 6})
 }

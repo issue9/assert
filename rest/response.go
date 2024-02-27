@@ -6,15 +6,11 @@ package rest
 
 import (
 	"bytes"
-	"encoding/json"
-	"encoding/xml"
-	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"reflect"
 
-	"github.com/issue9/assert/v3"
+	"github.com/issue9/assert/v4"
 )
 
 // Response 测试请求的返回结构
@@ -64,7 +60,7 @@ func (req *Request) Do(h http.Handler) *Response {
 
 // Resp 返回 [http.Response] 实例
 //
-// NOTE: http.Response.Body 内容已经被读取且关闭。
+// NOTE: [http.Response.Body] 内容已经被读取且关闭。
 func (resp *Response) Resp() *http.Response { return resp.resp }
 
 func (resp *Response) assert(expr bool, f *assert.Failure) *Response {
@@ -91,7 +87,7 @@ func (resp *Response) Fail(msg ...interface{}) *Response {
 func (resp *Response) Status(status int, msg ...interface{}) *Response {
 	resp.a.TB().Helper()
 	eq := resp.resp.StatusCode == status
-	return resp.assert(eq, assert.NewFailure("Status", msg, map[string]interface{}{"status1": resp.resp.StatusCode, "status2": status}))
+	return resp.assert(eq, assert.NewFailure("Status", msg, map[string]interface{}{"status": resp.resp.StatusCode, "val": status}))
 }
 
 // NotStatus 判断状态码是否与 status 不相等
@@ -120,14 +116,14 @@ func (resp *Response) NotHeader(key string, val string, msg ...interface{}) *Res
 // Body 断言内容与 val 相同
 func (resp *Response) Body(val []byte, msg ...interface{}) *Response {
 	resp.a.TB().Helper()
-	return resp.assert(bytes.Equal(resp.body, val), assert.NewFailure("Body", msg, map[string]interface{}{"v1": string(resp.body), "v2": string(val)}))
+	return resp.assert(bytes.Equal(resp.body, val), assert.NewFailure("Body", msg, map[string]interface{}{"body": string(resp.body), "val": string(val)}))
 }
 
 // StringBody 断言内容与 val 相同
 func (resp *Response) StringBody(val string, msg ...interface{}) *Response {
 	resp.a.TB().Helper()
 	b := string(resp.body)
-	return resp.assert(b == val, assert.NewFailure("StringBody", msg, map[string]interface{}{"v1": b, "v2": val}))
+	return resp.assert(b == val, assert.NewFailure("StringBody", msg, map[string]interface{}{"body": b, "val": val}))
 }
 
 // BodyNotEmpty 报文内容是否不为空
@@ -139,37 +135,7 @@ func (resp *Response) BodyNotEmpty(msg ...interface{}) *Response {
 // BodyEmpty 报文内容是否为空
 func (resp *Response) BodyEmpty(msg ...interface{}) *Response {
 	resp.a.TB().Helper()
-	return resp.assert(len(resp.body) == 0, assert.NewFailure("BodyEmpty", msg, map[string]interface{}{"v": resp.body}))
-}
-
-// JSONBody body 转换成 JSON 对象之后是否等价于 val
-//
-// Deprecated: 下个版本将会被删除。
-func (resp *Response) JSONBody(val interface{}) *Response {
-	resp.a.TB().Helper()
-	return resp.BodyFunc(func(a *assert.Assertion, body []byte) {
-		a.TB().Helper()
-
-		// NOTE: 应当始终将 body 转换 val 相同的类型，然后再比较对象，
-		// 因为 val 转换成字符串，可能因为空格缩进等原因，未必会与 body 是相同的。
-		b, err := UnmarshalObject(body, val, json.Unmarshal)
-		a.NotError(err).Equal(b, val)
-	})
-}
-
-// XMLBody body 转换成 XML 对象之后是否等价于 val
-//
-// Deprecated: 下个版本将会被删除。
-func (resp *Response) XMLBody(val interface{}) *Response {
-	resp.a.TB().Helper()
-	return resp.BodyFunc(func(a *assert.Assertion, body []byte) {
-		a.TB().Helper()
-
-		// NOTE: 应当始终将 body 转换 val 相同的类型，然后再比较对象，
-		// 因为 val 转换成字符串，可能因为空格缩进等原因，未必会与 body 是相同的。
-		b, err := UnmarshalObject(body, val, xml.Unmarshal)
-		a.NotError(err).Equal(b, val)
-	})
+	return resp.assert(len(resp.body) == 0, assert.NewFailure("BodyEmpty", msg, map[string]interface{}{"body": resp.body}))
 }
 
 // BodyFunc 指定对 body 内容的断言方式
@@ -181,20 +147,4 @@ func (resp *Response) BodyFunc(f func(a *assert.Assertion, body []byte)) *Respon
 	f(resp.a, b)
 
 	return resp
-}
-
-// UnmarshalObject 将 data 以 u 作为转换方式转换成与 val 相同的类型
-//
-// 如果 val 是指针，则会转换成其指向的类型，返回的对象是指针类型。
-func UnmarshalObject(data []byte, val interface{}, u func([]byte, interface{}) error) (interface{}, error) {
-	t := reflect.TypeOf(val)
-	for t.Kind() == reflect.Ptr {
-		t = t.Elem()
-	}
-	bv := reflect.New(t)
-
-	if err := u(data, bv.Interface()); err != nil && !errors.Is(err, io.EOF) {
-		return nil, err
-	}
-	return bv.Interface(), nil
 }

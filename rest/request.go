@@ -6,14 +6,12 @@ package rest
 
 import (
 	"bytes"
-	"encoding/json"
-	"encoding/xml"
 	"io"
 	"net/http"
 	"net/url"
 	"strings"
 
-	"github.com/issue9/assert/v3"
+	"github.com/issue9/assert/v4"
 )
 
 // Request 请求的参数封装
@@ -153,7 +151,7 @@ func (req *Request) StringBody(body string) *Request {
 
 // BodyFunc 指定一个未编码的对象
 //
-// marshal 对 obj 的编码函数，比如 json.Marshal 等。
+// marshal 对 obj 的编码函数，比如 [json.Marshal] 等。
 func (req *Request) BodyFunc(obj interface{}, marshal func(interface{}) ([]byte, error)) *Request {
 	req.a.TB().Helper()
 
@@ -162,30 +160,12 @@ func (req *Request) BodyFunc(obj interface{}, marshal func(interface{}) ([]byte,
 	return req.Body(data)
 }
 
-// JSONBody 指定一个 JSON 格式的 body
-//
-// NOTE: 此函并不会设置 content-type 报头。
-//
-// Deprecated: 下个版本将会被删除。
-func (req *Request) JSONBody(obj interface{}) *Request {
-	return req.BodyFunc(obj, json.Marshal)
-}
-
-// XMLBody 指定一个 XML 格式的 body
-//
-// NOTE: 此函并不会设置 content-type 报头。
-//
-// Deprecated: 下个版本将会被删除。
-func (req *Request) XMLBody(obj interface{}) *Request {
-	return req.BodyFunc(obj, xml.Marshal)
-}
-
 func (req *Request) buildPath() string {
 	path := req.path
 
 	for key, val := range req.params {
 		key = "{" + key + "}"
-		path = strings.Replace(path, key, val, -1)
+		path = strings.ReplaceAll(path, key, val)
 	}
 
 	if len(req.queries) > 0 {
