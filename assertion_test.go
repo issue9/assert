@@ -104,8 +104,9 @@ func TestAssertion_Panic(t *testing.T) {
 	}
 
 	a.Panic(f1)
-	a.PanicString(f1, "panic message")
+	a.PanicString(f1, "message")
 	a.PanicType(f1, "abc")
+	a.PanicValue(f1, "panic message")
 
 	f1 = func() {
 		panic(errors.New("panic"))

@@ -13,9 +13,10 @@ import (
 	"regexp"
 	"strings"
 	"testing"
+	"time"
 )
 
-// Assertion 可以以对象的方式调用包中的各个断言函数
+// Assertion 是对 testing 包的一些简单包装
 type Assertion struct {
 	tb    testing.TB
 	print func(...interface{})
@@ -196,7 +197,6 @@ func (a *Assertion) FileNotExistsFS(fsys fs.FS, path string, msg ...interface{})
 // Panic 断言函数会发生 panic
 func (a *Assertion) Panic(fn func(), msg ...interface{}) *Assertion {
 	a.TB().Helper()
-
 	has, _ := hasPanic(fn)
 	return a.Assert(has, NewFailure("Panic", msg, nil))
 }
@@ -218,6 +218,16 @@ func (a *Assertion) PanicType(fn func(), typ interface{}, msg ...interface{}) *A
 	if has, m := hasPanic(fn); has {
 		t1, t2 := getType(true, m, typ)
 		return a.Assert(t1 == t2, NewFailure("PanicType", msg, map[string]interface{}{"v1": t1, "v2": t2}))
+	}
+	return a.Assert(false, NewFailure("PanicType", msg, nil))
+}
+
+// PanicValue 断言函数会抛出与 v 相同的信息
+func (a *Assertion) PanicValue(fn func(), v interface{}, msg ...interface{}) *Assertion {
+	a.TB().Helper()
+
+	if has, m := hasPanic(fn); has {
+		return a.Assert(isEqual(m, v), NewFailure("PanicValue", msg, map[string]interface{}{"v": m}))
 	}
 	return a.Assert(false, NewFailure("PanicType", msg, nil))
 }
@@ -353,7 +363,7 @@ func (a *Assertion) Match(reg *regexp.Regexp, v interface{}, msg ...interface{})
 	case []byte:
 		return a.Assert(reg.Match(val), NewFailure("Match", msg, map[string]interface{}{"v": val}))
 	default:
-		panic("参数 v 的类型只能是 string 或是 []byte")
+		return a.Assert(reg.MatchString(fmt.Sprint(val)), NewFailure("Match", msg, map[string]interface{}{"v": val}))
 	}
 }
 
@@ -366,6 +376,15 @@ func (a *Assertion) NotMatch(reg *regexp.Regexp, v interface{}, msg ...interface
 	case []byte:
 		return a.Assert(!reg.Match(val), NewFailure("NotMatch", msg, map[string]interface{}{"v": val}))
 	default:
-		panic("参数 v 的类型只能是 string 或是 []byte")
+		return a.Assert(!reg.MatchString(fmt.Sprint(val)), NewFailure("NotMatch", msg, map[string]interface{}{"v": val}))
 	}
 }
+
+// Wait 等待一定时间再执行后续操作
+func (a *Assertion) Wait(d time.Duration) *Assertion {
+	time.Sleep(d)
+	return a
+}
+
+// WaitSeconds 等待 s 秒再执行后续操作
+func (a *Assertion) WaitSeconds(s int) *Assertion { return a.Wait(time.Duration(s) * time.Second) }

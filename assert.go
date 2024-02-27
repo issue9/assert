@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-// Package assert 是对 testing 包的一些简单包装
+// Package assert 测试用的断言包
 //
 //	func TestAssert(t *testing.T) {
 //	    var v interface{} = 5
