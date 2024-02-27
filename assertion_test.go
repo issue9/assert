@@ -187,9 +187,9 @@ func TestAssertion_TypeEqual(t *testing.T) {
 func TestAssertion_Same(t *testing.T) {
 	a := New(t, false)
 
-	a.NotSame(5, 5)
-	a.NotSame(struct{}{}, struct{}{})
-	a.NotSame(func() {}, func() {})
+	a.NotSame(5, 5).
+		NotSame(struct{}{}, struct{}{}).
+		NotSame(func() {}, func() {})
 
 	i := 5
 	a.NotSame(i, i)

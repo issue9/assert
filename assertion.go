@@ -16,14 +16,14 @@ import (
 	"time"
 )
 
-// Assertion 是对 testing 包的一些简单包装
+// Assertion 是对 [testing.TB] 的二次包装
 type Assertion struct {
 	tb    testing.TB
 	print func(...interface{})
 	f     FailureSprintFunc
 }
 
-// New 返回 Assertion 对象
+// New 返回 [Assertion] 对象
 //
 // fatal 决定在出错时是调用 tb.Error 还是 tb.Fatal；
 func New(tb testing.TB, fatal bool) *Assertion {
@@ -39,7 +39,7 @@ func New(tb testing.TB, fatal bool) *Assertion {
 	}
 }
 
-// NewWithEnv 以指定的环境变量初始化 *Assertion 对象
+// NewWithEnv 以指定的环境变量初始化 [Assertion] 对象
 //
 // env 是以 [testing.TB.Setenv] 的形式调用。
 func NewWithEnv(tb testing.TB, fatal bool, env map[string]string) *Assertion {
@@ -59,6 +59,7 @@ func (a *Assertion) Assert(expr bool, f *Failure) *Assertion {
 		a.TB().Helper()
 		a.print(a.f(f))
 	}
+	failurePool.Put(f)
 	return a
 }
 

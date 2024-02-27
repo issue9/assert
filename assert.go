@@ -28,15 +28,18 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"sync"
 )
 
 var failureSprint FailureSprintFunc = DefaultFailureSprint
+
+var failurePool = &sync.Pool{New: func() interface{} { return &Failure{} }}
 
 // Failure 在断言出错时输出的错误信息
 type Failure struct {
 	Action string                 // 操作名称，比如 Equal，NotEqual 等方法名称。
 	Values map[string]interface{} // 断言出错时返回的一些额外参数
-	User   string                 // 断言出错时用户反馈的额外信息
+	user   []interface{}          // 断言出错时用户反馈的额外信息
 }
 
 // FailureSprintFunc 将 [Failure] 转换成文本的函数
@@ -49,6 +52,7 @@ type FailureSprintFunc = func(*Failure) string
 // [New] 方法在默认情况下继承由此方法设置的值。
 func SetFailureSprintFunc(f FailureSprintFunc) { failureSprint = f }
 
+// GetFailureSprintFunc 获取当前的 [FailureSprintFunc] 方法
 func GetFailureSprintFunc() FailureSprintFunc { return failureSprint }
 
 // DefaultFailureSprint 默认的 [FailureSprintFunc] 实现
@@ -73,9 +77,9 @@ func DefaultFailureSprint(f *Failure) string {
 		}
 	}
 
-	if f.User != "" {
+	if u := f.User(); u != "" {
 		s.WriteString("用户反馈信息：")
-		s.WriteString(f.User)
+		s.WriteString(u)
 	}
 
 	return s.String()
@@ -87,19 +91,25 @@ func DefaultFailureSprint(f *Failure) string {
 // 对数据进行格式化，否则采用 fmt.Sprint(user...) 格式化数据；
 // kv 表示当前错误返回的数据；
 func NewFailure(action string, user []interface{}, kv map[string]interface{}) *Failure {
-	var u string
-	if len(user) > 0 {
-		switch v := user[0].(type) {
-		case string:
-			u = fmt.Sprintf(v, user[1:]...)
-		default:
-			u = fmt.Sprint(user...)
-		}
+	f := failurePool.Get().(*Failure)
+	f.Action = action
+	f.user = user
+	f.Values = kv
+	return f
+}
+
+// User 返回用户提交的返馈信息
+func (f *Failure) User() string {
+	// NOTE: 通过函数的方式返回字符串，而不是直接在 [NewFailure] 直接处理完，可以确保在未使用的情况下无需初始化。
+
+	if len(f.user) == 0 {
+		return ""
 	}
 
-	return &Failure{
-		Action: action,
-		User:   u,
-		Values: kv,
+	switch v := f.user[0].(type) {
+	case string:
+		return fmt.Sprintf(v, f.user[1:]...)
+	default:
+		return fmt.Sprint(f.user...)
 	}
 }
