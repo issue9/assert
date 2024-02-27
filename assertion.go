@@ -20,7 +20,6 @@ import (
 type Assertion struct {
 	tb    testing.TB
 	print func(...interface{})
-	f     FailureSprintFunc
 }
 
 // New 返回 [Assertion] 对象
@@ -35,7 +34,6 @@ func New(tb testing.TB, fatal bool) *Assertion {
 	return &Assertion{
 		tb:    tb,
 		print: p,
-		f:     failureSprint,
 	}
 }
 
@@ -57,7 +55,7 @@ func NewWithEnv(tb testing.TB, fatal bool, env map[string]string) *Assertion {
 func (a *Assertion) Assert(expr bool, f *Failure) *Assertion {
 	if !expr {
 		a.TB().Helper()
-		a.print(a.f(f))
+		a.print(GetFailureSprintFunc()(f))
 	}
 	failurePool.Put(f)
 	return a
