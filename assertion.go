@@ -16,8 +16,7 @@ import (
 
 // Assertion 可以以对象的方式调用包中的各个断言函数
 type Assertion struct {
-	tb testing.TB
-
+	tb    testing.TB
 	print func(...interface{})
 	f     FailureSprintFunc
 }
@@ -32,8 +31,7 @@ func New(tb testing.TB, fatal bool) *Assertion {
 	}
 
 	return &Assertion{
-		tb: tb,
-
+		tb:    tb,
 		print: p,
 		f:     failureSprint,
 	}
