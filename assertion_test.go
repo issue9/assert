@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"regexp"
 	"testing"
 	"time"
 )
@@ -206,4 +207,14 @@ func TestAssertion_Same(t *testing.T) {
 
 	a.NotSame(5, 5)
 	a.NotSame(f, 5)
+}
+
+func TestAssertion_Regexp(t *testing.T) {
+	a := New(t, false)
+
+	a.Match(regexp.MustCompile("^[1-9]*$"), "123")
+	a.NotMatch(regexp.MustCompile("^[1-9]*$"), "x123")
+
+	a.Match(regexp.MustCompile("^[1-9]*$"), []byte("123"))
+	a.NotMatch(regexp.MustCompile("^[1-9]*$"), []byte("x123"))
 }

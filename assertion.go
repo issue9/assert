@@ -10,6 +10,7 @@ import (
 	"io/fs"
 	"os"
 	"reflect"
+	"regexp"
 	"strings"
 	"testing"
 )
@@ -192,6 +193,7 @@ func (a *Assertion) FileNotExistsFS(fsys fs.FS, path string, msg ...interface{})
 	return a
 }
 
+// Panic 断言函数会发生 panic
 func (a *Assertion) Panic(fn func(), msg ...interface{}) *Assertion {
 	a.TB().Helper()
 
@@ -246,7 +248,7 @@ func (a *Assertion) NotContains(container, item interface{}, msg ...interface{})
 
 // Zero 断言是否为零值
 //
-// 最终调用的是 [reflect.Value.IsZero] 进行判断
+// 最终调用的是 [reflect.Value.IsZero] 进行判断，如果是指针，则会判断指向的对象。
 func (a *Assertion) Zero(v interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 	return a.Assert(isZero(v), NewFailure("Zero", msg, map[string]interface{}{"v": v}))
@@ -254,7 +256,7 @@ func (a *Assertion) Zero(v interface{}, msg ...interface{}) *Assertion {
 
 // NotZero 断言是否为非零值
 //
-// 最终调用的是 [reflect.Value.IsZero] 进行判断
+// 最终调用的是 [reflect.Value.IsZero] 进行判断，如果是指针，则会判断指向的对象。
 func (a *Assertion) NotZero(v interface{}, msg ...interface{}) *Assertion {
 	a.TB().Helper()
 	return a.Assert(!isZero(v), NewFailure("NotZero", msg, map[string]interface{}{"v": v}))
@@ -339,5 +341,33 @@ func canPointer(k reflect.Kind) bool {
 		return true
 	default:
 		return false
+	}
+}
+
+// Match 断言 v 是否匹配正则表达式 reg
+func (a *Assertion) Match(reg *regexp.Regexp, v interface{}, msg ...interface{}) *Assertion {
+	a.TB().Helper()
+	switch val := v.(type) {
+	case string:
+		return a.Assert(reg.MatchString(val), NewFailure("Match", msg, map[string]interface{}{"v": val}))
+	case []byte:
+		return a.Assert(reg.Match(val), NewFailure("Match", msg, map[string]interface{}{"v": val}))
+	default:
+		panic("参数 v 的类型只能是 string 或是 []byte")
+	}
+}
+
+// NotMatch 断言 v 是否不匹配正则表达式 reg
+//
+// reg 可以是 [regexp.Regexp] 或是正则表达式的字符串。
+func (a *Assertion) NotMatch(reg *regexp.Regexp, v interface{}, msg ...interface{}) *Assertion {
+	a.TB().Helper()
+	switch val := v.(type) {
+	case string:
+		return a.Assert(!reg.MatchString(val), NewFailure("NotMatch", msg, map[string]interface{}{"v": val}))
+	case []byte:
+		return a.Assert(!reg.Match(val), NewFailure("NotMatch", msg, map[string]interface{}{"v": val}))
+	default:
+		panic("参数 v 的类型只能是 string 或是 []byte")
 	}
 }

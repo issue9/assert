@@ -57,14 +57,14 @@ func isNil(expr interface{}) bool {
 
 // 判断两个值是否相等
 //
-// 除了通过 reflect.DeepEqual() 判断值是否相等之外，一些类似
+// 除了通过 [reflect.DeepEqual] 判断值是否相等之外，一些类似
 // 可转换的数值也能正确判断，比如以下值也将会被判断为相等：
 //
 //	int8(5)                     == int(5)
 //	[]int{1,2}                  == []int8{1,2}
 //	[]int{1,2}                  == [2]int8{1,2}
 //	[]int{1,2}                  == []float32{1,2}
-//	map[string]int{"1":"2":2}   == map[string]int8{"1":1,"2":2}
+//	map[string]int{"1":1,"2":2}   == map[string]int8{"1":1,"2":2}
 //
 //	// map 的键值不同，即使可相互转换也判断不相等。
 //	map[int]int{1:1,2:2}        != map[int8]int{1:1,2:2}
