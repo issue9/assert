@@ -210,7 +210,7 @@ func TestAssertion_Same(t *testing.T) {
 	a.NotSame(f, 5)
 }
 
-func TestAssertion_Regexp(t *testing.T) {
+func TestAssertion_Match(t *testing.T) {
 	a := New(t, false)
 
 	a.Match(regexp.MustCompile("^[1-9]*$"), "123")

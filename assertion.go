@@ -387,3 +387,6 @@ func (a *Assertion) Wait(d time.Duration) *Assertion {
 
 // WaitSeconds 等待 s 秒再执行后续操作
 func (a *Assertion) WaitSeconds(s int) *Assertion { return a.Wait(time.Duration(s) * time.Second) }
+
+// Go 以 goroutine 方式执行 f
+func (a *Assertion) Go(f func(*Assertion)) { go f(a) }
