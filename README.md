@@ -4,7 +4,7 @@ assert
 [![Go](https://github.com/issue9/assert/workflows/Go/badge.svg)](https://github.com/issue9/assert/actions?query=workflow%3AGo)
 [![codecov](https://codecov.io/gh/issue9/assert/branch/master/graph/badge.svg)](https://codecov.io/gh/issue9/assert)
 [![license](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://opensource.org/licenses/MIT)
-[![PkgGoDev](https://pkg.go.dev/badge/github.com/issue9/assert)](https://pkg.go.dev/github.com/issue9/assert/v3)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/issue9/assert)](https://pkg.go.dev/github.com/issue9/assert/v4)
 [![Go version](https://img.shields.io/github/go-mod/go-version/issue9/assert)](https://golang.org)
 
 assert 包是对 testing 的一个简单扩展，提供的一系列的断言函数，

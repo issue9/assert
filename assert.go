@@ -66,7 +66,7 @@ func DefaultFailureSprint(f *Failure) string {
 		for k := range f.Values {
 			keys = append(keys, k)
 		}
-		sort.Strings(keys)
+		sort.Strings(keys) // TODO(go1.21): slices.Sort
 
 		s.WriteString("反馈以下参数：\n")
 		for _, k := range keys {

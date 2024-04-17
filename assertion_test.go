@@ -8,7 +8,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"os"
 	"regexp"
 	"testing"
 	"time"
@@ -84,16 +83,6 @@ func TestAssertion_Error(t *testing.T) {
 	err4 := errors.New("err4")
 	err5 := fmt.Errorf("err5 with %w", err4)
 	a.ErrorIs(err5, err4)
-}
-
-func TestAssertion_FileExists_FileNotExists(t *testing.T) {
-	a := New(t, false)
-
-	a.FileExists("./assert.go", "a.FileExists(c:/windows) failed").
-		FileNotExists("c:/win", "a.FileNotExists(c:/win) failed")
-
-	a.FileExistsFS(os.DirFS("./"), "assert.go", "a.FileExistsFS(c:/windows) failed").
-		FileNotExistsFS(os.DirFS("c:/"), "win", "a.FileNotExistsFS(c:/win) failed")
 }
 
 func TestAssertion_Panic(t *testing.T) {
