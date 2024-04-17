@@ -6,7 +6,6 @@ package assert
 
 import (
 	"bytes"
-	"fmt"
 	"reflect"
 	"strings"
 )
@@ -168,19 +167,6 @@ func isEqual(v1, v2 interface{}) bool {
 	return false
 }
 
-// hasPanic 判断 fn 函数是否会发生 panic
-// 若发生了 panic，将把 msg 一起返回。
-func hasPanic(fn func()) (has bool, msg interface{}) {
-	defer func() {
-		if msg = recover(); msg != nil {
-			has = true
-		}
-	}()
-	fn()
-
-	return
-}
-
 // isContains 判断 container 是否包含了 item 的内容。若是指针，会判断指针指向的内容
 func isContains(container, item interface{}) bool {
 	if container == nil { // nil不包含任何东西
@@ -319,23 +305,6 @@ func isContains(container, item interface{}) bool {
 	}
 
 	return false
-}
-
-func getLen(v interface{}) (l int, msg string) {
-	r := reflect.ValueOf(v)
-	for r.Kind() == reflect.Ptr {
-		r = r.Elem()
-	}
-
-	if v == nil {
-		return 0, ""
-	}
-
-	switch r.Kind() {
-	case reflect.Array, reflect.String, reflect.Slice, reflect.Map, reflect.Chan:
-		return r.Len(), ""
-	}
-	return 0, fmt.Sprintf("无法获取 %s 类型的长度信息", r.Kind())
 }
 
 func getType(ptr bool, v1, v2 interface{}) (t1, t2 reflect.Type) {

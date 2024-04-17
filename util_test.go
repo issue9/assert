@@ -201,48 +201,6 @@ func TestIsNil(t *testing.T) {
 	}
 }
 
-func TestHasPanic(t *testing.T) {
-	f1 := func() {
-		panic("panic")
-	}
-
-	if has, _ := hasPanic(f1); !has {
-		t.Error("f1未发生panic")
-	}
-
-	f2 := func() {
-		f1()
-	}
-
-	if has, msg := hasPanic(f2); !has {
-		t.Error("f2未发生panic")
-	} else if msg != "panic" {
-		t.Errorf("f2发生了panic，但返回信息不正确，应为[panic]，但其实返回了%v", msg)
-	}
-
-	f3 := func() {
-		defer func() {
-			if msg := recover(); msg != nil {
-				t.Logf("TestHasPanic.f3 recover msg:[%v]", msg)
-			}
-		}()
-
-		f1()
-	}
-
-	if has, msg := hasPanic(f3); has {
-		t.Errorf("f3发生了panic，其信息为:[%v]", msg)
-	}
-
-	f4 := func() {
-		//todo
-	}
-
-	if has, msg := hasPanic(f4); has {
-		t.Errorf("f4发生panic，其信息为[%v]", msg)
-	}
-}
-
 func TestIsContains(t *testing.T) {
 	fn := func(result bool, container, item interface{}) {
 		t.Helper()

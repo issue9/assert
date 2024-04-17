@@ -6,8 +6,6 @@ package assert
 
 import (
 	"database/sql"
-	"errors"
-	"fmt"
 	"regexp"
 	"testing"
 	"time"
@@ -66,51 +64,6 @@ func TestAssertion_Equal_NotEqual_Nil_NotNil(t *testing.T) {
 		NotNil(v6, "a.NotNil(v6) failed")
 }
 
-func TestAssertion_Error(t *testing.T) {
-	a := New(t, false)
-
-	err := errors.New("test")
-	a.Error(err, "a.Error(err) failed")
-	a.ErrorString(err, "test", "ErrorString(err) failed")
-
-	err2 := &errorImpl{msg: "msg"}
-	a.Error(err2, "ErrorString(errorImpl) failed")
-	a.ErrorString(err2, "msg", "ErrorString(errorImpl) failed")
-
-	var err3 error
-	a.NotError(err3, "var err1 error failed")
-
-	err4 := errors.New("err4")
-	err5 := fmt.Errorf("err5 with %w", err4)
-	a.ErrorIs(err5, err4)
-}
-
-func TestAssertion_Panic(t *testing.T) {
-	a := New(t, false)
-
-	f1 := func() {
-		panic("panic message")
-	}
-
-	a.Panic(f1)
-	a.PanicString(f1, "message")
-	a.PanicType(f1, "abc")
-	a.PanicValue(f1, "panic message")
-
-	f1 = func() {
-		panic(errors.New("panic"))
-	}
-	a.PanicType(f1, errors.New("abc"))
-
-	f1 = func() {
-		panic(&errorImpl{msg: "panic"})
-	}
-	a.PanicType(f1, &errorImpl{msg: "abc"})
-
-	f1 = func() {}
-	a.NotPanic(f1)
-}
-
 func TestAssertion_Zero_NotZero(t *testing.T) {
 	a := New(t, false)
 
@@ -126,24 +79,6 @@ func TestAssertion_Zero_NotZero(t *testing.T) {
 
 	a.NotZero([]int{0, 0})
 	a.NotZero([]int{})
-}
-
-func TestAssertion_Length_NotLength(t *testing.T) {
-	a := New(t, false)
-
-	a.Length(nil, 0)
-	a.Length([]int{1, 2}, 2)
-	a.Length([3]int{1, 2, 3}, 3)
-	a.NotLength([3]int{1, 2, 3}, 2)
-	a.Length(map[string]string{"1": "1", "2": "2"}, 2)
-	a.NotLength(map[string]string{"1": "1", "2": "2"}, 3)
-	slices := []rune{'a', 'b', 'c'}
-	ps := &slices
-	pps := &ps
-	a.Length(pps, 3)
-	a.NotLength(pps, 2)
-	a.Length("string", 6)
-	a.NotLength("string", 4)
 }
 
 func TestAssertion_Contains(t *testing.T) {
