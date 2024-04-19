@@ -16,7 +16,7 @@
 //
 //	// 也可以对 testing.B 使用
 //	func Benchmark1(b *testing.B) {
-//	    a := assert.New(b)
+//	    a := assert.New(b, false)
 //	    a.True(false)
 //	    for(i:=0; i<b.N; i++) {
 //	        // do something

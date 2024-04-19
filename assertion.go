@@ -20,7 +20,7 @@ type Assertion struct {
 
 // New 返回 [Assertion] 对象
 //
-// fatal 决定在出错时是调用 tb.Error 还是 tb.Fatal；
+// fatal 决定在出错时是调用 [testing.TB.Error] 还是 [testing.TB.Fatal]；
 func New(tb testing.TB, fatal bool) *Assertion {
 	p := tb.Error
 	if fatal {
@@ -209,6 +209,19 @@ func (a *Assertion) NotMatch(reg *regexp.Regexp, v interface{}, msg ...interface
 	default:
 		return a.Assert(!reg.MatchString(fmt.Sprint(val)), NewFailure("NotMatch", msg, map[string]interface{}{"v": val}))
 	}
+}
+
+// When 断言 expr 为 true 且在条件成立时调用 f
+//
+// 当有一组依赖 expr 的断言时，可以调用此方法。f 的参数 a 即为当前实例。
+func (a *Assertion) When(expr bool, f func(a *Assertion), msg ...interface{}) *Assertion {
+	if expr {
+		f(a)
+	} else {
+		a.TB().Helper()
+		a.Assert(false, NewFailure("When", msg, nil))
+	}
+	return a
 }
 
 // Wait 等待一定时间再执行后续操作

@@ -143,3 +143,11 @@ func TestAssertion_Match(t *testing.T) {
 	a.Match(regexp.MustCompile("^[1-9]*$"), []byte("123"))
 	a.NotMatch(regexp.MustCompile("^[1-9]*$"), []byte("x123"))
 }
+
+func TestAssert_When(t *testing.T) {
+	a := New(t, false)
+
+	a.When(true, func(a *Assertion) {
+		a.True(true)
+	})
+}
