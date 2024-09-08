@@ -217,9 +217,6 @@ func (a *Assertion) NotMatch(reg *regexp.Regexp, v interface{}, msg ...interface
 func (a *Assertion) When(expr bool, f func(a *Assertion), msg ...interface{}) *Assertion {
 	if expr {
 		f(a)
-	} else {
-		a.TB().Helper()
-		a.Assert(false, NewFailure("When", msg, nil))
 	}
 	return a
 }
