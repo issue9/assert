@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        go: ['1.17.x', '1.22.x']
+        go: ['1.17.x', '1.23.x']
 
     steps:
 
@@ -30,7 +30,7 @@ jobs:
         run: go test -v -coverprofile='coverage.txt' -covermode=atomic ./...
 
       - name: Upload Coverage report
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           token: ${{secrets.CODECOV_TOKEN}}
           file: ./coverage.txt
