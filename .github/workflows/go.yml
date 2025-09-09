@@ -6,11 +6,11 @@ jobs:
   test:
     name: Test
     runs-on: ${{ matrix.os }}
-    
+
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        go: ['1.17.x', '1.23.x']
+        go: ['1.17.x', '1.25.x']
 
     steps:
 
@@ -25,7 +25,7 @@ jobs:
 
       - name: Vet
         run: go vet -v ./...
-        
+
       - name: Test
         run: go test -v -coverprofile='coverage.txt' -covermode=atomic ./...
 
