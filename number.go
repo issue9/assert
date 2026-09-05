@@ -89,7 +89,7 @@ func (a *Assertion) Positive(v any, msg ...any) *Assertion {
 // Negative 断言 v 为负数
 //
 // NOTE: 不包含 0
-func (a *Assertion) Negative(v interface{}, msg ...interface{}) *Assertion {
+func (a *Assertion) Negative(v any, msg ...any) *Assertion {
 	vv, ok := getNumber(v)
 	if !ok {
 		return a.Assert(false, NewFailure("Negative", msg, nil))
@@ -98,7 +98,7 @@ func (a *Assertion) Negative(v interface{}, msg ...interface{}) *Assertion {
 }
 
 // Between 断言 v 是否存在于 (min,max) 之间
-func (a *Assertion) Between(v interface{}, min, max float64, msg ...interface{}) *Assertion {
+func (a *Assertion) Between(v any, min, max float64, msg ...any) *Assertion {
 	vv, ok := getNumber(v)
 	if !ok {
 		return a.Assert(false, NewFailure("Between", msg, nil))
@@ -108,7 +108,7 @@ func (a *Assertion) Between(v interface{}, min, max float64, msg ...interface{})
 }
 
 // BetweenEqual 断言 v 是否存在于 [min,max] 之间
-func (a *Assertion) BetweenEqual(v interface{}, min, max float64, msg ...interface{}) *Assertion {
+func (a *Assertion) BetweenEqual(v any, min, max float64, msg ...any) *Assertion {
 	vv, ok := getNumber(v)
 	if !ok {
 		return a.Assert(false, NewFailure("BetweenEqual", msg, nil))
@@ -118,7 +118,7 @@ func (a *Assertion) BetweenEqual(v interface{}, min, max float64, msg ...interfa
 }
 
 // BetweenEqualMin 断言 v 是否存在于 [min,max) 之间
-func (a *Assertion) BetweenEqualMin(v interface{}, min, max float64, msg ...interface{}) *Assertion {
+func (a *Assertion) BetweenEqualMin(v any, min, max float64, msg ...any) *Assertion {
 	vv, ok := getNumber(v)
 	if !ok {
 		return a.Assert(false, NewFailure("BetweenEqualMin", msg, nil))
@@ -128,7 +128,7 @@ func (a *Assertion) BetweenEqualMin(v interface{}, min, max float64, msg ...inte
 }
 
 // BetweenEqualMax 断言 v 是否存在于 (min,max] 之间
-func (a *Assertion) BetweenEqualMax(v interface{}, min, max float64, msg ...interface{}) *Assertion {
+func (a *Assertion) BetweenEqualMax(v any, min, max float64, msg ...any) *Assertion {
 	vv, ok := getNumber(v)
 	if !ok {
 		return a.Assert(false, NewFailure("BetweenEqualMax", msg, nil))
@@ -138,7 +138,7 @@ func (a *Assertion) BetweenEqualMax(v interface{}, min, max float64, msg ...inte
 }
 
 // bool 表示是否成功转换
-func getNumber(v interface{}) (float64, bool) {
+func getNumber(v any) (float64, bool) {
 	switch val := v.(type) {
 	case int:
 		return float64(val), true
@@ -169,7 +169,7 @@ func getNumber(v interface{}) (float64, bool) {
 	return 0, false
 }
 
-func getLen(v interface{}) (l int, msg string) {
+func getLen(v any) (l int, msg string) {
 	r := reflect.ValueOf(v)
 	for r.Kind() == reflect.Pointer {
 		r = r.Elem()
