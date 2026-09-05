@@ -131,7 +131,6 @@ func TestAssertion_Same(t *testing.T) {
 	a.Same(f, f2)
 
 	a.NotSame(5, 5)
-	a.NotSame(f, 5)
 }
 
 func TestAssertion_Match(t *testing.T) {

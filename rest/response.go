@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/issue9/assert/v4"
+	"github.com/issue9/assert/v5"
 )
 
 // Response 测试请求的返回结构
@@ -100,14 +100,14 @@ func (resp *Response) NotStatus(status int, msg ...any) *Response {
 // Header 判断指定的报头是否与 val 相同
 //
 // msg 可以为空，会返回一个默认的错误提示信息
-func (resp *Response) Header(key string, val string, msg ...any) *Response {
+func (resp *Response) Header(key, val string, msg ...any) *Response {
 	resp.a.TB().Helper()
 	h := resp.resp.Header.Get(key)
 	return resp.assert(h == val, assert.NewFailure("Header", msg, map[string]any{"header": key, "v1": h, "v2": val}))
 }
 
 // NotHeader 指定的报头必定不与 val 相同。
-func (resp *Response) NotHeader(key string, val string, msg ...any) *Response {
+func (resp *Response) NotHeader(key, val string, msg ...any) *Response {
 	resp.a.TB().Helper()
 	h := resp.resp.Header.Get(key)
 	return resp.assert(h != val, assert.NewFailure("NotHeader", msg, map[string]any{"header": key, "v": h}))

@@ -11,7 +11,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/issue9/assert/v4"
+	"github.com/issue9/assert/v5"
 )
 
 // Request 请求的参数封装

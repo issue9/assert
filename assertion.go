@@ -106,7 +106,7 @@ func (a *Assertion) NotEmpty(expr any, msg ...any) *Assertion {
 
 // Contains 断言 container 包含 item 或是包含 item 中的所有项
 //
-// 若 container string、[]byte 和 []rune 类型，
+// 若 container 是 string、[]byte 和 []rune 类型，
 // 都将会以字符串的形式判断其是否包含 item。
 // 若 container 是个列表(array、slice、map)则判断其元素中是否包含 item 中的
 // 的所有项，或是 item 本身就是 container 中的一个元素。
@@ -152,18 +152,18 @@ func (a *Assertion) TypeEqual(ptr bool, v1, v2 any, msg ...any) *Assertion {
 }
 
 // Same 断言为同一个对象
-func (a *Assertion) Same(v1, v2 any, msg ...any) *Assertion {
+func (a *Assertion) Same[T any](v1, v2 T, msg ...any) *Assertion {
 	a.TB().Helper()
 	return a.Assert(isSame(v1, v2), NewFailure("Same", msg, nil))
 }
 
 // NotSame 断言为不是同一个对象
-func (a *Assertion) NotSame(v1, v2 any, msg ...any) *Assertion {
+func (a *Assertion) NotSame[T any](v1, v2 T, msg ...any) *Assertion {
 	a.TB().Helper()
 	return a.Assert(!isSame(v1, v2), NewFailure("NotSame", msg, nil))
 }
 
-func isSame(v1, v2 any) bool {
+func isSame[T any](v1, v2 T) bool {
 	rv1 := reflect.ValueOf(v1)
 	if !canPointer(rv1.Kind()) {
 		return false

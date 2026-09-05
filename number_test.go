@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2014-2024 caixw
+// SPDX-FileCopyrightText: 2014-2026 caixw
 //
 // SPDX-License-Identifier: MIT
 
@@ -27,21 +27,21 @@ func TestAssertion_Length_NotLength(t *testing.T) {
 func TestAssertion_Greater_Less(t *testing.T) {
 	a := New(t, false)
 
-	a.Greater(uint16(5), 3).Less(uint8(5), 6).GreaterEqual(uint64(5), 5).LessEqual(uint(5), 5)
+	a.Greater[uint16](5, 3).Less(uint8(5), 6).GreaterEqual[uint64](5, 5).LessEqual[uint](5, 5)
 }
 
 func TestAssertion_Positive_Negative(t *testing.T) {
 	a := New(t, false)
 
-	a.Positive(float32(5)).Negative(float64(-5))
+	a.Positive[float32](5).Negative[float64](-5)
 }
 
 func TestAssertion_Between(t *testing.T) {
 	a := New(t, false)
 
-	a.Between(int8(5), 1, 6).
-		BetweenEqual(int16(5), 5, 6).
-		BetweenEqual(int32(6), 5, 6).
-		BetweenEqualMin(int64(5), 5, 6).
-		BetweenEqualMax(uint32(5), 4, 5)
+	a.Between[int8](5, 1, 6).
+		BetweenEqual[int16](5, 5, 6).
+		BetweenEqual[int32](6, 5, 6).
+		BetweenEqualMin[int64](5, 5, 6).
+		BetweenEqualMax[uint32](5, 4, 5)
 }

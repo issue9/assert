@@ -43,130 +43,59 @@ func (a *Assertion) NotLength(v any, l int, msg ...any) *Assertion {
 	return a.Assert(rl != l, NewFailure("NotLength", msg, map[string]any{"l": rl}))
 }
 
-func (a *Assertion) Greater(v any, val float64, msg ...any) *Assertion {
-	vv, ok := getNumber(v)
-	if !ok {
-		return a.Assert(false, NewFailure("Greater", msg, nil))
-	}
-	return a.Assert(vv > val, NewFailure("Greater", msg, nil))
+type Number interface {
+	~int | ~int8 | ~int16 | ~int32 | ~int64 | ~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr |
+		~float32 | ~float64
 }
 
-func (a *Assertion) Less(v any, val float64, msg ...any) *Assertion {
-	vv, ok := getNumber(v)
-	if !ok {
-		return a.Assert(false, NewFailure("Less", msg, nil))
-	}
-	return a.Assert(vv < val, NewFailure("Less", msg, nil))
+func (a *Assertion) Greater[T Number](v, val T, msg ...any) *Assertion {
+	return a.Assert(v > val, NewFailure("Greater", msg, nil))
 }
 
-func (a *Assertion) GreaterEqual(v any, val float64, msg ...any) *Assertion {
-	vv, ok := getNumber(v)
-	if !ok {
-		return a.Assert(false, NewFailure("GreaterEqual", msg, nil))
-	}
-	return a.Assert(vv >= val, NewFailure("GreaterEqual", msg, nil))
+func (a *Assertion) Less[T Number](v, val T, msg ...any) *Assertion {
+	return a.Assert(v < val, NewFailure("Less", msg, nil))
 }
 
-func (a *Assertion) LessEqual(v any, val float64, msg ...any) *Assertion {
-	vv, ok := getNumber(v)
-	if !ok {
-		return a.Assert(false, NewFailure("LessEqual", msg, nil))
-	}
-	return a.Assert(vv <= val, NewFailure("LessEqual", msg, nil))
+func (a *Assertion) GreaterEqual[T Number](v, val T, msg ...any) *Assertion {
+	return a.Assert(v >= val, NewFailure("GreaterEqual", msg, nil))
+}
+
+func (a *Assertion) LessEqual[T Number](v, val T, msg ...any) *Assertion {
+	return a.Assert(v <= val, NewFailure("LessEqual", msg, nil))
 }
 
 // Positive 断言 v 为正数
 //
 // NOTE: 不包含 0
-func (a *Assertion) Positive(v any, msg ...any) *Assertion {
-	vv, ok := getNumber(v)
-	if !ok {
-		return a.Assert(false, NewFailure("Positive", msg, nil))
-	}
-	return a.Assert(vv > 0, NewFailure("Positive", msg, nil))
+func (a *Assertion) Positive[T Number](v T, msg ...any) *Assertion {
+	return a.Assert(v > 0, NewFailure("Positive", msg, nil))
 }
 
 // Negative 断言 v 为负数
 //
 // NOTE: 不包含 0
-func (a *Assertion) Negative(v any, msg ...any) *Assertion {
-	vv, ok := getNumber(v)
-	if !ok {
-		return a.Assert(false, NewFailure("Negative", msg, nil))
-	}
-	return a.Assert(vv < 0, NewFailure("Negative", msg, nil))
+func (a *Assertion) Negative[T Number](v T, msg ...any) *Assertion {
+	return a.Assert(v < 0, NewFailure("Negative", msg, nil))
 }
 
 // Between 断言 v 是否存在于 (min,max) 之间
-func (a *Assertion) Between(v any, min, max float64, msg ...any) *Assertion {
-	vv, ok := getNumber(v)
-	if !ok {
-		return a.Assert(false, NewFailure("Between", msg, nil))
-	}
-
-	return a.Assert(vv > min && vv < max, NewFailure("Between", msg, nil))
+func (a *Assertion) Between[T Number](v, min, max T, msg ...any) *Assertion {
+	return a.Assert(v > min && v < max, NewFailure("Between", msg, nil))
 }
 
 // BetweenEqual 断言 v 是否存在于 [min,max] 之间
-func (a *Assertion) BetweenEqual(v any, min, max float64, msg ...any) *Assertion {
-	vv, ok := getNumber(v)
-	if !ok {
-		return a.Assert(false, NewFailure("BetweenEqual", msg, nil))
-	}
-
-	return a.Assert(vv >= min && vv <= max, NewFailure("BetweenEqual", msg, nil))
+func (a *Assertion) BetweenEqual[T Number](v, min, max T, msg ...any) *Assertion {
+	return a.Assert(v >= min && v <= max, NewFailure("BetweenEqual", msg, nil))
 }
 
 // BetweenEqualMin 断言 v 是否存在于 [min,max) 之间
-func (a *Assertion) BetweenEqualMin(v any, min, max float64, msg ...any) *Assertion {
-	vv, ok := getNumber(v)
-	if !ok {
-		return a.Assert(false, NewFailure("BetweenEqualMin", msg, nil))
-	}
-
-	return a.Assert(vv >= min && vv < max, NewFailure("BetweenEqualMin", msg, nil))
+func (a *Assertion) BetweenEqualMin[T Number](v, min, max T, msg ...any) *Assertion {
+	return a.Assert(v >= min && v < max, NewFailure("BetweenEqualMin", msg, nil))
 }
 
 // BetweenEqualMax 断言 v 是否存在于 (min,max] 之间
-func (a *Assertion) BetweenEqualMax(v any, min, max float64, msg ...any) *Assertion {
-	vv, ok := getNumber(v)
-	if !ok {
-		return a.Assert(false, NewFailure("BetweenEqualMax", msg, nil))
-	}
-
-	return a.Assert(vv > min && vv <= max, NewFailure("BetweenEqualMax", msg, nil))
-}
-
-// bool 表示是否成功转换
-func getNumber(v any) (float64, bool) {
-	switch val := v.(type) {
-	case int:
-		return float64(val), true
-	case int8:
-		return float64(val), true
-	case int16:
-		return float64(val), true
-	case int32:
-		return float64(val), true
-	case int64:
-		return float64(val), true
-	case uint:
-		return float64(val), true
-	case uint8:
-		return float64(val), true
-	case uint16:
-		return float64(val), true
-	case uint32:
-		return float64(val), true
-	case uint64:
-		return float64(val), true
-	case float32:
-		return float64(val), true
-	case float64:
-		return float64(val), true
-	}
-
-	return 0, false
+func (a *Assertion) BetweenEqualMax[T Number](v, min, max T, msg ...any) *Assertion {
+	return a.Assert(v > min && v <= max, NewFailure("BetweenEqualMax", msg, nil))
 }
 
 func getLen(v any) (l int, msg string) {
