@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2014-2024 caixw
+// SPDX-FileCopyrightText: 2014-2026 caixw
 //
 // SPDX-License-Identifier: MIT
 
@@ -33,13 +33,13 @@ import (
 
 var failureSprint FailureSprintFunc = DefaultFailureSprint
 
-var failurePool = &sync.Pool{New: func() interface{} { return &Failure{} }}
+var failurePool = &sync.Pool{New: func() any { return &Failure{} }}
 
 // Failure 在断言出错时输出的错误信息
 type Failure struct {
-	Action string                 // 操作名称，比如 Equal，NotEqual 等方法名称。
-	Values map[string]interface{} // 断言出错时返回的一些额外参数
-	user   []interface{}          // 断言出错时用户反馈的额外信息
+	Action string         // 操作名称，比如 Equal，NotEqual 等方法名称。
+	Values map[string]any // 断言出错时返回的一些额外参数
+	user   []any          // 断言出错时用户反馈的额外信息
 }
 
 // FailureSprintFunc 将 [Failure] 转换成文本的函数
@@ -72,7 +72,7 @@ func DefaultFailureSprint(f *Failure) string {
 		for _, k := range keys {
 			s.WriteString(k)
 			s.WriteByte('=')
-			s.WriteString(fmt.Sprint(f.Values[k]))
+			fmt.Fprint(&s, f.Values[k])
 			s.WriteByte('\n')
 		}
 	}
@@ -90,7 +90,7 @@ func DefaultFailureSprint(f *Failure) string {
 // user 表示用户提交的反馈，其第一个元素如果是 string，那么将调用 fmt.Sprintf(user[0], user[1:]...)
 // 对数据进行格式化，否则采用 fmt.Sprint(user...) 格式化数据；
 // kv 表示当前错误返回的数据；
-func NewFailure(action string, user []interface{}, kv map[string]interface{}) *Failure {
+func NewFailure(action string, user []any, kv map[string]any) *Failure {
 	f := failurePool.Get().(*Failure)
 	f.Action = action
 	f.user = user

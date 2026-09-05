@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2014-2024 caixw
+// SPDX-FileCopyrightText: 2014-2026 caixw
 //
 // SPDX-License-Identifier: MIT
 
@@ -152,7 +152,7 @@ func (req *Request) StringBody(body string) *Request {
 // BodyFunc 指定一个未编码的对象
 //
 // marshal 对 obj 的编码函数，比如 [json.Marshal] 等。
-func (req *Request) BodyFunc(obj interface{}, marshal func(interface{}) ([]byte, error)) *Request {
+func (req *Request) BodyFunc(obj any, marshal func(any) ([]byte, error)) *Request {
 	req.a.TB().Helper()
 
 	data, err := marshal(obj)

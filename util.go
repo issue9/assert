@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2014-2024 caixw
+// SPDX-FileCopyrightText: 2014-2026 caixw
 //
 // SPDX-License-Identifier: MIT
 
@@ -12,13 +12,13 @@ import (
 
 // 判断一个值是否为空(0, "", false, 空数组等)。
 // []string{""}空数组里套一个空字符串，不会被判断为空。
-func isEmpty(expr interface{}) bool {
+func isEmpty(expr any) bool {
 	if isZero(expr) {
 		return true
 	}
 
 	rv := reflect.ValueOf(expr)
-	for rv.Kind() == reflect.Ptr {
+	for rv.Kind() == reflect.Pointer {
 		rv = rv.Elem()
 	}
 	switch rv.Kind() {
@@ -29,13 +29,13 @@ func isEmpty(expr interface{}) bool {
 	}
 }
 
-func isZero(v interface{}) bool {
+func isZero(v any) bool {
 	if isNil(v) || reflect.ValueOf(v).IsZero() {
 		return true
 	}
 
 	rv := reflect.ValueOf(v)
-	for rv.Kind() == reflect.Ptr {
+	for rv.Kind() == reflect.Pointer {
 		rv = rv.Elem()
 	}
 	return rv.IsZero()
@@ -43,7 +43,7 @@ func isZero(v interface{}) bool {
 
 // isNil 判断一个值是否为 nil。
 // 当特定类型的变量，已经声明，但还未赋值时，也将返回 true
-func isNil(expr interface{}) bool {
+func isNil(expr any) bool {
 	if nil == expr {
 		return true
 	}
@@ -67,7 +67,7 @@ func isNil(expr interface{}) bool {
 //
 //	// map 的键值不同，即使可相互转换也判断不相等。
 //	map[int]int{1:1,2:2}        != map[int8]int{1:1,2:2}
-func isEqual(v1, v2 interface{}) bool {
+func isEqual(v1, v2 any) bool {
 	if reflect.DeepEqual(v1, v2) {
 		return true
 	}
@@ -92,7 +92,7 @@ func isEqual(v1, v2 interface{}) bool {
 
 	// 过滤掉已经在 reflect.DeepEqual() 进行处理的类型
 	switch vv1Type.Kind() {
-	case reflect.Struct, reflect.Ptr, reflect.Func, reflect.Interface:
+	case reflect.Struct, reflect.Pointer, reflect.Func, reflect.Interface:
 		return false
 	case reflect.Slice, reflect.Array:
 		// vv2.Kind() 与 vv1 的不相同
@@ -168,7 +168,7 @@ func isEqual(v1, v2 interface{}) bool {
 }
 
 // isContains 判断 container 是否包含了 item 的内容。若是指针，会判断指针指向的内容
-func isContains(container, item interface{}) bool {
+func isContains(container, item any) bool {
 	if container == nil { // nil不包含任何东西
 		return false
 	}
@@ -176,11 +176,11 @@ func isContains(container, item interface{}) bool {
 	cv := reflect.ValueOf(container)
 	iv := reflect.ValueOf(item)
 
-	for cv.Kind() == reflect.Ptr {
+	for cv.Kind() == reflect.Pointer {
 		cv = cv.Elem()
 	}
 
-	for iv.Kind() == reflect.Ptr {
+	for iv.Kind() == reflect.Pointer {
 		iv = iv.Elem()
 	}
 
@@ -307,15 +307,15 @@ func isContains(container, item interface{}) bool {
 	return false
 }
 
-func getType(ptr bool, v1, v2 interface{}) (t1, t2 reflect.Type) {
+func getType(ptr bool, v1, v2 any) (t1, t2 reflect.Type) {
 	t1 = reflect.TypeOf(v1)
 	t2 = reflect.TypeOf(v2)
 
 	if ptr {
-		for t1.Kind() == reflect.Ptr {
+		for t1.Kind() == reflect.Pointer {
 			t1 = t1.Elem()
 		}
-		for t2.Kind() == reflect.Ptr {
+		for t2.Kind() == reflect.Pointer {
 			t2 = t2.Elem()
 		}
 	}

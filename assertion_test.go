@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2014-2024 caixw
+// SPDX-FileCopyrightText: 2014-2026 caixw
 //
 // SPDX-License-Identifier: MIT
 
@@ -48,7 +48,7 @@ func TestAssertion_Equal_NotEqual_Nil_NotNil(t *testing.T) {
 		NotEqual(v1, v3, "a.NotEqual(v1,v3) failed").
 		NotEqual(v3, v4, "a.NotEqual(v3,v4) failed")
 
-	var v5 interface{}
+	var v5 any
 	v6 := 0
 	v7 := []int{}
 
@@ -67,7 +67,7 @@ func TestAssertion_Equal_NotEqual_Nil_NotNil(t *testing.T) {
 func TestAssertion_Zero_NotZero(t *testing.T) {
 	a := New(t, false)
 
-	var v interface{}
+	var v any
 	a.Zero(0)
 	a.Zero(nil)
 	a.Zero(time.Time{})

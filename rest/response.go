@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2014-2024 caixw
+// SPDX-FileCopyrightText: 2014-2026 caixw
 //
 // SPDX-License-Identifier: MIT
 
@@ -70,72 +70,72 @@ func (resp *Response) assert(expr bool, f *assert.Failure) *Response {
 }
 
 // Success 状态码是否在 100-399 之间
-func (resp *Response) Success(msg ...interface{}) *Response {
+func (resp *Response) Success(msg ...any) *Response {
 	resp.a.TB().Helper()
 	succ := resp.resp.StatusCode >= 100 && resp.resp.StatusCode < 400
-	return resp.assert(succ, assert.NewFailure("Success", msg, map[string]interface{}{"status": resp.resp.StatusCode}))
+	return resp.assert(succ, assert.NewFailure("Success", msg, map[string]any{"status": resp.resp.StatusCode}))
 }
 
 // Fail 状态码是否大于 399
-func (resp *Response) Fail(msg ...interface{}) *Response {
+func (resp *Response) Fail(msg ...any) *Response {
 	resp.a.TB().Helper()
 	fail := resp.resp.StatusCode >= 400
-	return resp.assert(fail, assert.NewFailure("Fail", msg, map[string]interface{}{"status": resp.resp.StatusCode}))
+	return resp.assert(fail, assert.NewFailure("Fail", msg, map[string]any{"status": resp.resp.StatusCode}))
 }
 
 // Status 判断状态码是否与 status 相等
-func (resp *Response) Status(status int, msg ...interface{}) *Response {
+func (resp *Response) Status(status int, msg ...any) *Response {
 	resp.a.TB().Helper()
 	eq := resp.resp.StatusCode == status
-	return resp.assert(eq, assert.NewFailure("Status", msg, map[string]interface{}{"status": resp.resp.StatusCode, "val": status}))
+	return resp.assert(eq, assert.NewFailure("Status", msg, map[string]any{"status": resp.resp.StatusCode, "val": status}))
 }
 
 // NotStatus 判断状态码是否与 status 不相等
-func (resp *Response) NotStatus(status int, msg ...interface{}) *Response {
+func (resp *Response) NotStatus(status int, msg ...any) *Response {
 	resp.a.TB().Helper()
 	neq := resp.resp.StatusCode != status
-	return resp.assert(neq, assert.NewFailure("NotStatus", msg, map[string]interface{}{"status": resp.resp.StatusCode}))
+	return resp.assert(neq, assert.NewFailure("NotStatus", msg, map[string]any{"status": resp.resp.StatusCode}))
 }
 
 // Header 判断指定的报头是否与 val 相同
 //
 // msg 可以为空，会返回一个默认的错误提示信息
-func (resp *Response) Header(key string, val string, msg ...interface{}) *Response {
+func (resp *Response) Header(key string, val string, msg ...any) *Response {
 	resp.a.TB().Helper()
 	h := resp.resp.Header.Get(key)
-	return resp.assert(h == val, assert.NewFailure("Header", msg, map[string]interface{}{"header": key, "v1": h, "v2": val}))
+	return resp.assert(h == val, assert.NewFailure("Header", msg, map[string]any{"header": key, "v1": h, "v2": val}))
 }
 
 // NotHeader 指定的报头必定不与 val 相同。
-func (resp *Response) NotHeader(key string, val string, msg ...interface{}) *Response {
+func (resp *Response) NotHeader(key string, val string, msg ...any) *Response {
 	resp.a.TB().Helper()
 	h := resp.resp.Header.Get(key)
-	return resp.assert(h != val, assert.NewFailure("NotHeader", msg, map[string]interface{}{"header": key, "v": h}))
+	return resp.assert(h != val, assert.NewFailure("NotHeader", msg, map[string]any{"header": key, "v": h}))
 }
 
 // Body 断言内容与 val 相同
-func (resp *Response) Body(val []byte, msg ...interface{}) *Response {
+func (resp *Response) Body(val []byte, msg ...any) *Response {
 	resp.a.TB().Helper()
-	return resp.assert(bytes.Equal(resp.body, val), assert.NewFailure("Body", msg, map[string]interface{}{"body": string(resp.body), "val": string(val)}))
+	return resp.assert(bytes.Equal(resp.body, val), assert.NewFailure("Body", msg, map[string]any{"body": string(resp.body), "val": string(val)}))
 }
 
 // StringBody 断言内容与 val 相同
-func (resp *Response) StringBody(val string, msg ...interface{}) *Response {
+func (resp *Response) StringBody(val string, msg ...any) *Response {
 	resp.a.TB().Helper()
 	b := string(resp.body)
-	return resp.assert(b == val, assert.NewFailure("StringBody", msg, map[string]interface{}{"body": b, "val": val}))
+	return resp.assert(b == val, assert.NewFailure("StringBody", msg, map[string]any{"body": b, "val": val}))
 }
 
 // BodyNotEmpty 报文内容是否不为空
-func (resp *Response) BodyNotEmpty(msg ...interface{}) *Response {
+func (resp *Response) BodyNotEmpty(msg ...any) *Response {
 	resp.a.TB().Helper()
 	return resp.assert(len(resp.body) > 0, assert.NewFailure("BodyNotEmpty", msg, nil))
 }
 
 // BodyEmpty 报文内容是否为空
-func (resp *Response) BodyEmpty(msg ...interface{}) *Response {
+func (resp *Response) BodyEmpty(msg ...any) *Response {
 	resp.a.TB().Helper()
-	return resp.assert(len(resp.body) == 0, assert.NewFailure("BodyEmpty", msg, map[string]interface{}{"body": resp.body}))
+	return resp.assert(len(resp.body) == 0, assert.NewFailure("BodyEmpty", msg, map[string]any{"body": resp.body}))
 }
 
 // BodyFunc 指定对 body 内容的断言方式

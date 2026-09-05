@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2014-2024 caixw
+// SPDX-FileCopyrightText: 2014-2026 caixw
 //
 // SPDX-License-Identifier: MIT
 
@@ -16,14 +16,14 @@ import (
 //   - string
 //   - slice
 //   - array
-func (a *Assertion) Length(v interface{}, l int, msg ...interface{}) *Assertion {
+func (a *Assertion) Length(v any, l int, msg ...any) *Assertion {
 	a.TB().Helper()
 
 	rl, err := getLen(v)
 	if err != "" {
-		a.Assert(false, NewFailure("Length", msg, map[string]interface{}{"err": err}))
+		a.Assert(false, NewFailure("Length", msg, map[string]any{"err": err}))
 	}
-	return a.Assert(rl == l, NewFailure("Length", msg, map[string]interface{}{"l1": rl, "l2": l}))
+	return a.Assert(rl == l, NewFailure("Length", msg, map[string]any{"l1": rl, "l2": l}))
 }
 
 // NotLength 断言长度不是指定的值
@@ -33,17 +33,17 @@ func (a *Assertion) Length(v interface{}, l int, msg ...interface{}) *Assertion 
 //   - string
 //   - slice
 //   - array
-func (a *Assertion) NotLength(v interface{}, l int, msg ...interface{}) *Assertion {
+func (a *Assertion) NotLength(v any, l int, msg ...any) *Assertion {
 	a.TB().Helper()
 
 	rl, err := getLen(v)
 	if err != "" {
-		a.Assert(false, NewFailure("NotLength", msg, map[string]interface{}{"err": err}))
+		a.Assert(false, NewFailure("NotLength", msg, map[string]any{"err": err}))
 	}
-	return a.Assert(rl != l, NewFailure("NotLength", msg, map[string]interface{}{"l": rl}))
+	return a.Assert(rl != l, NewFailure("NotLength", msg, map[string]any{"l": rl}))
 }
 
-func (a *Assertion) Greater(v interface{}, val float64, msg ...interface{}) *Assertion {
+func (a *Assertion) Greater(v any, val float64, msg ...any) *Assertion {
 	vv, ok := getNumber(v)
 	if !ok {
 		return a.Assert(false, NewFailure("Greater", msg, nil))
@@ -51,7 +51,7 @@ func (a *Assertion) Greater(v interface{}, val float64, msg ...interface{}) *Ass
 	return a.Assert(vv > val, NewFailure("Greater", msg, nil))
 }
 
-func (a *Assertion) Less(v interface{}, val float64, msg ...interface{}) *Assertion {
+func (a *Assertion) Less(v any, val float64, msg ...any) *Assertion {
 	vv, ok := getNumber(v)
 	if !ok {
 		return a.Assert(false, NewFailure("Less", msg, nil))
@@ -59,7 +59,7 @@ func (a *Assertion) Less(v interface{}, val float64, msg ...interface{}) *Assert
 	return a.Assert(vv < val, NewFailure("Less", msg, nil))
 }
 
-func (a *Assertion) GreaterEqual(v interface{}, val float64, msg ...interface{}) *Assertion {
+func (a *Assertion) GreaterEqual(v any, val float64, msg ...any) *Assertion {
 	vv, ok := getNumber(v)
 	if !ok {
 		return a.Assert(false, NewFailure("GreaterEqual", msg, nil))
@@ -67,7 +67,7 @@ func (a *Assertion) GreaterEqual(v interface{}, val float64, msg ...interface{})
 	return a.Assert(vv >= val, NewFailure("GreaterEqual", msg, nil))
 }
 
-func (a *Assertion) LessEqual(v interface{}, val float64, msg ...interface{}) *Assertion {
+func (a *Assertion) LessEqual(v any, val float64, msg ...any) *Assertion {
 	vv, ok := getNumber(v)
 	if !ok {
 		return a.Assert(false, NewFailure("LessEqual", msg, nil))
@@ -78,7 +78,7 @@ func (a *Assertion) LessEqual(v interface{}, val float64, msg ...interface{}) *A
 // Positive 断言 v 为正数
 //
 // NOTE: 不包含 0
-func (a *Assertion) Positive(v interface{}, msg ...interface{}) *Assertion {
+func (a *Assertion) Positive(v any, msg ...any) *Assertion {
 	vv, ok := getNumber(v)
 	if !ok {
 		return a.Assert(false, NewFailure("Positive", msg, nil))
@@ -171,7 +171,7 @@ func getNumber(v interface{}) (float64, bool) {
 
 func getLen(v interface{}) (l int, msg string) {
 	r := reflect.ValueOf(v)
-	for r.Kind() == reflect.Ptr {
+	for r.Kind() == reflect.Pointer {
 		r = r.Elem()
 	}
 

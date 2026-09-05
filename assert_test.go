@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2014-2024 caixw
+// SPDX-FileCopyrightText: 2014-2026 caixw
 //
 // SPDX-License-Identifier: MIT
 
@@ -16,7 +16,7 @@ func TestDefaultFailureSprint(t *testing.T) {
 	}
 
 	// 带 user
-	f = NewFailure("AB", []interface{}{1, 2}, nil)
+	f = NewFailure("AB", []any{1, 2}, nil)
 	if f.Action != "AB" || f.User() != "1 2" || len(f.Values) != 0 {
 		t.Error("err3")
 	}
@@ -25,7 +25,7 @@ func TestDefaultFailureSprint(t *testing.T) {
 	}
 
 	// 带 values
-	f = NewFailure("AB", nil, map[string]interface{}{"k1": "v1", "k2": 2})
+	f = NewFailure("AB", nil, map[string]any{"k1": "v1", "k2": 2})
 	if f.Action != "AB" || f.User() != "" || len(f.Values) != 2 {
 		t.Error("err5")
 	}
@@ -34,7 +34,7 @@ func TestDefaultFailureSprint(t *testing.T) {
 	}
 
 	// 带 user,values
-	f = NewFailure("AB", []interface{}{1, 2}, map[string]interface{}{"k1": "v1", "k2": 2})
+	f = NewFailure("AB", []any{1, 2}, map[string]any{"k1": "v1", "k2": 2})
 	if f.Action != "AB" || f.User() == "" || len(f.Values) != 2 {
 		t.Error("err7")
 	}

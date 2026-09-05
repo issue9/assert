@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2014-2024 caixw
+// SPDX-FileCopyrightText: 2014-2026 caixw
 //
 // SPDX-License-Identifier: MIT
 
@@ -10,7 +10,7 @@ import (
 )
 
 func TestIsZero(t *testing.T) {
-	zero := func(v interface{}) {
+	zero := func(v any) {
 		t.Helper()
 		if !isZero(v) {
 			t.Errorf("zero: %v", v)
@@ -24,14 +24,14 @@ func TestIsZero(t *testing.T) {
 }
 
 func TestIsEqual(t *testing.T) {
-	eq := func(v1, v2 interface{}) {
+	eq := func(v1, v2 any) {
 		t.Helper()
 		if !isEqual(v1, v2) {
 			t.Errorf("eq:[%v]!=[%v]", v1, v2)
 		}
 	}
 
-	neq := func(v1, v2 interface{}) {
+	neq := func(v1, v2 any) {
 		t.Helper()
 		if isEqual(v1, v2) {
 			t.Errorf("eq:[%v]==[%v]", v1, v2)
@@ -202,7 +202,7 @@ func TestIsNil(t *testing.T) {
 }
 
 func TestIsContains(t *testing.T) {
-	fn := func(result bool, container, item interface{}) {
+	fn := func(result bool, container, item any) {
 		t.Helper()
 		if result != isContains(container, item) {
 			t.Errorf("%v == (isContains(%v, %v))出错\n", result, container, item)
@@ -242,8 +242,8 @@ func TestIsContains(t *testing.T) {
 	fn(true, []int{1, 2, 3}, 1)
 	fn(true, []int{1, 2, 3}, int8(3))
 	fn(true, []int{1, 2, 4}, []int{1, 2})
-	fn(true, []interface{}{[]int{1, 2}, 5, 6}, []int8{1, 2})
-	fn(true, []interface{}{[]int{1, 2}, 5, 6}, 5)
+	fn(true, []any{[]int{1, 2}, 5, 6}, []int8{1, 2})
+	fn(true, []any{[]int{1, 2}, 5, 6}, 5)
 
 	fn(true, map[string]int{"1": 1, "2": 2}, map[string]int8{"1": 1})
 	fn(true,

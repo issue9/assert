@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2014-2024 caixw
+// SPDX-FileCopyrightText: 2014-2026 caixw
 //
 // SPDX-License-Identifier: MIT
 
@@ -15,7 +15,7 @@ import (
 // Assertion 是对 [testing.TB] 的二次包装
 type Assertion struct {
 	tb    testing.TB
-	print func(...interface{})
+	print func(...any)
 }
 
 // New 返回 [Assertion] 对象
@@ -64,44 +64,44 @@ func (a *Assertion) TB() testing.TB { return a.tb }
 //
 // args 对应 [fmt.Printf] 函数中的参数，其中 args[0] 对应第一个参数 format，依次类推，
 // 其它断言函数的 args 参数，功能与此相同。
-func (a *Assertion) True(expr bool, msg ...interface{}) *Assertion {
+func (a *Assertion) True(expr bool, msg ...any) *Assertion {
 	a.TB().Helper()
 	return a.Assert(expr, NewFailure("True", msg, nil))
 }
 
-func (a *Assertion) False(expr bool, msg ...interface{}) *Assertion {
+func (a *Assertion) False(expr bool, msg ...any) *Assertion {
 	a.TB().Helper()
 	return a.Assert(!expr, NewFailure("False", msg, nil))
 }
 
-func (a *Assertion) Nil(expr interface{}, msg ...interface{}) *Assertion {
+func (a *Assertion) Nil(expr any, msg ...any) *Assertion {
 	a.TB().Helper()
-	return a.Assert(isNil(expr), NewFailure("Nil", msg, map[string]interface{}{"v": expr}))
+	return a.Assert(isNil(expr), NewFailure("Nil", msg, map[string]any{"v": expr}))
 }
 
-func (a *Assertion) NotNil(expr interface{}, msg ...interface{}) *Assertion {
+func (a *Assertion) NotNil(expr any, msg ...any) *Assertion {
 	a.TB().Helper()
-	return a.Assert(!isNil(expr), NewFailure("NotNil", msg, map[string]interface{}{"v": expr}))
+	return a.Assert(!isNil(expr), NewFailure("NotNil", msg, map[string]any{"v": expr}))
 }
 
-func (a *Assertion) Equal(v1, v2 interface{}, msg ...interface{}) *Assertion {
+func (a *Assertion) Equal(v1, v2 any, msg ...any) *Assertion {
 	a.TB().Helper()
-	return a.Assert(isEqual(v1, v2), NewFailure("Equal", msg, map[string]interface{}{"v1": v1, "v2": v2}))
+	return a.Assert(isEqual(v1, v2), NewFailure("Equal", msg, map[string]any{"v1": v1, "v2": v2}))
 }
 
-func (a *Assertion) NotEqual(v1, v2 interface{}, msg ...interface{}) *Assertion {
+func (a *Assertion) NotEqual(v1, v2 any, msg ...any) *Assertion {
 	a.TB().Helper()
-	return a.Assert(!isEqual(v1, v2), NewFailure("NotEqual", msg, map[string]interface{}{"v1": v1, "v2": v2}))
+	return a.Assert(!isEqual(v1, v2), NewFailure("NotEqual", msg, map[string]any{"v1": v1, "v2": v2}))
 }
 
-func (a *Assertion) Empty(expr interface{}, msg ...interface{}) *Assertion {
+func (a *Assertion) Empty(expr any, msg ...any) *Assertion {
 	a.TB().Helper()
-	return a.Assert(isEmpty(expr), NewFailure("Empty", msg, map[string]interface{}{"v": expr}))
+	return a.Assert(isEmpty(expr), NewFailure("Empty", msg, map[string]any{"v": expr}))
 }
 
-func (a *Assertion) NotEmpty(expr interface{}, msg ...interface{}) *Assertion {
+func (a *Assertion) NotEmpty(expr any, msg ...any) *Assertion {
 	a.TB().Helper()
-	return a.Assert(!isEmpty(expr), NewFailure("NotEmpty", msg, map[string]interface{}{"v": expr}))
+	return a.Assert(!isEmpty(expr), NewFailure("NotEmpty", msg, map[string]any{"v": expr}))
 }
 
 // Contains 断言 container 包含 item 或是包含 item 中的所有项
@@ -110,37 +110,37 @@ func (a *Assertion) NotEmpty(expr interface{}, msg ...interface{}) *Assertion {
 // 都将会以字符串的形式判断其是否包含 item。
 // 若 container 是个列表(array、slice、map)则判断其元素中是否包含 item 中的
 // 的所有项，或是 item 本身就是 container 中的一个元素。
-func (a *Assertion) Contains(container, item interface{}, msg ...interface{}) *Assertion {
+func (a *Assertion) Contains(container, item any, msg ...any) *Assertion {
 	a.TB().Helper()
-	return a.Assert(isContains(container, item), NewFailure("Contains", msg, map[string]interface{}{"container": container, "item": item}))
+	return a.Assert(isContains(container, item), NewFailure("Contains", msg, map[string]any{"container": container, "item": item}))
 }
 
 // NotContains 断言 container 不包含 item 或是不包含 item 中的所有项
-func (a *Assertion) NotContains(container, item interface{}, msg ...interface{}) *Assertion {
+func (a *Assertion) NotContains(container, item any, msg ...any) *Assertion {
 	a.TB().Helper()
-	return a.Assert(!isContains(container, item), NewFailure("NotContains", msg, map[string]interface{}{"container": container, "item": item}))
+	return a.Assert(!isContains(container, item), NewFailure("NotContains", msg, map[string]any{"container": container, "item": item}))
 }
 
 // Zero 断言是否为零值
 //
 // 最终调用的是 [reflect.Value.IsZero] 进行判断，如果是指针，则会判断指向的对象。
-func (a *Assertion) Zero(v interface{}, msg ...interface{}) *Assertion {
+func (a *Assertion) Zero(v any, msg ...any) *Assertion {
 	a.TB().Helper()
-	return a.Assert(isZero(v), NewFailure("Zero", msg, map[string]interface{}{"v": v}))
+	return a.Assert(isZero(v), NewFailure("Zero", msg, map[string]any{"v": v}))
 }
 
 // NotZero 断言是否为非零值
 //
 // 最终调用的是 [reflect.Value.IsZero] 进行判断，如果是指针，则会判断指向的对象。
-func (a *Assertion) NotZero(v interface{}, msg ...interface{}) *Assertion {
+func (a *Assertion) NotZero(v any, msg ...any) *Assertion {
 	a.TB().Helper()
-	return a.Assert(!isZero(v), NewFailure("NotZero", msg, map[string]interface{}{"v": v}))
+	return a.Assert(!isZero(v), NewFailure("NotZero", msg, map[string]any{"v": v}))
 }
 
 // TypeEqual 断言两个值的类型是否相同
 //
 // ptr 如果为 true，则会在对象为指针时，查找其指向的对象。
-func (a *Assertion) TypeEqual(ptr bool, v1, v2 interface{}, msg ...interface{}) *Assertion {
+func (a *Assertion) TypeEqual(ptr bool, v1, v2 any, msg ...any) *Assertion {
 	if v1 == v2 {
 		return a
 	}
@@ -148,22 +148,22 @@ func (a *Assertion) TypeEqual(ptr bool, v1, v2 interface{}, msg ...interface{}) 
 	a.TB().Helper()
 
 	t1, t2 := getType(ptr, v1, v2)
-	return a.Assert(t1 == t2, NewFailure("TypeEqual", msg, map[string]interface{}{"v1": t1, "v2": t2}))
+	return a.Assert(t1 == t2, NewFailure("TypeEqual", msg, map[string]any{"v1": t1, "v2": t2}))
 }
 
 // Same 断言为同一个对象
-func (a *Assertion) Same(v1, v2 interface{}, msg ...interface{}) *Assertion {
+func (a *Assertion) Same(v1, v2 any, msg ...any) *Assertion {
 	a.TB().Helper()
 	return a.Assert(isSame(v1, v2), NewFailure("Same", msg, nil))
 }
 
 // NotSame 断言为不是同一个对象
-func (a *Assertion) NotSame(v1, v2 interface{}, msg ...interface{}) *Assertion {
+func (a *Assertion) NotSame(v1, v2 any, msg ...any) *Assertion {
 	a.TB().Helper()
 	return a.Assert(!isSame(v1, v2), NewFailure("NotSame", msg, nil))
 }
 
-func isSame(v1, v2 interface{}) bool {
+func isSame(v1, v2 any) bool {
 	rv1 := reflect.ValueOf(v1)
 	if !canPointer(rv1.Kind()) {
 		return false
@@ -178,7 +178,7 @@ func isSame(v1, v2 interface{}) bool {
 
 func canPointer(k reflect.Kind) bool {
 	switch k {
-	case reflect.Ptr, reflect.Map, reflect.Chan, reflect.Slice, reflect.UnsafePointer, reflect.Func:
+	case reflect.Pointer, reflect.Map, reflect.Chan, reflect.Slice, reflect.UnsafePointer, reflect.Func:
 		return true
 	default:
 		return false
@@ -186,35 +186,35 @@ func canPointer(k reflect.Kind) bool {
 }
 
 // Match 断言 v 是否匹配正则表达式 reg
-func (a *Assertion) Match(reg *regexp.Regexp, v interface{}, msg ...interface{}) *Assertion {
+func (a *Assertion) Match(reg *regexp.Regexp, v any, msg ...any) *Assertion {
 	a.TB().Helper()
 	switch val := v.(type) {
 	case string:
-		return a.Assert(reg.MatchString(val), NewFailure("Match", msg, map[string]interface{}{"v": val}))
+		return a.Assert(reg.MatchString(val), NewFailure("Match", msg, map[string]any{"v": val}))
 	case []byte:
-		return a.Assert(reg.Match(val), NewFailure("Match", msg, map[string]interface{}{"v": val}))
+		return a.Assert(reg.Match(val), NewFailure("Match", msg, map[string]any{"v": val}))
 	default:
-		return a.Assert(reg.MatchString(fmt.Sprint(val)), NewFailure("Match", msg, map[string]interface{}{"v": val}))
+		return a.Assert(reg.MatchString(fmt.Sprint(val)), NewFailure("Match", msg, map[string]any{"v": val}))
 	}
 }
 
 // NotMatch 断言 v 是否不匹配正则表达式 reg
-func (a *Assertion) NotMatch(reg *regexp.Regexp, v interface{}, msg ...interface{}) *Assertion {
+func (a *Assertion) NotMatch(reg *regexp.Regexp, v any, msg ...any) *Assertion {
 	a.TB().Helper()
 	switch val := v.(type) {
 	case string:
-		return a.Assert(!reg.MatchString(val), NewFailure("NotMatch", msg, map[string]interface{}{"v": val}))
+		return a.Assert(!reg.MatchString(val), NewFailure("NotMatch", msg, map[string]any{"v": val}))
 	case []byte:
-		return a.Assert(!reg.Match(val), NewFailure("NotMatch", msg, map[string]interface{}{"v": val}))
+		return a.Assert(!reg.Match(val), NewFailure("NotMatch", msg, map[string]any{"v": val}))
 	default:
-		return a.Assert(!reg.MatchString(fmt.Sprint(val)), NewFailure("NotMatch", msg, map[string]interface{}{"v": val}))
+		return a.Assert(!reg.MatchString(fmt.Sprint(val)), NewFailure("NotMatch", msg, map[string]any{"v": val}))
 	}
 }
 
 // When 断言 expr 为 true 且在条件成立时调用 f
 //
 // 当有一组依赖 expr 的断言时，可以调用此方法。f 的参数 a 即为当前实例。
-func (a *Assertion) When(expr bool, f func(a *Assertion), msg ...interface{}) *Assertion {
+func (a *Assertion) When(expr bool, f func(a *Assertion), msg ...any) *Assertion {
 	if expr {
 		f(a)
 	}
