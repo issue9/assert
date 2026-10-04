@@ -150,7 +150,7 @@ Content-Type: application/xml;charset=utf-8
 
 func TestServer_RawHTTP(t *testing.T) {
 	a := assert.New(t, true)
-	s := NewServer(a, h, nil)
+	s := NewServer(a, h)
 
 	for _, item := range raw {
 		req := strings.Replace(item.req, "{host}", s.URL(), 1)

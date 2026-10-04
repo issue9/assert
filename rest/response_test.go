@@ -13,37 +13,35 @@ import (
 
 func TestRequest_Do(t *testing.T) {
 	a := assert.New(t, false)
-	srv := NewServer(a, h, nil)
 
-	srv.Get("/get").
-		Do(nil).
+	Get(a, "/get", h).
+		Do().
 		Success().
 		Status(201)
 
-	srv.NewRequest(http.MethodGet, "/not-exists").
-		Do(nil).
+	NewRequest(a, http.MethodGet, "/not-exists", h).
+		Do().
 		Fail()
 
-	srv.NewRequest(http.MethodGet, "/get").
-		Do(BuildHandler(a, 202, "", nil)).
+	NewRequest(a, http.MethodGet, "/get", BuildHandler(a, 202, "", nil)).
+		Do().
 		Status(202)
 
-	r := Get(a, "/get")
-	r.Do(BuildHandler(a, 202, "", nil)).Status(202)
-	r.Do(BuildHandler(a, 203, "", nil)).Status(203)
+	Get(a, "/get", BuildHandler(a, 202, "", nil)).Do().Status(202)
+	Get(a, "/get", BuildHandler(a, 203, "", nil)).Do().Status(203)
 	a.Panic(func() {
-		r.Do(nil)
+		Get(a, "/get", nil).Do()
 	})
 }
 
 func TestResponse(t *testing.T) {
-	srv := NewServer(assert.New(t, false), h, nil)
+	srv := NewServer(assert.New(t, false), h)
 
 	srv.NewRequest(http.MethodGet, "/body").
 		Header("content-type", "application/json").
 		Query("page", "5").
 		StringBody(`{"id":5}`).
-		Do(nil).
+		Do().
 		Status(http.StatusCreated).
 		NotStatus(http.StatusNotFound).
 		Header("content-type", "application/json;charset=utf-8").
@@ -54,7 +52,7 @@ func TestResponse(t *testing.T) {
 
 	srv.NewRequest(http.MethodGet, "/get").
 		Query("page", "5").
-		Do(nil).
+		Do().
 		Status(http.StatusCreated).
 		NotHeader("content-type", "invalid value").
 		BodyEmpty()

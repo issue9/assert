@@ -43,7 +43,7 @@ func BuildHandlerFunc(a *assert.Assertion, code int, body string, headers map[st
 
 func (srv *Server) RawHTTP(req, resp string) *Server {
 	srv.Assertion().TB().Helper()
-	RawHTTP(srv.Assertion(), srv.client, req, resp)
+	RawHTTP(srv.Assertion(), srv.server.Client(), req, resp)
 	return srv
 }
 
