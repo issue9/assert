@@ -94,6 +94,9 @@ func (a *Assertion) NotEqual(v1, v2 any, msg ...any) *Assertion {
 	return a.Assert(!isEqual(v1, v2), NewFailure("NotEqual", msg, map[string]any{"v1": v1, "v2": v2}))
 }
 
+// Empty 判断对象是否为空
+//
+// 与 [Assertion.Zero] 相比，包含了对容器对象的长度为 0 的判断。
 func (a *Assertion) Empty(expr any, msg ...any) *Assertion {
 	a.TB().Helper()
 	return a.Assert(isEmpty(expr), NewFailure("Empty", msg, map[string]any{"v": expr}))
