@@ -43,3 +43,6 @@ func (srv *Server) Assertion() *assert.Assertion { return srv.a }
 //
 // 该方法会自动注册在 [testing.T.Cleanup]，一般情况下无需手动调用。
 func (srv *Server) Close() { srv.server.Close() }
+
+// Server 返回 [httptest.Server] 对象
+func (srv *Server) Server() *httptest.Server { return srv.server }
