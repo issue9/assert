@@ -9,7 +9,7 @@ import (
 	"reflect"
 	"regexp"
 	"testing"
-	"time"
+	"testing/synctest"
 )
 
 // Assertion 是对 [testing.TB] 的二次包装
@@ -224,14 +224,16 @@ func (a *Assertion) When(expr bool, f func(a *Assertion), msg ...any) *Assertion
 	return a
 }
 
-// Wait 等待一定时间再执行后续操作
-func (a *Assertion) Wait(d time.Duration) *Assertion {
-	time.Sleep(d)
+func (a *Assertion) SyncTest(f func(a *Assertion, wait func())) *Assertion {
+	t, ok := a.TB().(*testing.T)
+	if !ok {
+		panic("SyncTest 只能应用在 testing.T 上")
+	}
+
+	synctest.Test(t, func(t *testing.T) { f(a, synctest.Wait) })
+
 	return a
 }
-
-// WaitSeconds 等待 s 秒再执行后续操作
-func (a *Assertion) WaitSeconds(s int) *Assertion { return a.Wait(time.Duration(s) * time.Second) }
 
 // Go 以 goroutine 方式执行 f
 func (a *Assertion) Go(f func(*Assertion)) *Assertion {
