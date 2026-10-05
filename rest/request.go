@@ -27,6 +27,7 @@ type Request struct {
 
 	client *http.Client
 	h      http.Handler
+	s      *Server
 }
 
 // NewRequest 获取一条请求的结果
@@ -41,12 +42,12 @@ type Request struct {
 //	resp1 := r.Param("id", "1").Do()
 //	resp2 := r.Param("id", "2").Do()
 func (srv *Server) NewRequest(method, path string) *Request {
-	return NewRequest(srv.a, method, srv.URL()+path, nil).Client(srv.server.Client())
+	req := NewRequest(srv.a, method, srv.URL()+path).Client(srv.server.Client())
+	req.s = srv
+	return req
 }
 
-func (srv *Server) Get(path string) *Request {
-	return srv.NewRequest(http.MethodGet, path)
-}
+func (srv *Server) Get(path string) *Request { return srv.NewRequest(http.MethodGet, path) }
 
 func (srv *Server) Put(path string, body []byte) *Request {
 	return srv.NewRequest(http.MethodPut, path).Body(body)
@@ -60,38 +61,44 @@ func (srv *Server) Patch(path string, body []byte) *Request {
 	return srv.NewRequest(http.MethodPatch, path).Body(body)
 }
 
-func (srv *Server) Delete(path string) *Request {
-	return srv.NewRequest(http.MethodDelete, path)
-}
+func (srv *Server) Delete(path string) *Request { return srv.NewRequest(http.MethodDelete, path) }
 
 // NewRequest 以调用链的方式构建一个访问请求对象
-func NewRequest(a *assert.Assertion, method, path string, h http.Handler) *Request {
+func NewRequest(a *assert.Assertion, method, path string) *Request {
 	return &Request{
 		a:      a,
 		method: method,
 		path:   path,
-		h:      h,
 	}
 }
 
-func Get(a *assert.Assertion, path string, h http.Handler) *Request {
-	return NewRequest(a, http.MethodGet, path, h)
+func Get(a *assert.Assertion, path string) *Request {
+	return NewRequest(a, http.MethodGet, path)
 }
 
-func Delete(a *assert.Assertion, path string, h http.Handler) *Request {
-	return NewRequest(a, http.MethodDelete, path, h)
+func Delete(a *assert.Assertion, path string) *Request {
+	return NewRequest(a, http.MethodDelete, path)
 }
 
-func Post(a *assert.Assertion, path string, body []byte, h http.Handler) *Request {
-	return NewRequest(a, http.MethodPost, path, h).Body(body)
+func Post(a *assert.Assertion, path string, body []byte) *Request {
+	return NewRequest(a, http.MethodPost, path).Body(body)
 }
 
-func Put(a *assert.Assertion, path string, body []byte, h http.Handler) *Request {
-	return NewRequest(a, http.MethodPut, path, h).Body(body)
+func Put(a *assert.Assertion, path string, body []byte) *Request {
+	return NewRequest(a, http.MethodPut, path).Body(body)
 }
 
-func Patch(a *assert.Assertion, path string, body []byte, h http.Handler) *Request {
-	return NewRequest(a, http.MethodPatch, path, h).Body(body)
+func Patch(a *assert.Assertion, path string, body []byte) *Request {
+	return NewRequest(a, http.MethodPatch, path).Body(body)
+}
+
+// Handler 指定路由函数
+func (req *Request) Handler(h http.Handler) *Request {
+	if req.h != nil {
+		panic("该参数已经被指定")
+	}
+	req.h = h
+	return req
 }
 
 // Client 指定采用的客户端实例

@@ -41,7 +41,5 @@ func (srv *Server) Assertion() *assert.Assertion { return srv.a }
 
 // Close 关闭服务
 //
-// 如果未手动调用，则在 testing.TB.Cleanup 中自动调用。
-func (srv *Server) Close() {
-	srv.server.Close()
-}
+// 该方法会自动注册在 [testing.T.Cleanup]，一般情况下无需手动调用。
+func (srv *Server) Close() { srv.server.Close() }

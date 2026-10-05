@@ -41,6 +41,9 @@ func BuildHandlerFunc(a *assert.Assertion, code int, body string, headers map[st
 	}
 }
 
+// RawHTTP 通过原始数据进行比较请求和返回数据是符合要求
+//
+// NOTE: 具体可参考 [RawHTTP] 方法。
 func (srv *Server) RawHTTP(req, resp string) *Server {
 	srv.Assertion().TB().Helper()
 	RawHTTP(srv.Assertion(), srv.server.Client(), req, resp)

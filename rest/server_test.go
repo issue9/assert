@@ -14,7 +14,7 @@ func TestNew(t *testing.T) {
 	a := assert.New(t, false)
 
 	srv := NewServer(a, nil)
-	a.NotNil(srv)
+	a.NotNil(srv).NotNil(srv.Assertion())
 
 	srv.Close()
 	srv.Close()

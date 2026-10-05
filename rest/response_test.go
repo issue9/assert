@@ -14,23 +14,26 @@ import (
 func TestRequest_Do(t *testing.T) {
 	a := assert.New(t, false)
 
-	Get(a, "/get", h).
+	Get(a, "/get").
+		Handler(h).
 		Do().
 		Success().
 		Status(201)
 
-	NewRequest(a, http.MethodGet, "/not-exists", h).
+	NewRequest(a, http.MethodGet, "/not-exists").
+		Handler(h).
 		Do().
 		Fail()
 
-	NewRequest(a, http.MethodGet, "/get", BuildHandler(a, 202, "", nil)).
+	NewRequest(a, http.MethodGet, "/get").
+		Handler(BuildHandler(a, 202, "", nil)).
 		Do().
 		Status(202)
 
-	Get(a, "/get", BuildHandler(a, 202, "", nil)).Do().Status(202)
-	Get(a, "/get", BuildHandler(a, 203, "", nil)).Do().Status(203)
+	Get(a, "/get").Handler(BuildHandler(a, 202, "", nil)).Do().Status(202)
+	Get(a, "/get").Handler(BuildHandler(a, 203, "", nil)).Do().Status(203)
 	a.Panic(func() {
-		Get(a, "/get", nil).Do()
+		Get(a, "/get").Do()
 	})
 }
 
