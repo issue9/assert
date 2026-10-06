@@ -26,7 +26,7 @@ func (req *Request) Do() *Response {
 
 	var err error
 	var resp *http.Response
-	if req.s == nil {
+	if req.h != nil {
 		w := httptest.NewRecorder()
 		req.h.ServeHTTP(w, req.Request())
 		resp = w.Result()

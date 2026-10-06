@@ -93,18 +93,27 @@ func Patch(a *assert.Assertion, path string, body []byte) *Request {
 }
 
 // Handler 指定路由函数
+//
+// 如果指定了该值，那么 Request 生成的请求会使用参数 h 处理，
+// 否则会通过 [Request.Client] 访问直接的请求地址。
 func (req *Request) Handler(h http.Handler) *Request {
 	if req.h != nil {
 		panic("该参数已经被指定")
 	}
+
 	req.h = h
 	return req
 }
 
 // Client 指定采用的客户端实例
 //
-// 可以为空，如果为空，那么在 Do 函数中的参数必不能为空。
+// 在已经通过 [Request.Handler] 指定 [http.Handler] 参数的情况下，
+// 当前函数的调用是不会起作用的。
 func (req *Request) Client(c *http.Client) *Request {
+	if req.h != nil {
+		panic("已经指定 Request.Handler，当前函数并不会起作用！")
+	}
+
 	req.client = c
 	return req
 }
