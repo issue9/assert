@@ -170,12 +170,12 @@ func (a *Assertion) Same[T any](v1, v2 T, msg ...any) *Assertion {
 }
 
 // NotSame 断言为不是同一个对象
-func (a *Assertion) NotSame[T any](v1, v2 T, msg ...any) *Assertion {
+func (a *Assertion) NotSame(v1, v2 any, msg ...any) *Assertion {
 	a.TB().Helper()
 	return a.Assert(!isSame(v1, v2), NewFailure("NotSame", msg, nil))
 }
 
-func isSame[T any](v1, v2 T) bool {
+func isSame(v1, v2 any) bool {
 	rv1 := reflect.ValueOf(v1)
 	if !canPointer(rv1.Kind()) {
 		return false
