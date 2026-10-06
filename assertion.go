@@ -84,9 +84,18 @@ func (a *Assertion) NotNil(expr any, msg ...any) *Assertion {
 	return a.Assert(!isNil(expr), NewFailure("NotNil", msg, map[string]any{"v": expr}))
 }
 
+// Equal 判断两值值是否相等
+//
+// 该方法法需要两值的类型是相等的，比如 int(8) 和 int16(8) 是相等的，
+// 甚至 map[string]int{"key":5} 和 map[string]int8{"key":5} 也是相等的。
 func (a *Assertion) Equal(v1, v2 any, msg ...any) *Assertion {
 	a.TB().Helper()
 	return a.Assert(isEqual(v1, v2), NewFailure("Equal", msg, map[string]any{"v1": v1, "v2": v2}))
+}
+
+// StrictEqual 从类型到值都相等
+func (a *Assertion) StrictEqual[T comparable](v1, v2 T, msg ...any) *Assertion {
+	return a.Assert(v1 == v2, NewFailure("StrictEqual", msg, map[string]any{"v1": v1, "v2": v2}))
 }
 
 func (a *Assertion) NotEqual(v1, v2 any, msg ...any) *Assertion {
@@ -224,6 +233,9 @@ func (a *Assertion) When(expr bool, f func(a *Assertion), msg ...any) *Assertion
 	return a
 }
 
+// SyncTest 调用 [synctest.Test] 的测试用例
+//
+// NOTE: 此方法要求 [Assertion.TB] 的类型必须为 [testing.T]。
 func (a *Assertion) SyncTest(f func(a *Assertion, wait func())) *Assertion {
 	t, ok := a.TB().(*testing.T)
 	if !ok {
