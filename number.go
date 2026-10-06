@@ -64,16 +64,12 @@ func (a *Assertion) LessEqual[T Number](v, val T, msg ...any) *Assertion {
 	return a.Assert(v <= val, NewFailure("LessEqual", msg, nil))
 }
 
-// Positive 断言 v 为正数
-//
-// NOTE: 不包含 0
+// Positive 断言 v 为大于 0 的数
 func (a *Assertion) Positive[T Number](v T, msg ...any) *Assertion {
 	return a.Assert(v > 0, NewFailure("Positive", msg, nil))
 }
 
-// Negative 断言 v 为负数
-//
-// NOTE: 不包含 0
+// Negative 断言 v 为小于 0 的数
 func (a *Assertion) Negative[T Number](v T, msg ...any) *Assertion {
 	return a.Assert(v < 0, NewFailure("Negative", msg, nil))
 }

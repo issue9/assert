@@ -26,7 +26,8 @@ package assert
 
 import (
 	"fmt"
-	"sort"
+	"maps"
+	"slices"
 	"strings"
 	"sync"
 )
@@ -62,11 +63,8 @@ func DefaultFailureSprint(f *Failure) string {
 	s.WriteString(" 断言失败！")
 
 	if len(f.Values) > 0 {
-		keys := make([]string, 0, len(f.Values))
-		for k := range f.Values {
-			keys = append(keys, k)
-		}
-		sort.Strings(keys) // TODO(go1.21): slices.Sort
+		keys := slices.Collect(maps.Keys(f.Values))
+		slices.Sort(keys)
 
 		s.WriteString("反馈以下参数：\n")
 		for _, k := range keys {
