@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-package assert
+package internal
 
 import (
 	"testing"
@@ -12,7 +12,7 @@ import (
 func TestIsZero(t *testing.T) {
 	zero := func(v any) {
 		t.Helper()
-		if !isZero(v) {
+		if !IsZero(v) {
 			t.Errorf("zero: %v", v)
 		}
 	}
@@ -26,14 +26,14 @@ func TestIsZero(t *testing.T) {
 func TestIsEqual(t *testing.T) {
 	eq := func(v1, v2 any) {
 		t.Helper()
-		if !isEqual(v1, v2) {
+		if !IsEqual(v1, v2) {
 			t.Errorf("eq:[%v]!=[%v]", v1, v2)
 		}
 	}
 
 	neq := func(v1, v2 any) {
 		t.Helper()
-		if isEqual(v1, v2) {
+		if IsEqual(v1, v2) {
 			t.Errorf("eq:[%v]==[%v]", v1, v2)
 		}
 	}
@@ -128,75 +128,75 @@ func TestIsEqual(t *testing.T) {
 }
 
 func TestIsEmpty(t *testing.T) {
-	if isEmpty([]string{""}) {
+	if IsEmpty([]string{""}) {
 		t.Error("isEmpty([]string{\"\"})")
 	}
 
-	if !isEmpty([]string{}) {
+	if !IsEmpty([]string{}) {
 		t.Error("isEmpty([]string{})")
 	}
 
-	if !isEmpty([]int{}) {
+	if !IsEmpty([]int{}) {
 		t.Error("isEmpty([]int{})")
 	}
 
-	if !isEmpty(map[string]int{}) {
+	if !IsEmpty(map[string]int{}) {
 		t.Error("isEmpty(map[string]int{})")
 	}
 
-	if !isEmpty(0) {
+	if !IsEmpty(0) {
 		t.Error("isEmpty(0)")
 	}
 
-	if !isEmpty(int64(0)) {
+	if !IsEmpty(int64(0)) {
 		t.Error("isEmpty(int64(0))")
 	}
 
-	if !isEmpty(uint64(0)) {
+	if !IsEmpty(uint64(0)) {
 		t.Error("isEmpty(uint64(0))")
 	}
 
-	if !isEmpty(0.0) {
+	if !IsEmpty(0.0) {
 		t.Error("isEmpty(0.0)")
 	}
 
-	if !isEmpty(float32(0)) {
+	if !IsEmpty(float32(0)) {
 		t.Error("isEmpty(0.0)")
 	}
 
-	if !isEmpty("") {
+	if !IsEmpty("") {
 		t.Error("isEmpty(``)")
 	}
 
-	if !isEmpty([0]int{}) {
+	if !IsEmpty([0]int{}) {
 		t.Error("isEmpty([0]int{})")
 	}
 
-	if !isEmpty(time.Time{}) {
+	if !IsEmpty(time.Time{}) {
 		t.Error("isEmpty(time.Time{})")
 	}
 
-	if !isEmpty(&time.Time{}) {
+	if !IsEmpty(&time.Time{}) {
 		t.Error("isEmpty(&time.Time{})")
 	}
 
-	if isEmpty("  ") {
+	if IsEmpty("  ") {
 		t.Error("isEmpty(\"  \")")
 	}
 }
 
 func TestIsNil(t *testing.T) {
-	if !isNil(nil) {
+	if !IsNil(nil) {
 		t.Error("isNil(nil)")
 	}
 
 	var v1 []int
-	if !isNil(v1) {
+	if !IsNil(v1) {
 		t.Error("isNil(v1)")
 	}
 
 	var v2 map[string]string
-	if !isNil(v2) {
+	if !IsNil(v2) {
 		t.Error("isNil(v2)")
 	}
 }
@@ -204,7 +204,7 @@ func TestIsNil(t *testing.T) {
 func TestIsContains(t *testing.T) {
 	fn := func(result bool, container, item any) {
 		t.Helper()
-		if result != isContains(container, item) {
+		if result != IsContains(container, item) {
 			t.Errorf("%v == (isContains(%v, %v))出错\n", result, container, item)
 		}
 	}

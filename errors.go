@@ -8,6 +8,8 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/issue9/assert/v5/internal"
 )
 
 // Error 断言有错误发生
@@ -17,7 +19,7 @@ import (
 // [Assertion.NotNil] 的特化版本，限定了类型为 error。
 func (a *Assertion) Error(expr error, msg ...any) *Assertion {
 	a.TB().Helper()
-	return a.Assert(!isNil(expr), NewFailure("Error", msg, map[string]any{"v": expr}))
+	return a.Assert(!internal.IsNil(expr), NewFailure("Error", msg, map[string]any{"v": expr}))
 }
 
 // ErrorString 断言有错误发生且错误信息中包含指定的字符串 str
@@ -26,7 +28,7 @@ func (a *Assertion) Error(expr error, msg ...any) *Assertion {
 func (a *Assertion) ErrorString(expr error, str string, msg ...any) *Assertion {
 	a.TB().Helper()
 
-	if isNil(expr) { // 空值，必定没有错误
+	if internal.IsNil(expr) { // 空值，必定没有错误
 		return a.Assert(false, NewFailure("ErrorString", msg, map[string]any{"v": expr}))
 	}
 	return a.Assert(strings.Contains(expr.Error(), str), NewFailure("ErrorString", msg, map[string]any{"v": expr}))
@@ -45,7 +47,7 @@ func (a *Assertion) ErrorIs(expr, target error, msg ...any) *Assertion {
 // [Assertion.Nil] 的特化版本，限定了类型为 error。
 func (a *Assertion) NotError(expr error, msg ...any) *Assertion {
 	a.TB().Helper()
-	return a.Assert(isNil(expr), NewFailure("NotError", msg, map[string]any{"v": expr}))
+	return a.Assert(internal.IsNil(expr), NewFailure("NotError", msg, map[string]any{"v": expr}))
 }
 
 // Panic 断言函数会发生 panic
@@ -70,7 +72,7 @@ func (a *Assertion) PanicType(fn func(), typ any, msg ...any) *Assertion {
 	a.TB().Helper()
 
 	if has, m := hasPanic(fn); has {
-		t1, t2 := getType(true, m, typ)
+		t1, t2 := internal.GetType(true, m, typ)
 		return a.Assert(t1 == t2, NewFailure("PanicType", msg, map[string]any{"v1": t1, "v2": t2}))
 	}
 	return a.Assert(false, NewFailure("PanicType", msg, nil))
@@ -81,7 +83,7 @@ func (a *Assertion) PanicValue(fn func(), v any, msg ...any) *Assertion {
 	a.TB().Helper()
 
 	if has, m := hasPanic(fn); has {
-		return a.Assert(isEqual(m, v), NewFailure("PanicValue", msg, map[string]any{"v": m}))
+		return a.Assert(internal.IsEqual(m, v), NewFailure("PanicValue", msg, map[string]any{"v": m}))
 	}
 	return a.Assert(false, NewFailure("PanicType", msg, nil))
 }

@@ -2,7 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
-package assert
+// Package internal 公用函数
+package internal
 
 import (
 	"bytes"
@@ -12,8 +13,8 @@ import (
 
 // 判断一个值是否为空(0, "", false, 空数组等)。
 // []string{""}空数组里套一个空字符串，不会被判断为空。
-func isEmpty(expr any) bool {
-	if isZero(expr) {
+func IsEmpty(expr any) bool {
+	if IsZero(expr) {
 		return true
 	}
 
@@ -29,8 +30,8 @@ func isEmpty(expr any) bool {
 	}
 }
 
-func isZero(v any) bool {
-	if isNil(v) || reflect.ValueOf(v).IsZero() {
+func IsZero(v any) bool {
+	if IsNil(v) || reflect.ValueOf(v).IsZero() {
 		return true
 	}
 
@@ -41,9 +42,9 @@ func isZero(v any) bool {
 	return rv.IsZero()
 }
 
-// isNil 判断一个值是否为 nil。
+// IsNil 判断一个值是否为 nil。
 // 当特定类型的变量，已经声明，但还未赋值时，也将返回 true
-func isNil(expr any) bool {
+func IsNil(expr any) bool {
 	if nil == expr {
 		return true
 	}
@@ -67,7 +68,7 @@ func isNil(expr any) bool {
 //
 //	// map 的键值不同，即使可相互转换也判断不相等。
 //	map[int]int{1:1,2:2}        != map[int8]int{1:1,2:2}
-func isEqual(v1, v2 any) bool {
+func IsEqual(v1, v2 any) bool {
 	if reflect.DeepEqual(v1, v2) {
 		return true
 	}
@@ -99,7 +100,7 @@ func isEqual(v1, v2 any) bool {
 		if vv2.Kind() != reflect.Slice && vv2.Kind() != reflect.Array {
 			// 虽然类型不同，但可以相互转换成 vv1 的，如：vv2 是 string，vv2 是 []byte，
 			if vv2Type.ConvertibleTo(vv1Type) {
-				return isEqual(vv1.Interface(), vv2.Convert(vv1Type).Interface())
+				return IsEqual(vv1.Interface(), vv2.Convert(vv1Type).Interface())
 			}
 			return false
 		}
@@ -111,7 +112,7 @@ func isEqual(v1, v2 any) bool {
 		}
 
 		for i := 0; i < vv1.Len(); i++ {
-			if !isEqual(vv1.Index(i).Interface(), vv2.Index(i).Interface()) {
+			if !IsEqual(vv1.Index(i).Interface(), vv2.Index(i).Interface()) {
 				return false
 			}
 		}
@@ -142,7 +143,7 @@ func isEqual(v1, v2 any) bool {
 				return false
 			}
 
-			if !isEqual(vv1.MapIndex(index).Interface(), vv2Index.Interface()) {
+			if !IsEqual(vv1.MapIndex(index).Interface(), vv2Index.Interface()) {
 				return false
 			}
 		}
@@ -152,7 +153,7 @@ func isEqual(v1, v2 any) bool {
 			return vv1.String() == vv2.String()
 		}
 		if vv2Type.ConvertibleTo(vv1Type) { // 考虑 v1 是 string，v2 是 []byte 的情况
-			return isEqual(vv1.Interface(), vv2.Convert(vv1Type).Interface())
+			return IsEqual(vv1.Interface(), vv2.Convert(vv1Type).Interface())
 		}
 
 		return false
@@ -167,8 +168,8 @@ func isEqual(v1, v2 any) bool {
 	return false
 }
 
-// isContains 判断 container 是否包含了 item 的内容。若是指针，会判断指针指向的内容
-func isContains(container, item any) bool {
+// IsContains 判断 container 是否包含了 item 的内容。若是指针，会判断指针指向的内容
+func IsContains(container, item any) bool {
 	if container == nil { // nil不包含任何东西
 		return false
 	}
@@ -184,7 +185,7 @@ func isContains(container, item any) bool {
 		iv = iv.Elem()
 	}
 
-	if isEqual(container, item) {
+	if IsEqual(container, item) {
 		return true
 	}
 
@@ -242,7 +243,7 @@ func isContains(container, item any) bool {
 
 		// item 是 container 的一个元素
 		for i := 0; i < cv.Len(); i++ {
-			if isEqual(cv.Index(i).Interface(), iv.Interface()) {
+			if IsEqual(cv.Index(i).Interface(), iv.Interface()) {
 				return true
 			}
 		}
@@ -262,7 +263,7 @@ func isContains(container, item any) bool {
 		// 依次比较 item 的各个子元素是否都存在于 container，且下标都相同
 		ivIndex := 0
 		for i := 0; i < cv.Len(); i++ {
-			if isEqual(cv.Index(i).Interface(), iv.Index(ivIndex).Interface()) {
+			if IsEqual(cv.Index(i).Interface(), iv.Index(ivIndex).Interface()) {
 				if (ivIndex == 0) && (i+iv.Len() > cv.Len()) {
 					return false
 				}
@@ -296,7 +297,7 @@ func isContains(container, item any) bool {
 			if !cvItem.IsValid() { // container 中不包含该值。
 				return false
 			}
-			if !isEqual(cvItem.Interface(), iv.MapIndex(key).Interface()) {
+			if !IsEqual(cvItem.Interface(), iv.MapIndex(key).Interface()) {
 				return false
 			}
 		}
@@ -307,7 +308,7 @@ func isContains(container, item any) bool {
 	return false
 }
 
-func getType(ptr bool, v1, v2 any) (t1, t2 reflect.Type) {
+func GetType(ptr bool, v1, v2 any) (t1, t2 reflect.Type) {
 	t1 = reflect.TypeOf(v1)
 	t2 = reflect.TypeOf(v2)
 

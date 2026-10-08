@@ -5,6 +5,7 @@
 package rest
 
 import (
+	"encoding/json/v2"
 	"net/http"
 	"testing"
 
@@ -37,6 +38,10 @@ func TestRequest_Do(t *testing.T) {
 	})
 }
 
+type obj struct {
+	ID int `json:"id"`
+}
+
 func TestResponse(t *testing.T) {
 	srv := NewServer(assert.New(t, false), h)
 
@@ -51,6 +56,7 @@ func TestResponse(t *testing.T) {
 		NotHeader("content-type", "invalid value").
 		Body([]byte(`{"id":6}`)).
 		StringBody(`{"id":6}`).
+		EncodingBody[obj](&obj{ID: 6}, func(b []byte, a any) error { return json.Unmarshal(b, a) }).
 		BodyNotEmpty()
 
 	srv.NewRequest(http.MethodGet, "/get").

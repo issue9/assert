@@ -113,6 +113,9 @@ func (req *Request) Client(c *http.Client) *Request {
 	if req.h != nil {
 		panic("已经指定 Request.Handler，当前函数并不会起作用！")
 	}
+	if req.client != nil {
+		panic("该参数已经被指定")
+	}
 
 	req.client = c
 	return req
@@ -168,10 +171,10 @@ func (req *Request) StringBody(body string) *Request {
 	return req
 }
 
-// BodyFunc 指定一个未编码的对象
+// EncodingBody 指定一个未编码的对象
 //
 // marshal 对 obj 的编码函数，比如 [json.Marshal] 等。
-func (req *Request) BodyFunc(obj any, marshal func(any) ([]byte, error)) *Request {
+func (req *Request) EncodingBody(obj any, marshal func(any) ([]byte, error)) *Request {
 	req.a.TB().Helper()
 
 	data, err := marshal(obj)

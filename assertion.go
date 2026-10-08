@@ -10,6 +10,8 @@ import (
 	"regexp"
 	"testing"
 	"testing/synctest"
+
+	"github.com/issue9/assert/v5/internal"
 )
 
 // Assertion 是对 [testing.TB] 的二次包装
@@ -76,12 +78,12 @@ func (a *Assertion) False(expr bool, msg ...any) *Assertion {
 
 func (a *Assertion) Nil(expr any, msg ...any) *Assertion {
 	a.TB().Helper()
-	return a.Assert(isNil(expr), NewFailure("Nil", msg, map[string]any{"v": expr}))
+	return a.Assert(internal.IsNil(expr), NewFailure("Nil", msg, map[string]any{"v": expr}))
 }
 
 func (a *Assertion) NotNil(expr any, msg ...any) *Assertion {
 	a.TB().Helper()
-	return a.Assert(!isNil(expr), NewFailure("NotNil", msg, map[string]any{"v": expr}))
+	return a.Assert(!internal.IsNil(expr), NewFailure("NotNil", msg, map[string]any{"v": expr}))
 }
 
 // Equal 判断两值值是否相等
@@ -90,7 +92,7 @@ func (a *Assertion) NotNil(expr any, msg ...any) *Assertion {
 // 甚至 map[string]int{"key":5} 和 map[string]int8{"key":5} 也是相等的。
 func (a *Assertion) Equal(v1, v2 any, msg ...any) *Assertion {
 	a.TB().Helper()
-	return a.Assert(isEqual(v1, v2), NewFailure("Equal", msg, map[string]any{"v1": v1, "v2": v2}))
+	return a.Assert(internal.IsEqual(v1, v2), NewFailure("Equal", msg, map[string]any{"v1": v1, "v2": v2}))
 }
 
 // StrictEqual 从类型到值都相等
@@ -100,7 +102,7 @@ func (a *Assertion) StrictEqual[T comparable](v1, v2 T, msg ...any) *Assertion {
 
 func (a *Assertion) NotEqual(v1, v2 any, msg ...any) *Assertion {
 	a.TB().Helper()
-	return a.Assert(!isEqual(v1, v2), NewFailure("NotEqual", msg, map[string]any{"v1": v1, "v2": v2}))
+	return a.Assert(!internal.IsEqual(v1, v2), NewFailure("NotEqual", msg, map[string]any{"v1": v1, "v2": v2}))
 }
 
 // Empty 判断对象是否为空
@@ -108,12 +110,12 @@ func (a *Assertion) NotEqual(v1, v2 any, msg ...any) *Assertion {
 // 与 [Assertion.Zero] 相比，包含了对容器对象的长度为 0 的判断。
 func (a *Assertion) Empty(expr any, msg ...any) *Assertion {
 	a.TB().Helper()
-	return a.Assert(isEmpty(expr), NewFailure("Empty", msg, map[string]any{"v": expr}))
+	return a.Assert(internal.IsEmpty(expr), NewFailure("Empty", msg, map[string]any{"v": expr}))
 }
 
 func (a *Assertion) NotEmpty(expr any, msg ...any) *Assertion {
 	a.TB().Helper()
-	return a.Assert(!isEmpty(expr), NewFailure("NotEmpty", msg, map[string]any{"v": expr}))
+	return a.Assert(!internal.IsEmpty(expr), NewFailure("NotEmpty", msg, map[string]any{"v": expr}))
 }
 
 // Contains 断言 container 包含 item 或是包含 item 中的所有项
@@ -124,13 +126,13 @@ func (a *Assertion) NotEmpty(expr any, msg ...any) *Assertion {
 // 的所有项，或是 item 本身就是 container 中的一个元素。
 func (a *Assertion) Contains(container, item any, msg ...any) *Assertion {
 	a.TB().Helper()
-	return a.Assert(isContains(container, item), NewFailure("Contains", msg, map[string]any{"container": container, "item": item}))
+	return a.Assert(internal.IsContains(container, item), NewFailure("Contains", msg, map[string]any{"container": container, "item": item}))
 }
 
 // NotContains 断言 container 不包含 item 或是不包含 item 中的所有项
 func (a *Assertion) NotContains(container, item any, msg ...any) *Assertion {
 	a.TB().Helper()
-	return a.Assert(!isContains(container, item), NewFailure("NotContains", msg, map[string]any{"container": container, "item": item}))
+	return a.Assert(!internal.IsContains(container, item), NewFailure("NotContains", msg, map[string]any{"container": container, "item": item}))
 }
 
 // Zero 断言是否为零值
@@ -138,7 +140,7 @@ func (a *Assertion) NotContains(container, item any, msg ...any) *Assertion {
 // 最终调用的是 [reflect.Value.IsZero] 进行判断，如果是指针，则会判断指向的对象。
 func (a *Assertion) Zero(v any, msg ...any) *Assertion {
 	a.TB().Helper()
-	return a.Assert(isZero(v), NewFailure("Zero", msg, map[string]any{"v": v}))
+	return a.Assert(internal.IsZero(v), NewFailure("Zero", msg, map[string]any{"v": v}))
 }
 
 // NotZero 断言是否为非零值
@@ -146,7 +148,7 @@ func (a *Assertion) Zero(v any, msg ...any) *Assertion {
 // 最终调用的是 [reflect.Value.IsZero] 进行判断，如果是指针，则会判断指向的对象。
 func (a *Assertion) NotZero(v any, msg ...any) *Assertion {
 	a.TB().Helper()
-	return a.Assert(!isZero(v), NewFailure("NotZero", msg, map[string]any{"v": v}))
+	return a.Assert(!internal.IsZero(v), NewFailure("NotZero", msg, map[string]any{"v": v}))
 }
 
 // TypeEqual 断言两个值的类型是否相同
@@ -159,7 +161,7 @@ func (a *Assertion) TypeEqual(ptr bool, v1, v2 any, msg ...any) *Assertion {
 
 	a.TB().Helper()
 
-	t1, t2 := getType(ptr, v1, v2)
+	t1, t2 := internal.GetType(ptr, v1, v2)
 	return a.Assert(t1 == t2, NewFailure("TypeEqual", msg, map[string]any{"v1": t1, "v2": t2}))
 }
 

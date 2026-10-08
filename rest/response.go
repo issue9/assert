@@ -6,11 +6,15 @@ package rest
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
+	"slices"
 
 	"github.com/issue9/assert/v5"
+	"github.com/issue9/assert/v5/internal"
 )
 
 // Response 测试请求的返回结构
@@ -119,6 +123,27 @@ func (resp *Response) StringBody(val string, msg ...any) *Response {
 	return resp.assert(b == val, assert.NewFailure("StringBody", msg, map[string]any{"body": b, "val": val}))
 }
 
+// EncodingBody 断言返回内容解码后与 val 是相等的
+//
+// T 的类型不能为指针和函数。
+func (resp *Response) EncodingBody[T any](val *T, u func([]byte, any) error, msg ...any) *Response {
+	resp.a.TB().Helper()
+
+	k := reflect.TypeFor[T]().Kind()
+	if k == reflect.Pointer || k == reflect.Func {
+		return resp.assert(false, assert.NewFailure("EncodingBody", nil, map[string]any{"err": fmt.Errorf("类型 T 的 kind %s 无效", k)}))
+	}
+
+	var v2 T
+	if err := u(resp.body, &v2); err != nil {
+		return resp.assert(false, assert.NewFailure("EncodingBody", nil, map[string]any{"body": string(resp.body), "err": err}))
+	}
+
+	resp.assert(internal.IsEqual(val, &v2), assert.NewFailure("EncodingBody", msg, map[string]any{"v1": val, "v2": v2}))
+
+	return resp
+}
+
 // BodyNotEmpty 报文内容是否不为空
 func (resp *Response) BodyNotEmpty(msg ...any) *Response {
 	resp.a.TB().Helper()
@@ -134,10 +159,6 @@ func (resp *Response) BodyEmpty(msg ...any) *Response {
 // BodyFunc 指定对 body 内容的断言方式
 func (resp *Response) BodyFunc(f func(a *assert.Assertion, body []byte)) *Response {
 	resp.a.TB().Helper()
-
-	b := make([]byte, len(resp.body))
-	copy(b, resp.body)
-	f(resp.a, b)
-
+	f(resp.a, slices.Clone(resp.body))
 	return resp
 }
