@@ -42,7 +42,7 @@ func (a *Assertion) EncodingNotEqual[T any](v1, v2 []byte, u func(data []byte, v
 
 func unmarshal[T any](v1, v2 []byte, u func([]byte, any) error) (v111, v222 *T, err error) {
 	k := reflect.TypeFor[T]().Kind()
-	if k == reflect.Pointer || k == reflect.Func {
+	if k == reflect.Pointer || k == reflect.Func || k == reflect.Chan {
 		return nil, nil, fmt.Errorf("类型 T 的 kind %s 无效", k)
 	}
 

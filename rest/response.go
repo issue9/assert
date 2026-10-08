@@ -130,7 +130,7 @@ func (resp *Response) EncodingBody[T any](val *T, u func([]byte, any) error, msg
 	resp.a.TB().Helper()
 
 	k := reflect.TypeFor[T]().Kind()
-	if k == reflect.Pointer || k == reflect.Func {
+	if k == reflect.Pointer || k == reflect.Func || k == reflect.Chan {
 		return resp.assert(false, assert.NewFailure("EncodingBody", nil, map[string]any{"err": fmt.Errorf("类型 T 的 kind %s 无效", k)}))
 	}
 
