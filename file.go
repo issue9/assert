@@ -12,49 +12,28 @@ import (
 
 func (a *Assertion) FileExists(path string, msg ...any) *Assertion {
 	a.TB().Helper()
-
-	if _, err := os.Stat(path); err != nil && !errors.Is(err, fs.ErrExist) {
-		return a.Assert(false, NewFailure("FileExists", msg, map[string]any{"err": err}))
-	}
-	return a
+	_, err := os.Stat(path)
+	return a.Assert(err == nil, NewFailure("FileExists", msg, map[string]any{"err": err}))
 }
 
 func (a *Assertion) FileNotExists(path string, msg ...any) *Assertion {
 	a.TB().Helper()
 
 	_, err := os.Stat(path)
-	if err == nil {
-		return a.Assert(false, NewFailure("FileNotExists", msg, nil))
-	}
-	if errors.Is(err, fs.ErrExist) {
-		return a.Assert(false, NewFailure("FileNotExists", msg, map[string]any{"err": err}))
-	}
-
-	return a
+	return a.Assert(errors.Is(err, fs.ErrNotExist), NewFailure("FileNotExists", msg, nil))
 }
 
 func (a *Assertion) FileExistsFS(fsys fs.FS, path string, msg ...any) *Assertion {
 	a.TB().Helper()
-
-	if _, err := fs.Stat(fsys, path); err != nil && !errors.Is(err, fs.ErrExist) {
-		return a.Assert(false, NewFailure("FileExistsFS", msg, map[string]any{"err": err}))
-	}
-
-	return a
+	_, err := fs.Stat(fsys, path)
+	return a.Assert(err == nil, NewFailure("FileExistsFS", msg, map[string]any{"err": err}))
 }
 
 func (a *Assertion) FileNotExistsFS(fsys fs.FS, path string, msg ...any) *Assertion {
 	a.TB().Helper()
 
 	_, err := fs.Stat(fsys, path)
-	if err == nil {
-		return a.Assert(false, NewFailure("FileNotExistsFS", msg, nil))
-	}
-	if errors.Is(err, fs.ErrExist) {
-		return a.Assert(false, NewFailure("FileNotExistsFS", msg, map[string]any{"err": err}))
-	}
-
-	return a
+	return a.Assert(errors.Is(err, fs.ErrNotExist), NewFailure("FileNotExistsFS", msg, nil))
 }
 
 // IsDir 断言 path 是个目录
