@@ -14,10 +14,6 @@ import (
 	"time"
 )
 
-func (a *Assertion) testFalse() {
-	// TODO
-}
-
 type errorImpl struct {
 	msg string
 }
@@ -186,7 +182,8 @@ func TestAssertion_When(t *testing.T) {
 }
 
 func TestAssertion_Eventually(t *testing.T) {
-	a := New(t, false)
+	out := &bytes.Buffer{}
+	a := newWithLogEnv(t, func(a ...any) { fmt.Fprint(out, a...) }, nil)
 
 	cnt := 0
 	a.Eventually(func() bool {
@@ -196,10 +193,36 @@ func TestAssertion_Eventually(t *testing.T) {
 		}
 		return false
 	}, 500*time.Microsecond)
+	if out.Len() > 0 {
+		t.Error("断言出错了")
+	}
+
+	a.Eventually(func() bool {
+		return false
+	}, 500*time.Microsecond, "Eventually always false")
+	if !strings.Contains(out.String(), "Eventually always false") {
+		t.Error("断言出错了")
+	}
 }
 
 func TestAssertion_Never(t *testing.T) {
-	a := New(t, false)
+	out := &bytes.Buffer{}
+	a := newWithLogEnv(t, func(a ...any) { fmt.Fprint(out, a...) }, nil)
 
 	a.Never(func() bool { return false }, 500*time.Microsecond)
+	if out.Len() > 0 {
+		t.Error("断言出错了")
+	}
+
+	cnt := 0
+	a.Never(func() bool {
+		cnt++
+		if cnt > 10 {
+			return true
+		}
+		return false
+	}, 500*time.Microsecond, "Never return true")
+	if !strings.Contains(out.String(), "Never return true") {
+		t.Error("断言出错了")
+	}
 }

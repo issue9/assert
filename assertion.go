@@ -264,15 +264,19 @@ func (a *Assertion) SyncTest(f func(a *Assertion, wait func())) *Assertion {
 
 // Eventually 断言在 timeout 时间之内 f 会返回 true
 func (a *Assertion) Eventually(f func() bool, timeout time.Duration, msg ...any) *Assertion {
+	a.TB().Helper()
 	return a.try(false, f, timeout, msg...)
 }
 
-// Never 断言在 timeout 时间之内 f 始终返回 true
+// Never 断言在 timeout 时间之内 f 始终返回 false
 func (a *Assertion) Never(f func() bool, timeout time.Duration, msg ...any) *Assertion {
+	a.TB().Helper()
 	return a.try(true, f, timeout, msg...)
 }
 
 func (a *Assertion) try(never bool, f func() bool, timeout time.Duration, msg ...any) *Assertion {
+	a.TB().Helper()
+
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel() // cancel 多次调用不影响
 
@@ -286,10 +290,10 @@ LOOP:
 		select {
 		case <-ctx.Done():
 			if never {
-				// Never 械下，如果是 cancel 表示断言失败
+				// Never 模式下，如果是 cancel 表示断言失败
 				a.Assert(errors.Is(ctx.Err(), context.DeadlineExceeded), NewFailure("Never", msg, nil))
 			} else {
-				// Eventually 械下，如果是 Deadline 表示断言失败
+				// Eventually 模式下，如果是 Deadline 表示断言失败
 				a.Assert(errors.Is(ctx.Err(), context.Canceled), NewFailure("Eventually", msg, nil))
 			}
 			break LOOP
