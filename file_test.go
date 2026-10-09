@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2014-2024 caixw
+// SPDX-FileCopyrightText: 2014-2026 caixw
 //
 // SPDX-License-Identifier: MIT
 
@@ -20,13 +20,13 @@ func TestAssertion_FileExists_FileNotExists(t *testing.T) {
 		FileNotExistsFS(fsys, "win", "a.FileNotExistsFS(c:/win) failed")
 }
 
-func TestAssertion_IsDir_IsNotDir(t *testing.T) {
+func TestAssertion_Dir_NotDir(t *testing.T) {
 	a := New(t, false)
 
-	a.IsDir("./rest", "a.IsDir(./rest) failed").
-		IsNotDir("./assert.go", "a.IsNotDir(./assert.go) failed")
+	a.Dir("./rest", "a.Dir(./rest) failed").
+		NotDir("./assert.go", "a.NotDir(./assert.go) failed")
 
 	fsys := os.DirFS("./")
-	a.IsDirFS(fsys, "rest", "a.IsDirFS(./rest) failed").
-		IsNotDirFS(fsys, "assert.go", "a.IsNotDirFS(./assert.go) failed")
+	a.DirFS(fsys, "rest", "a.DirFS(./rest) failed").
+		NotDirFS(fsys, "assert.go", "a.NotDirFS(./assert.go) failed")
 }

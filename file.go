@@ -36,8 +36,8 @@ func (a *Assertion) FileNotExistsFS(fsys fs.FS, path string, msg ...any) *Assert
 	return a.Assert(errors.Is(err, fs.ErrNotExist), NewFailure("FileNotExistsFS", msg, nil))
 }
 
-// IsDir 断言 path 是个目录
-func (a *Assertion) IsDir(path string, msg ...any) *Assertion {
+// Dir 断言 path 是个目录
+func (a *Assertion) Dir(path string, msg ...any) *Assertion {
 	a.TB().Helper()
 
 	s, err := os.Stat(path)
@@ -47,18 +47,8 @@ func (a *Assertion) IsDir(path string, msg ...any) *Assertion {
 	return a.Assert(s.IsDir(), NewFailure("IsDir", msg, nil))
 }
 
-func (a *Assertion) IsDirFS(fsys fs.FS, path string, msg ...any) *Assertion {
-	a.TB().Helper()
-
-	s, err := fs.Stat(fsys, path)
-	if err != nil {
-		return a.Assert(false, NewFailure("IsDirFS", msg, map[string]any{"err": err}))
-	}
-	return a.Assert(s.IsDir(), NewFailure("IsDirFS", msg, nil))
-}
-
-// IsNotDir 断言 path 不存在或是非目录
-func (a *Assertion) IsNotDir(path string, msg ...any) *Assertion {
+// NotDir 断言 path 不存在或是非目录
+func (a *Assertion) NotDir(path string, msg ...any) *Assertion {
 	a.TB().Helper()
 
 	s, err := os.Stat(path)
@@ -68,7 +58,17 @@ func (a *Assertion) IsNotDir(path string, msg ...any) *Assertion {
 	return a.Assert(!s.IsDir(), NewFailure("IsNotDir", msg, nil))
 }
 
-func (a *Assertion) IsNotDirFS(fsys fs.FS, path string, msg ...any) *Assertion {
+func (a *Assertion) DirFS(fsys fs.FS, path string, msg ...any) *Assertion {
+	a.TB().Helper()
+
+	s, err := fs.Stat(fsys, path)
+	if err != nil {
+		return a.Assert(false, NewFailure("IsDirFS", msg, map[string]any{"err": err}))
+	}
+	return a.Assert(s.IsDir(), NewFailure("IsDirFS", msg, nil))
+}
+
+func (a *Assertion) NotDirFS(fsys fs.FS, path string, msg ...any) *Assertion {
 	a.TB().Helper()
 
 	s, err := fs.Stat(fsys, path)
