@@ -5,11 +5,18 @@
 package assert
 
 import (
+	"bytes"
 	"database/sql"
+	"fmt"
 	"regexp"
+	"strings"
 	"testing"
 	"time"
 )
+
+func (a *Assertion) testFalse() {
+	// TODO
+}
 
 type errorImpl struct {
 	msg string
@@ -20,17 +27,44 @@ func (err *errorImpl) Error() string {
 }
 
 func TestAssertion_True_False(t *testing.T) {
-	a := New(t, true)
+	out := &bytes.Buffer{}
+	a := newWithLogEnv(t, func(a ...any) { fmt.Fprint(out, a...) }, nil)
 
 	if t != a.TB() {
-		t.Error("a.T与t不相等")
+		t.Error("a.T 与 t 不相等")
 	}
 
-	a.True(true)
-	a.True(true, "a.True(5==5 failed")
+	t.Run("True", func(t *testing.T) {
+		out := &bytes.Buffer{}
+		a := newWithLogEnv(t, func(a ...any) { fmt.Fprint(out, a...) }, nil)
 
-	a.False(false, "a.False(false) failed")
-	a.False(false, "a.False(4==5) failed")
+		a.True(true).
+			True(true, "a.True(5==5) failed")
+		if out.Len() > 0 {
+			t.Error("断言出错了")
+		}
+
+		a.True(false, "a.True(5==5) failed")
+		if !strings.Contains(out.String(), "a.True(5==5) failed") {
+			t.Error("断言出错了")
+		}
+	})
+
+	t.Run("False", func(t *testing.T) {
+		out := &bytes.Buffer{}
+		a := newWithLogEnv(t, func(a ...any) { fmt.Fprint(out, a...) }, nil)
+
+		a.False(false, "a.False(false) failed").
+			False(false, "a.False(4==5) failed")
+		if out.Len() > 0 {
+			t.Error("断言出错了")
+		}
+
+		a.False(true, "a.False(true) failed")
+		if !strings.Contains(out.String(), "a.False(true) failed") {
+			t.Error("断言出错了")
+		}
+	})
 }
 
 func TestAssertion_Equal_NotEqual_Nil_NotNil(t *testing.T) {

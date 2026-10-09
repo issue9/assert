@@ -19,11 +19,9 @@ import (
 
 // Assertion 是对 [testing.TB] 的二次包装
 type Assertion struct {
-	tb    testing.TB
-	print func(...any)
-
-	fatal bool
-	env   map[string]string
+	tb  testing.TB
+	log func(...any)
+	env map[string]string
 }
 
 // New 创建 [Assertion] 对象
@@ -43,16 +41,18 @@ func NewWithEnv(tb testing.TB, fatal bool, env map[string]string) *Assertion {
 		p = tb.Fatal
 	}
 
+	return newWithLogEnv(tb, p, env)
+}
+
+func newWithLogEnv(tb testing.TB, log func(...any), env map[string]string) *Assertion {
 	for k, v := range env {
 		tb.Setenv(k, v)
 	}
 
 	return &Assertion{
-		tb:    tb,
-		print: p,
-
-		fatal: fatal,
-		env:   env,
+		tb:  tb,
+		log: log,
+		env: env,
 	}
 }
 
@@ -64,7 +64,9 @@ func NewWithEnv(tb testing.TB, fatal bool, env map[string]string) *Assertion {
 func (a *Assertion) Assert(expr bool, f *Failure) *Assertion {
 	if !expr {
 		a.TB().Helper()
-		a.print(GetFailureSprintFunc()(f)) // 如果这里调用了 Fail，那么不触发 failurePool.Put 回收 f。
+
+		// 如果这里调用了 Fail，那么不触发 failurePool.Put 回收 f，sync.Pool 不回收不会造成内存泄漏。
+		a.log(GetFailureSprintFunc()(f))
 	}
 	failurePool.Put(f)
 	return a
@@ -255,7 +257,7 @@ func (a *Assertion) SyncTest(f func(a *Assertion, wait func())) *Assertion {
 		panic("SyncTest 只能应用在 testing.T 上")
 	}
 
-	synctest.Test(t, func(t *testing.T) { f(NewWithEnv(t, a.fatal, a.env), synctest.Wait) })
+	synctest.Test(t, func(t *testing.T) { f(newWithLogEnv(t, a.log, a.env), synctest.Wait) })
 
 	return a
 }
