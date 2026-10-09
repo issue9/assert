@@ -6,6 +6,7 @@ package assert
 
 import (
 	"fmt"
+	"math"
 	"reflect"
 )
 
@@ -84,6 +85,18 @@ func (a *Assertion) BetweenEqualMin[T RealNumber](v, min, max T, msg ...any) *As
 // BetweenEqualMax 断言 v 是否存在于 (min,max] 之间
 func (a *Assertion) BetweenEqualMax[T RealNumber](v, min, max T, msg ...any) *Assertion {
 	return a.Assert(v > min && v <= max, NewFailure("BetweenEqualMax", msg, nil))
+}
+
+// InDelta 断言 v1 和 v2 的差值小于或等于 delta
+func (a *Assertion) InDelta[T RealNumber](v1, v2 T, delta float64, msg ...any) *Assertion {
+	v := math.Abs(float64(v1) - float64(v2))
+	return a.Assert(v <= delta, NewFailure("InDelta", msg, nil))
+}
+
+// NotInDelta 断言 v1 和 v2 的差值大于 delta
+func (a *Assertion) NotInDelta[T RealNumber](v1, v2 T, delta float64, msg ...any) *Assertion {
+	v := math.Abs(float64(v1) - float64(v2))
+	return a.Assert(v > delta, NewFailure("NotInDelta", msg, nil))
 }
 
 // Length 获取对象的长度

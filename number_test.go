@@ -4,7 +4,11 @@
 
 package assert
 
-import "testing"
+import (
+	"math"
+	"testing"
+	"time"
+)
 
 func TestAssertion_Length_NotLength(t *testing.T) {
 	a := New(t, false)
@@ -44,4 +48,15 @@ func TestAssertion_Between(t *testing.T) {
 		BetweenEqual[int32](6, 5, 6).
 		BetweenEqualMin[int64](5, 5, 6).
 		BetweenEqualMax[uint32](5, 4, 5)
+}
+
+func TestAssertion_InDetla(t *testing.T) {
+	a := New(t, false)
+
+	a.InDelta(10, 10.5, 0.5)
+	a.InDelta(time.Duration(10), time.Duration(11), 5)
+	a.InDelta(10, 10.5, 0.50001)
+	a.NotInDelta(10, 10.5, 0.49)
+
+	a.NotInDelta(math.Inf(1), 1, 0.5)
 }
