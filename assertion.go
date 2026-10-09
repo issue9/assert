@@ -5,11 +5,14 @@
 package assert
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"reflect"
 	"regexp"
 	"testing"
 	"testing/synctest"
+	"time"
 
 	"github.com/issue9/assert/v5/internal"
 )
@@ -253,6 +256,49 @@ func (a *Assertion) SyncTest(f func(a *Assertion, wait func())) *Assertion {
 	}
 
 	synctest.Test(t, func(t *testing.T) { f(NewWithEnv(t, a.fatal, a.env), synctest.Wait) })
+
+	return a
+}
+
+// Eventually 断言在 timeout 时间之内 f 会返回 true
+func (a *Assertion) Eventually(f func() bool, timeout time.Duration, msg ...any) *Assertion {
+	return a.try(false, f, timeout, msg...)
+}
+
+// Never 断言在 timeout 时间之内 f 始终返回 true
+func (a *Assertion) Never(f func() bool, timeout time.Duration, msg ...any) *Assertion {
+	return a.try(true, f, timeout, msg...)
+}
+
+func (a *Assertion) try(never bool, f func() bool, timeout time.Duration, msg ...any) *Assertion {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel() // cancel 多次调用不影响
+
+	ret := make(chan bool, 1) // 保存异步调用的返回值
+	ff := func() { ret <- f() }
+
+	go ff()
+
+LOOP:
+	for {
+		select {
+		case <-ctx.Done():
+			if never {
+				// Never 械下，如果是 cancel 表示断言失败
+				a.Assert(errors.Is(ctx.Err(), context.DeadlineExceeded), NewFailure("Never", msg, nil))
+			} else {
+				// Eventually 械下，如果是 Deadline 表示断言失败
+				a.Assert(errors.Is(ctx.Err(), context.Canceled), NewFailure("Eventually", msg, nil))
+			}
+			break LOOP
+		case v := <-ret:
+			if v { // 无论是 never 还是 eventually 都是返回 true 退出
+				cancel()
+			} else {
+				go ff() // 收到 ff 的返回值，才进行下一次调用。
+			}
+		}
+	}
 
 	return a
 }

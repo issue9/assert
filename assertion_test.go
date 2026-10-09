@@ -143,10 +143,29 @@ func TestAssertion_Match(t *testing.T) {
 	a.NotMatch(regexp.MustCompile("^[1-9]*$"), []byte("x123"))
 }
 
-func TestAssert_When(t *testing.T) {
+func TestAssertion_When(t *testing.T) {
 	a := New(t, false)
 
 	a.When(true, func(a *Assertion) {
 		a.True(true)
 	})
+}
+
+func TestAssertion_Eventually(t *testing.T) {
+	a := New(t, false)
+
+	cnt := 0
+	a.Eventually(func() bool {
+		cnt++
+		if cnt > 10 {
+			return true
+		}
+		return false
+	}, 500*time.Microsecond)
+}
+
+func TestAssertion_Never(t *testing.T) {
+	a := New(t, false)
+
+	a.Never(func() bool { return false }, 500*time.Microsecond)
 }
