@@ -85,7 +85,7 @@ func (a *Assertion) PanicValue(fn func(), v any, msg ...any) *Assertion {
 	if has, m := hasPanic(fn); has {
 		return a.Assert(internal.IsEqual(m, v), NewFailure("PanicValue", msg, map[string]any{"v": m}))
 	}
-	return a.Assert(false, NewFailure("PanicType", msg, nil))
+	return a.Assert(false, NewFailure("PanicValue", msg, nil))
 }
 
 // NotPanic 断言 fn 不会 panic

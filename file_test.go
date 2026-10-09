@@ -28,5 +28,5 @@ func TestAssertion_IsDir_IsNotDir(t *testing.T) {
 
 	fsys := os.DirFS("./")
 	a.IsDirFS(fsys, "rest", "a.IsDirFS(./rest) failed").
-		IsNotDirFS(fsys, "./assert.go", "a.IsNotDirFS(./assert.go) failed")
+		IsNotDirFS(fsys, "assert.go", "a.IsNotDirFS(./assert.go) failed")
 }

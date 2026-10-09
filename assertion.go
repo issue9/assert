@@ -53,7 +53,7 @@ func NewWithEnv(tb testing.TB, fatal bool, env map[string]string) *Assertion {
 func (a *Assertion) Assert(expr bool, f *Failure) *Assertion {
 	if !expr {
 		a.TB().Helper()
-		a.print(GetFailureSprintFunc()(f))
+		a.print(GetFailureSprintFunc()(f)) // 如果这里调用了 Fail，那么不触发 failurePool.Put 回收 f。
 	}
 	failurePool.Put(f)
 	return a

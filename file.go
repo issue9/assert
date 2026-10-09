@@ -92,7 +92,7 @@ func (a *Assertion) IsNotDir(path string, msg ...any) *Assertion {
 func (a *Assertion) IsNotDirFS(fsys fs.FS, path string, msg ...any) *Assertion {
 	a.TB().Helper()
 
-	s, err := os.Stat(path)
+	s, err := fs.Stat(fsys, path)
 	if err != nil {
 		return a.Assert(false, NewFailure("IsNotDirFS", msg, map[string]any{"err": err}))
 	}

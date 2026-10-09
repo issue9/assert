@@ -27,17 +27,21 @@ func NewTestServer(a *assert.Assertion, h http.Handler) *Server {
 
 // NewServer 调用 [httptest.NewServer] 生成的测试服务
 func NewServer(a *assert.Assertion, h http.Handler) *Server {
+	s := httptest.NewServer(h)
+	a.TB().Cleanup(s.Close)
 	return &Server{
 		a:      a,
-		server: httptest.NewServer(h),
+		server: s,
 	}
 }
 
 // NewTLSServer 调用 [httptest.NewTLSServer] 生成的测试服务
 func NewTLSServer(a *assert.Assertion, h http.Handler) *Server {
+	s := httptest.NewTLSServer(h)
+	a.TB().Cleanup(s.Close)
 	return &Server{
 		a:      a,
-		server: httptest.NewTLSServer(h),
+		server: s,
 	}
 }
 
