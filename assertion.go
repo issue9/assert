@@ -18,31 +18,39 @@ import (
 type Assertion struct {
 	tb    testing.TB
 	print func(...any)
+
+	fatal bool
+	env   map[string]string
 }
 
-// New 返回 [Assertion] 对象
+// New 创建 [Assertion] 对象
 //
 // fatal 决定在出错时是调用 [testing.TB.Error] 还是 [testing.TB.Fatal]；
 func New(tb testing.TB, fatal bool) *Assertion {
+	return NewWithEnv(tb, fatal, nil)
+}
+
+// NewWithEnv 以指定的环境变量初始化 [Assertion] 对象
+//
+// fatal 决定在出错时是调用 [testing.TB.Error] 还是 [testing.TB.Fatal]；
+// env 是以 [testing.TB.Setenv] 的形式调用；
+func NewWithEnv(tb testing.TB, fatal bool, env map[string]string) *Assertion {
 	p := tb.Error
 	if fatal {
 		p = tb.Fatal
 	}
 
-	return &Assertion{
-		tb:    tb,
-		print: p,
-	}
-}
-
-// NewWithEnv 以指定的环境变量初始化 [Assertion] 对象
-//
-// env 是以 [testing.TB.Setenv] 的形式调用。
-func NewWithEnv(tb testing.TB, fatal bool, env map[string]string) *Assertion {
 	for k, v := range env {
 		tb.Setenv(k, v)
 	}
-	return New(tb, fatal)
+
+	return &Assertion{
+		tb:    tb,
+		print: p,
+
+		fatal: fatal,
+		env:   env,
+	}
 }
 
 // Assert 断言 expr 条件成立
@@ -244,13 +252,7 @@ func (a *Assertion) SyncTest(f func(a *Assertion, wait func())) *Assertion {
 		panic("SyncTest 只能应用在 testing.T 上")
 	}
 
-	synctest.Test(t, func(t *testing.T) { f(a, synctest.Wait) })
+	synctest.Test(t, func(t *testing.T) { f(NewWithEnv(t, a.fatal, a.env), synctest.Wait) })
 
-	return a
-}
-
-// Go 以 goroutine 方式执行 f
-func (a *Assertion) Go(f func(*Assertion)) *Assertion {
-	go f(a)
 	return a
 }
