@@ -5,17 +5,31 @@
 package rest
 
 import (
+	"net/http"
 	"testing"
 
 	"github.com/issue9/assert/v5"
 )
 
-func TestNew(t *testing.T) {
+func TestServer(t *testing.T) {
 	a := assert.New(t, false)
 
-	srv := NewServer(a, nil)
-	a.NotNil(srv).NotNil(srv.Assertion())
+	testServer(NewTestServer(a, h))
+	testServer(NewServer(a, h))
+	testServer(NewTLSServer(a, h))
+}
 
-	srv.Close()
-	srv.Close()
+func testServer(s *Server) {
+	s.Get("/get").Do().Status(http.StatusCreated)
+	s.Post("/body", nil).
+		Header("content-type", "application/json").
+		StringBody(`{"id":5}`).
+		Do().
+		Status(http.StatusCreated).
+		StringBody(`{"id":6}`)
+
+	s.Get("/not-exists").Do().Status(http.StatusNotFound)
+
+	s.Close()
+	s.Close()
 }

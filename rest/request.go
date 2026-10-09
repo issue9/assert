@@ -53,6 +53,9 @@ func (srv *Server) Put(path string, body []byte) *Request {
 	return srv.NewRequest(http.MethodPut, path).Body(body)
 }
 
+// Post 发动 POST 请求
+//
+// body 可以为空，之后通过 [Server.Body] 之类的方法提交。
 func (srv *Server) Post(path string, body []byte) *Request {
 	return srv.NewRequest(http.MethodPost, path).Body(body)
 }
@@ -109,6 +112,8 @@ func (req *Request) Handler(h http.Handler) *Request {
 //
 // 在已经通过 [Request.Handler] 指定 [http.Handler] 参数的情况下，
 // 当前函数的调用是不会起作用的。
+//
+// 通过 [Server.NewRequest] 创建的 [Request] 对象，已经指定了 client 对象，不再需要调用此方法。
 func (req *Request) Client(c *http.Client) *Request {
 	if req.h != nil {
 		panic("已经指定 Request.Handler，当前函数并不会起作用！")

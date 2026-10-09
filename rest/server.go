@@ -17,13 +17,27 @@ type Server struct {
 	server *httptest.Server
 }
 
-// NewServer 声明新的测试服务
-//
-// 这是使用 [httptest.NewTestServer] 创建的内存服务，无须端口。
-func NewServer(a *assert.Assertion, h http.Handler) *Server {
+// NewTestServer 创建基于内存的测试服务
+func NewTestServer(a *assert.Assertion, h http.Handler) *Server {
 	return &Server{
 		a:      a,
 		server: httptest.NewTestServer(a.TB(), h),
+	}
+}
+
+// NewServer 调用 [httptest.NewServer] 生成的测试服务
+func NewServer(a *assert.Assertion, h http.Handler) *Server {
+	return &Server{
+		a:      a,
+		server: httptest.NewServer(h),
+	}
+}
+
+// NewTLSServer 调用 [httptest.NewTLSServer] 生成的测试服务
+func NewTLSServer(a *assert.Assertion, h http.Handler) *Server {
+	return &Server{
+		a:      a,
+		server: httptest.NewTLSServer(h),
 	}
 }
 

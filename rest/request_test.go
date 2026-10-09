@@ -13,7 +13,7 @@ import (
 )
 
 func TestRequest_buildPath(t *testing.T) {
-	srv := NewServer(assert.New(t, false), h)
+	srv := NewTestServer(assert.New(t, false), h)
 	a := srv.Assertion()
 	a.NotNil(srv)
 

@@ -43,7 +43,7 @@ type obj struct {
 }
 
 func TestResponse(t *testing.T) {
-	srv := NewServer(assert.New(t, false), h)
+	srv := NewTestServer(assert.New(t, false), h)
 
 	srv.NewRequest(http.MethodGet, "/body").
 		Header("content-type", "application/json").
