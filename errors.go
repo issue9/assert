@@ -34,7 +34,7 @@ func (a *Assertion) ErrorString(expr error, str string, msg ...any) *Assertion {
 	return a.Assert(strings.Contains(expr.Error(), str), NewFailure("ErrorString", msg, map[string]any{"v": expr}))
 }
 
-// ErrorIs 断言 expr 为 target 类型
+// ErrorIs 断言 expr 包含 target
 //
 // 相当于 a.True(errors.Is(expr, target))
 func (a *Assertion) ErrorIs(expr, target error, msg ...any) *Assertion {
@@ -95,15 +95,12 @@ func (a *Assertion) NotPanic(fn func(), msg ...any) *Assertion {
 	return a.Assert(!has, NewFailure("NotPanic", msg, map[string]any{"err": m}))
 }
 
-// hasPanic 判断 fn 函数是否会发生 panic
-// 若发生了 panic，将把 msg 一起返回。
+// hasPanic 判断 fn 函数是否会发生 panic，若发生了 panic，将把 msg 一起返回。
 func hasPanic(fn func()) (has bool, msg any) {
 	defer func() {
-		if msg = recover(); msg != nil {
-			has = true
-		}
+		msg = recover()
+		has = msg != nil
 	}()
 	fn()
-
 	return
 }

@@ -25,8 +25,6 @@ type Assertion struct {
 }
 
 // New 创建 [Assertion] 对象
-//
-// fatal 决定在出错时是调用 [testing.TB.Error] 还是 [testing.TB.Fatal]；
 func New(tb testing.TB, fatal bool) *Assertion {
 	return NewWithEnv(tb, fatal, nil)
 }
@@ -34,7 +32,7 @@ func New(tb testing.TB, fatal bool) *Assertion {
 // NewWithEnv 以指定的环境变量初始化 [Assertion] 对象
 //
 // fatal 决定在出错时是调用 [testing.TB.Error] 还是 [testing.TB.Fatal]；
-// env 是以 [testing.TB.Setenv] 的形式调用；
+// env 是以 [testing.TB.Setenv] 的形式设置环境参数；
 func NewWithEnv(tb testing.TB, fatal bool, env map[string]string) *Assertion {
 	p := tb.Error
 	if fatal {

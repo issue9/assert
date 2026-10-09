@@ -22,7 +22,7 @@ func Benchmark1(b *testing.B) {
     a := assert.New(b, false)
     v := false
     a.True(v)
-    for(i:=0; i<b.N; i++) {
+    for i:=0; i<b.N; i++ {
         // do something
     }
 }
