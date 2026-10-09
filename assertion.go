@@ -7,7 +7,6 @@ package assert
 import (
 	"context"
 	"errors"
-	"fmt"
 	"reflect"
 	"regexp"
 	"testing"
@@ -210,29 +209,37 @@ func canPointer(k reflect.Kind) bool {
 	}
 }
 
+type StringByteRune interface {
+	~string | ~[]byte | ~[]rune
+}
+
 // Match 断言 v 是否匹配正则表达式 reg
-func (a *Assertion) Match(reg *regexp.Regexp, v any, msg ...any) *Assertion {
+func (a *Assertion) Match[T StringByteRune](reg *regexp.Regexp, v T, msg ...any) *Assertion {
 	a.TB().Helper()
-	switch val := v.(type) {
+	switch val := any(v).(type) {
 	case string:
 		return a.Assert(reg.MatchString(val), NewFailure("Match", msg, map[string]any{"v": val}))
 	case []byte:
 		return a.Assert(reg.Match(val), NewFailure("Match", msg, map[string]any{"v": val}))
+	case []rune:
+		return a.Assert(reg.MatchString(string(val)), NewFailure("Match", msg, map[string]any{"v": val}))
 	default:
-		return a.Assert(reg.MatchString(fmt.Sprint(val)), NewFailure("Match", msg, map[string]any{"v": val}))
+		panic("参数 v 的类型无效")
 	}
 }
 
 // NotMatch 断言 v 是否不匹配正则表达式 reg
-func (a *Assertion) NotMatch(reg *regexp.Regexp, v any, msg ...any) *Assertion {
+func (a *Assertion) NotMatch[T StringByteRune](reg *regexp.Regexp, v T, msg ...any) *Assertion {
 	a.TB().Helper()
-	switch val := v.(type) {
+	switch val := any(v).(type) {
 	case string:
 		return a.Assert(!reg.MatchString(val), NewFailure("NotMatch", msg, map[string]any{"v": val}))
 	case []byte:
 		return a.Assert(!reg.Match(val), NewFailure("NotMatch", msg, map[string]any{"v": val}))
+	case []rune:
+		return a.Assert(!reg.MatchString(string(val)), NewFailure("NotMatch", msg, map[string]any{"v": val}))
 	default:
-		return a.Assert(!reg.MatchString(fmt.Sprint(val)), NewFailure("NotMatch", msg, map[string]any{"v": val}))
+		panic("参数 v 的类型无效")
 	}
 }
 

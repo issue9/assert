@@ -22,7 +22,7 @@ func Benchmark1(b *testing.B) {
     a := assert.New(b, false)
     v := false
     a.True(v)
-    for i:=0; i<b.N; i++ {
+    for b.Loop() {
         // do something
     }
 }
@@ -38,11 +38,11 @@ func TestHTTP( t *testing.T) {
     srv.NewRequest(http.MethodGet, "/body").
         Header("content-type", "application/json").
         Query("page", "5").
-        JSONBody(&bodyTest{ID: 5}).
+        EncodingBody(&bodyTest{ID: 5}, json.Marshal).
         Do().
         Status(http.StatusCreated).
         Header("content-type", "application/json;charset=utf-8").
-        JSONBody(&bodyTest{ID: 6})
+        EncodingBody(&bodyTest{ID: 6}, json.Unmarshal)
 }
 ```
 

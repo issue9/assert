@@ -166,11 +166,20 @@ func TestAssertion_Same(t *testing.T) {
 func TestAssertion_Match(t *testing.T) {
 	a := New(t, false)
 
-	a.Match(regexp.MustCompile("^[1-9]*$"), "123")
-	a.NotMatch(regexp.MustCompile("^[1-9]*$"), "x123")
+	t.Run("string", func(t *testing.T) {
+		a.Match(regexp.MustCompile("^[1-9]*$"), "123")
+		a.NotMatch(regexp.MustCompile("^[1-9]*$"), "x123")
+	})
 
-	a.Match(regexp.MustCompile("^[1-9]*$"), []byte("123"))
-	a.NotMatch(regexp.MustCompile("^[1-9]*$"), []byte("x123"))
+	t.Run("[]byte", func(t *testing.T) {
+		a.Match(regexp.MustCompile("^[1-9]*$"), []byte("123"))
+		a.NotMatch(regexp.MustCompile("^[1-9]*$"), []byte("x123"))
+	})
+
+	t.Run("[]rune", func(t *testing.T) {
+		a.Match(regexp.MustCompile("^[1-9]*$"), []rune("123"))
+		a.NotMatch(regexp.MustCompile("^[1-9]*$"), []rune("x123"))
+	})
 }
 
 func TestAssertion_When(t *testing.T) {
