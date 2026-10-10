@@ -2,26 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-// Package assert 测试用的断言包
-//
-//	func TestAssert(t *testing.T) {
-//	    var v interface{} = 5
-//
-//	    a := assert.New(t, false)
-//	    a.True(v==5, "v的值[%v]不等于5", v).
-//	        Equal(5, v, "v的值[%v]不等于5", v).
-//	        Nil(v).
-//	        TB().Log("success")
-//	}
-//
-//	// 也可以对 testing.B 使用
-//	func Benchmark1(b *testing.B) {
-//	    a := assert.New(b, false)
-//	    a.True(false)
-//	    for(i:=0; i<b.N; i++) {
-//	        // do something
-//	    }
-//	}
+// Package assert 配合标准库 testing 使用的断言库
 package assert
 
 import (
