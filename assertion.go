@@ -10,7 +10,6 @@ import (
 	"reflect"
 	"regexp"
 	"testing"
-	"testing/synctest"
 	"time"
 
 	"github.com/issue9/assert/v5/internal"
@@ -255,20 +254,6 @@ func (a *Assertion) When(expr bool, f func(a *Assertion), msg ...any) *Assertion
 	if expr {
 		f(a)
 	}
-	return a
-}
-
-// SyncTest 调用 [synctest.Test] 的测试用例
-//
-// NOTE: 此方法要求 [Assertion.TB] 的类型必须为 [testing.T]。
-func (a *Assertion) SyncTest(f func(a *Assertion, wait func())) *Assertion {
-	t, ok := a.TB().(*testing.T)
-	if !ok {
-		panic("SyncTest 只能应用在 testing.T 上")
-	}
-
-	synctest.Test(t, func(t *testing.T) { f(newWithLogEnv(t, a.log, a.env), synctest.Wait) })
-
 	return a
 }
 
