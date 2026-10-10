@@ -53,6 +53,11 @@ func newWithLogEnv(tb testing.TB, log func(...any), env map[string]string) *Asse
 	}
 }
 
+// New 从当前对象派生出一个新的 [Assertion] 对象
+//
+// 除了 [testing.TB] 之外，其它属性均从当前对象继承。
+func (a *Assertion) New(tb testing.TB) *Assertion { return newWithLogEnv(tb, a.log, a.env) }
+
 // Assert 断言 expr 条件成立
 //
 // f 表示在断言失败时输出的信息
@@ -65,7 +70,7 @@ func (a *Assertion) Assert(expr bool, f *Failure) *Assertion {
 		// 如果这里调用了 Fail，那么不触发 failurePool.Put 回收 f，sync.Pool 不回收不会造成内存泄漏。
 		a.log(GetFailureSprintFunc()(f))
 	}
-	failurePool.Put(f)
+	putFailure(f)
 	return a
 }
 

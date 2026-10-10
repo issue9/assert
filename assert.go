@@ -48,6 +48,14 @@ type Failure struct {
 // NOTE: 可以使用此方法实现对错误信息的本地化。
 type FailureSprintFunc = func(*Failure) string
 
+func putFailure(f *Failure) {
+	if len(f.user) < 16 && len(f.Values) < 16 {
+		clear(f.Values)
+		f.user = f.user[:0]
+		failurePool.Put(f)
+	}
+}
+
 // SetFailureSprintFunc 设置一个全局的转换方法
 //
 // [New] 方法在默认情况下继承由此方法设置的值。
