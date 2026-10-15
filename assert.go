@@ -38,8 +38,6 @@ func putFailure(f *Failure) {
 }
 
 // SetFailureSprintFunc 设置一个全局的转换方法
-//
-// [New] 方法在默认情况下继承由此方法设置的值。
 func SetFailureSprintFunc(f FailureSprintFunc) { failureSprint = f }
 
 // GetFailureSprintFunc 获取当前的 [FailureSprintFunc] 方法

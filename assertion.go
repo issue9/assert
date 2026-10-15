@@ -276,7 +276,10 @@ func (a *Assertion) try(never bool, f func() bool, timeout time.Duration, msg ..
 	defer cancel() // cancel 多次调用不影响
 
 	ret := make(chan bool, 1) // 保存异步调用的返回值
-	ff := func() { ret <- f() }
+	ff := func() {
+		a.TB().Helper()
+		ret <- f()
+	}
 
 	go ff()
 
