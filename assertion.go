@@ -111,6 +111,7 @@ func (a *Assertion) Equal(v1, v2 any, msg ...any) *Assertion {
 
 // StrictEqual 从类型到值都相等
 func (a *Assertion) StrictEqual[T comparable](v1, v2 T, msg ...any) *Assertion {
+	a.TB().Helper()
 	return a.Assert(v1 == v2, NewFailure("StrictEqual", msg, map[string]any{"v1": v1, "v2": v2}))
 }
 
