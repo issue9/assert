@@ -42,7 +42,7 @@ type Request struct {
 //	resp1 := r.Param("id", "1").Do()
 //	resp2 := r.Param("id", "2").Do()
 func (srv *Server) NewRequest(method, path string) *Request {
-	req := NewRequest(srv.a, method, srv.URL()+path).Client(srv.server.Client())
+	req := NewRequest(srv.a, method, srv.URL()+path).Client(srv.Server().Client())
 	req.s = srv
 	return req
 }

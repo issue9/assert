@@ -170,10 +170,6 @@ func (a *Assertion) NotZero(v any, msg ...any) *Assertion {
 //
 // ptr 如果为 true，则会在对象为指针时，查找其指向的对象。
 func (a *Assertion) TypeEqual(ptr bool, v1, v2 any, msg ...any) *Assertion {
-	if v1 == v2 {
-		return a
-	}
-
 	a.TB().Helper()
 
 	t1, t2 := internal.GetType(ptr, v1, v2)

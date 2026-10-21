@@ -55,10 +55,7 @@ func DefaultFailureSprint(f *Failure) string {
 
 		s.WriteString("反馈以下参数：\n")
 		for _, k := range keys {
-			s.WriteString(k)
-			s.WriteByte('=')
-			fmt.Fprint(&s, f.Values[k])
-			s.WriteByte('\n')
+			fmt.Fprintf(&s, "%s=%v\n", k, f.Values[k])
 		}
 	}
 

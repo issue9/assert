@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+type mapKey string
+
 func TestIsZero(t *testing.T) {
 	zero := func(v any) {
 		t.Helper()
@@ -37,6 +39,9 @@ func TestIsEqual(t *testing.T) {
 			t.Errorf("eq:[%v]==[%v]", v1, v2)
 		}
 	}
+
+	neq(1, 1.9)
+	neq(1.9, 1)
 
 	eq([]byte("abc"), "abc")
 	eq("abc", []byte("abc"))
@@ -80,6 +85,8 @@ func TestIsEqual(t *testing.T) {
 		},
 	)
 	eq(map[string]int{"1": 1, "2": 2}, map[string]int8{"1": 1, "2": 2})
+
+	neq(map[string]int{"1": 1, "2": 2}, map[mapKey]int8{"1": 1, "2": 2})
 
 	// 比较两个元素类型可转换的 map
 	eq(

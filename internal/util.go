@@ -133,7 +133,7 @@ func IsEqual(v1, v2 any) bool {
 		}
 
 		// 两个 map 的键名类型不同
-		if vv2Type.Key().Kind() != vv1Type.Key().Kind() {
+		if vv2Type.Key() != vv1Type.Key() {
 			return false
 		}
 
@@ -159,10 +159,9 @@ func IsEqual(v1, v2 any) bool {
 		return false
 	}
 
-	if vv1Type.ConvertibleTo(vv2Type) {
-		return vv2.Interface() == vv1.Convert(vv2Type).Interface()
-	} else if vv2Type.ConvertibleTo(vv1Type) {
-		return vv1.Interface() == vv2.Convert(vv1Type).Interface()
+	if vv1Type.ConvertibleTo(vv2Type) && vv2Type.ConvertibleTo(vv1Type) {
+		return vv2.Interface() == vv1.Convert(vv2Type).Interface() &&
+			vv1.Interface() == vv2.Convert(vv1Type).Interface()
 	}
 
 	return false

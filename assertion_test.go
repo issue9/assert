@@ -121,6 +121,8 @@ func TestAssertion_Contains(t *testing.T) {
 func TestAssertion_TypeEqual(t *testing.T) {
 	a := New(t, true)
 
+	a.TypeEqual(false, []int{5}, []int{})
+
 	a.TypeEqual(false, 1, 2)
 	a.TypeEqual(false, 1, 1)
 	a.TypeEqual(false, 1.0, 2.0)
