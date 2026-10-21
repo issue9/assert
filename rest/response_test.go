@@ -56,7 +56,7 @@ func TestResponse(t *testing.T) {
 		NotHeader("content-type", "invalid value").
 		Body([]byte(`{"id":6}`)).
 		StringBody(`{"id":6}`).
-		EncodingBody[obj](&obj{ID: 6}, func(b []byte, a any) error { return json.Unmarshal(b, a) }).
+		EncodingBody(&obj{ID: 6}, func(b []byte, a any) error { return json.Unmarshal(b, a) }).
 		BodyNotEmpty()
 
 	srv.NewRequest(http.MethodGet, "/get").

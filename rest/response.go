@@ -39,6 +39,12 @@ func (req *Request) Do() *Response {
 		req.a.NotError(err).NotNil(resp)
 	}
 
+	if resp == nil {
+		return &Response{
+			a: req.a,
+		}
+	}
+
 	var bs []byte
 	if resp.Body != nil {
 		bs, err = io.ReadAll(resp.Body)
@@ -69,29 +75,45 @@ func (resp *Response) assert(expr bool, f *assert.Failure) *Response {
 // Success 状态码是否在 100-399 之间
 func (resp *Response) Success(msg ...any) *Response {
 	resp.a.TB().Helper()
-	succ := resp.resp.StatusCode >= 100 && resp.resp.StatusCode < 400
-	return resp.assert(succ, assert.NewFailure("Success", msg, map[string]any{"status": resp.resp.StatusCode}))
+
+	resp.a.When(resp.resp != nil, func(a *assert.Assertion) {
+		succ := resp.resp.StatusCode >= 100 && resp.resp.StatusCode < 400
+		resp.assert(succ, assert.NewFailure("Success", msg, map[string]any{"status": resp.resp.StatusCode}))
+	})
+	return resp
 }
 
 // Fail 状态码是否大于 399
 func (resp *Response) Fail(msg ...any) *Response {
 	resp.a.TB().Helper()
-	fail := resp.resp.StatusCode >= 400
-	return resp.assert(fail, assert.NewFailure("Fail", msg, map[string]any{"status": resp.resp.StatusCode}))
+
+	resp.a.When(resp.resp != nil, func(a *assert.Assertion) {
+		fail := resp.resp.StatusCode >= 400
+		resp.assert(fail, assert.NewFailure("Fail", msg, map[string]any{"status": resp.resp.StatusCode}))
+	})
+	return resp
 }
 
 // Status 判断状态码是否与 status 相等
 func (resp *Response) Status(status int, msg ...any) *Response {
 	resp.a.TB().Helper()
-	eq := resp.resp.StatusCode == status
-	return resp.assert(eq, assert.NewFailure("Status", msg, map[string]any{"status": resp.resp.StatusCode, "val": status}))
+
+	resp.a.When(resp.resp != nil, func(a *assert.Assertion) {
+		eq := resp.resp.StatusCode == status
+		resp.assert(eq, assert.NewFailure("Status", msg, map[string]any{"status": resp.resp.StatusCode, "val": status}))
+	})
+	return resp
 }
 
 // NotStatus 判断状态码是否与 status 不相等
 func (resp *Response) NotStatus(status int, msg ...any) *Response {
 	resp.a.TB().Helper()
-	neq := resp.resp.StatusCode != status
-	return resp.assert(neq, assert.NewFailure("NotStatus", msg, map[string]any{"status": resp.resp.StatusCode}))
+
+	resp.a.When(resp.resp != nil, func(a *assert.Assertion) {
+		neq := resp.resp.StatusCode != status
+		resp.assert(neq, assert.NewFailure("NotStatus", msg, map[string]any{"status": resp.resp.StatusCode}))
+	})
+	return resp
 }
 
 // Header 判断指定的报头是否与 val 相同
@@ -99,15 +121,23 @@ func (resp *Response) NotStatus(status int, msg ...any) *Response {
 // msg 可以为空，会返回一个默认的错误提示信息
 func (resp *Response) Header(key, val string, msg ...any) *Response {
 	resp.a.TB().Helper()
-	h := resp.resp.Header.Get(key)
-	return resp.assert(h == val, assert.NewFailure("Header", msg, map[string]any{"header": key, "v1": h, "v2": val}))
+
+	resp.a.When(resp.resp != nil, func(a *assert.Assertion) {
+		h := resp.resp.Header.Get(key)
+		resp.assert(h == val, assert.NewFailure("Header", msg, map[string]any{"header": key, "v1": h, "v2": val}))
+	})
+	return resp
 }
 
 // NotHeader 指定的报头必定不与 val 相同。
 func (resp *Response) NotHeader(key, val string, msg ...any) *Response {
 	resp.a.TB().Helper()
-	h := resp.resp.Header.Get(key)
-	return resp.assert(h != val, assert.NewFailure("NotHeader", msg, map[string]any{"header": key, "v": h}))
+
+	resp.a.When(resp.resp != nil, func(a *assert.Assertion) {
+		h := resp.resp.Header.Get(key)
+		resp.assert(h != val, assert.NewFailure("NotHeader", msg, map[string]any{"header": key, "v": h}))
+	})
+	return resp
 }
 
 // Body 断言内容与 val 相同

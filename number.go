@@ -18,7 +18,7 @@ func (a *Assertion) Length(v any, l int, msg ...any) *Assertion {
 
 	rl, err := Length(v)
 	if err != nil {
-		a.Assert(false, NewFailure("Length", msg, map[string]any{"err": err}))
+		return a.Assert(false, NewFailure("Length", msg, map[string]any{"err": err}))
 	}
 	return a.Assert(rl == l, NewFailure("Length", msg, map[string]any{"l1": rl, "l2": l}))
 }
@@ -31,7 +31,7 @@ func (a *Assertion) NotLength(v any, l int, msg ...any) *Assertion {
 
 	rl, err := Length(v)
 	if err != nil {
-		a.Assert(false, NewFailure("NotLength", msg, map[string]any{"err": err}))
+		return a.Assert(false, NewFailure("NotLength", msg, map[string]any{"err": err}))
 	}
 	return a.Assert(rl != l, NewFailure("NotLength", msg, map[string]any{"l": rl}))
 }

@@ -28,5 +28,6 @@ func TestAssertion_Dir_NotDir(t *testing.T) {
 
 	fsys := os.DirFS("./")
 	a.DirFS(fsys, "rest", "a.DirFS(./rest) failed").
-		NotDirFS(fsys, "assert.go", "a.NotDirFS(./assert.go) failed")
+		NotDirFS(fsys, "assert.go", "a.NotDirFS(./assert.go) failed").
+		NotDirFS(fsys, "not-exists-file", "a.NotDirFS(not-exists-file) failed")
 }
