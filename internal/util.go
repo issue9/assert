@@ -169,8 +169,12 @@ func IsEqual(v1, v2 any) bool {
 
 // IsContains 判断 container 是否包含了 item 的内容。若是指针，会判断指针指向的内容
 func IsContains(container, item any) bool {
-	if container == nil { // nil不包含任何东西
+	if container == nil || item == nil { // nil不包含任何东西
 		return false
+	}
+
+	if IsEqual(container, item) {
+		return true
 	}
 
 	cv := reflect.ValueOf(container)
@@ -182,10 +186,6 @@ func IsContains(container, item any) bool {
 
 	for iv.Kind() == reflect.Pointer {
 		iv = iv.Elem()
-	}
-
-	if IsEqual(container, item) {
-		return true
 	}
 
 	// 判断是字符串的情况
