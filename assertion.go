@@ -172,6 +172,10 @@ func (a *Assertion) NotZero(v any, msg ...any) *Assertion {
 func (a *Assertion) TypeEqual(ptr bool, v1, v2 any, msg ...any) *Assertion {
 	a.TB().Helper()
 
+	if v1 == nil && v2 == nil {
+		return a
+	}
+
 	t1, t2 := internal.GetType(ptr, v1, v2)
 	return a.Assert(t1 == t2, NewFailure("TypeEqual", msg, map[string]any{"v1": t1, "v2": t2}))
 }

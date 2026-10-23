@@ -5,6 +5,7 @@
 package internal
 
 import (
+	"reflect"
 	"testing"
 	"time"
 )
@@ -247,6 +248,7 @@ func TestIsContains(t *testing.T) {
 	fn(true, "中文a", '中')
 
 	fn(true, []int{1, 2, 3}, 1)
+	fn(true, []int{1, 2, 1, 2, 3}, []int{1, 2, 3})
 	fn(true, []int{1, 2, 3}, int8(3))
 	fn(true, []int{1, 2, 4}, []int{1, 2})
 	fn(true, []any{[]int{1, 2}, 5, 6}, []int8{1, 2})
@@ -272,4 +274,17 @@ func TestIsContains(t *testing.T) {
 	fn(false, []int{1, 2, 3}, []int8{1, 3})
 	fn(false, []int{1, 2, 3}, []int{1, 2, 3, 4})
 	fn(false, []int{}, []int{1}) // 空数组
+}
+
+func TestGetType(t *testing.T) {
+	p1, p2 := GetType(false, 5, 6)
+	if p1.Kind() != reflect.Int || p2.Kind() != reflect.Int {
+		t.Errorf("GetType(false,%v, %v)出错\n", 5, 6)
+	}
+
+	v := 5
+	p1, p2 = GetType(true, &v, &v)
+	if p1.Kind() != reflect.Int || p2.Kind() != reflect.Int {
+		t.Error("GetType(false,&v, &v)出错\n")
+	}
 }

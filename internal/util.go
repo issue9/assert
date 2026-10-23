@@ -259,20 +259,19 @@ func IsContains(container, item any) bool {
 			return false
 		}
 
-		// 依次比较 item 的各个子元素是否都存在于 container，且下标都相同
-		ivIndex := 0
+		// 依次比较 item 的各个子元素是否都存在于 container
+	LOOP:
 		for i := 0; i < cv.Len(); i++ {
-			if IsEqual(cv.Index(i).Interface(), iv.Index(ivIndex).Interface()) {
-				if (ivIndex == 0) && (i+iv.Len() > cv.Len()) {
-					return false
-				}
-				ivIndex++
-				if ivIndex == iv.Len() { // 已经遍历完 iv
-					return true
-				}
-			} else if ivIndex > 0 {
+			if i+iv.Len() > cv.Len() { // cv 剩余的元素已经没有 iv 多了
 				return false
 			}
+
+			for j := 0; j < iv.Len(); j++ {
+				if !IsEqual(cv.Index(i+j).Interface(), iv.Index(j).Interface()) {
+					continue LOOP
+				}
+			}
+			return true
 		}
 		return false
 	} // end cv.Kind == reflect.Slice and reflect.Array
@@ -296,7 +295,12 @@ func IsContains(container, item any) bool {
 			if !cvItem.IsValid() { // container 中不包含该值。
 				return false
 			}
-			if !IsEqual(cvItem.Interface(), iv.MapIndex(key).Interface()) {
+			ivItem := iv.MapIndex(key)
+			if !ivItem.IsValid() {
+				return false
+			}
+
+			if !IsEqual(cvItem.Interface(), ivItem.Interface()) {
 				return false
 			}
 		}
@@ -307,6 +311,7 @@ func IsContains(container, item any) bool {
 	return false
 }
 
+// v1 和 v2 不能是 nil，否则会 panic
 func GetType(ptr bool, v1, v2 any) (t1, t2 reflect.Type) {
 	t1 = reflect.TypeOf(v1)
 	t2 = reflect.TypeOf(v2)
