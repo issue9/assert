@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/issue9/assert/v5/internal"
+	"github.com/issue9/assert/v6/internal"
 )
 
 // EncodingEqual 断言两个编码相同

@@ -9,7 +9,7 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/issue9/assert/v5"
+	"github.com/issue9/assert/v6"
 )
 
 func TestRequest_buildPath(t *testing.T) {

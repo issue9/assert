@@ -13,8 +13,8 @@ import (
 	"reflect"
 	"slices"
 
-	"github.com/issue9/assert/v5"
-	"github.com/issue9/assert/v5/internal"
+	"github.com/issue9/assert/v6"
+	"github.com/issue9/assert/v6/internal"
 )
 
 // Response 测试请求的返回结构

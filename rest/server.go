@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/issue9/assert/v5"
+	"github.com/issue9/assert/v6"
 )
 
 // Server 测试服务

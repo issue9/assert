@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/issue9/assert/v5/internal"
+	"github.com/issue9/assert/v6/internal"
 )
 
 // Assertion 是对 [testing.TB] 的二次包装

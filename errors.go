@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/issue9/assert/v5/internal"
+	"github.com/issue9/assert/v6/internal"
 )
 
 // Error 断言有错误发生
