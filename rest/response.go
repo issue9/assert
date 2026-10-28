@@ -77,6 +77,7 @@ func (resp *Response) Success(msg ...any) *Response {
 	resp.a.TB().Helper()
 
 	resp.a.When(resp.resp != nil, func(a *assert.Assertion) {
+		a.TB().Helper()
 		succ := resp.resp.StatusCode >= 100 && resp.resp.StatusCode < 400
 		resp.assert(succ, assert.NewFailure("Success", msg, map[string]any{"status": resp.resp.StatusCode}))
 	})
@@ -88,6 +89,7 @@ func (resp *Response) Fail(msg ...any) *Response {
 	resp.a.TB().Helper()
 
 	resp.a.When(resp.resp != nil, func(a *assert.Assertion) {
+		a.TB().Helper()
 		fail := resp.resp.StatusCode >= 400
 		resp.assert(fail, assert.NewFailure("Fail", msg, map[string]any{"status": resp.resp.StatusCode}))
 	})
@@ -99,6 +101,7 @@ func (resp *Response) Status(status int, msg ...any) *Response {
 	resp.a.TB().Helper()
 
 	resp.a.When(resp.resp != nil, func(a *assert.Assertion) {
+		a.TB().Helper()
 		eq := resp.resp.StatusCode == status
 		resp.assert(eq, assert.NewFailure("Status", msg, map[string]any{"status": resp.resp.StatusCode, "val": status}))
 	})
@@ -110,6 +113,7 @@ func (resp *Response) NotStatus(status int, msg ...any) *Response {
 	resp.a.TB().Helper()
 
 	resp.a.When(resp.resp != nil, func(a *assert.Assertion) {
+		a.TB().Helper()
 		neq := resp.resp.StatusCode != status
 		resp.assert(neq, assert.NewFailure("NotStatus", msg, map[string]any{"status": resp.resp.StatusCode}))
 	})
@@ -123,6 +127,7 @@ func (resp *Response) Header(key, val string, msg ...any) *Response {
 	resp.a.TB().Helper()
 
 	resp.a.When(resp.resp != nil, func(a *assert.Assertion) {
+		a.TB().Helper()
 		h := resp.resp.Header.Get(key)
 		resp.assert(h == val, assert.NewFailure("Header", msg, map[string]any{"header": key, "v1": h, "v2": val}))
 	})
@@ -134,6 +139,7 @@ func (resp *Response) NotHeader(key, val string, msg ...any) *Response {
 	resp.a.TB().Helper()
 
 	resp.a.When(resp.resp != nil, func(a *assert.Assertion) {
+		a.TB().Helper()
 		h := resp.resp.Header.Get(key)
 		resp.assert(h != val, assert.NewFailure("NotHeader", msg, map[string]any{"header": key, "v": h}))
 	})

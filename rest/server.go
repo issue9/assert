@@ -49,7 +49,7 @@ func NewTLSServer(a *assert.Assertion, h http.Handler) *Server {
 //
 // 该值可能不是一个固定的值，具体可参考 [httptest.Server.URL] 的相关说明。
 func (srv *Server) URL() string {
-	if srv.server.URL != "" {
+	if srv.server != nil && srv.server.URL != "" {
 		return srv.server.URL
 	}
 	return "https://example.com"
