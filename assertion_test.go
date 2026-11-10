@@ -24,7 +24,8 @@ func (err *errorImpl) Error() string {
 
 func TestAssertion_True_False(t *testing.T) {
 	out := &bytes.Buffer{}
-	a := newWithLogEnv(t, func(a ...any) { fmt.Fprint(out, a...) }, nil)
+	a := New(t, false)
+	a.log = func(a ...any) { fmt.Fprint(out, a...) }
 
 	if t != a.TB() {
 		t.Error("a.T 与 t 不相等")
@@ -32,7 +33,8 @@ func TestAssertion_True_False(t *testing.T) {
 
 	t.Run("True", func(t *testing.T) {
 		out := &bytes.Buffer{}
-		a := newWithLogEnv(t, func(a ...any) { fmt.Fprint(out, a...) }, nil)
+		a := New(t, false)
+		a.log = func(a ...any) { fmt.Fprint(out, a...) }
 
 		a.True(true).
 			True(true, "a.True(5==5) failed")
@@ -48,7 +50,8 @@ func TestAssertion_True_False(t *testing.T) {
 
 	t.Run("False", func(t *testing.T) {
 		out := &bytes.Buffer{}
-		a := newWithLogEnv(t, func(a ...any) { fmt.Fprint(out, a...) }, nil)
+		a := New(t, false)
+		a.log = func(a ...any) { fmt.Fprint(out, a...) }
 
 		a.False(false, "a.False(false) failed").
 			False(false, "a.False(4==5) failed")
@@ -194,7 +197,8 @@ func TestAssertion_When(t *testing.T) {
 
 func TestAssertion_Eventually(t *testing.T) {
 	out := &bytes.Buffer{}
-	a := newWithLogEnv(t, func(a ...any) { fmt.Fprint(out, a...) }, nil)
+	a := New(t, false)
+	a.log = func(a ...any) { fmt.Fprint(out, a...) }
 
 	cnt := 0
 	a.Eventually(func() bool {
@@ -218,7 +222,8 @@ func TestAssertion_Eventually(t *testing.T) {
 
 func TestAssertion_Never(t *testing.T) {
 	out := &bytes.Buffer{}
-	a := newWithLogEnv(t, func(a ...any) { fmt.Fprint(out, a...) }, nil)
+	a := New(t, false)
+	a.log = func(a ...any) { fmt.Fprint(out, a...) }
 
 	a.Never(func() bool { return false }, 500*time.Microsecond)
 	if out.Len() > 0 {

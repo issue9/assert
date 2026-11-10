@@ -18,8 +18,10 @@ import (
 // Assertion 是对 [testing.TB] 的二次包装
 type Assertion struct {
 	tb  testing.TB
-	log func(...any)
 	env map[string]string
+
+	fatal bool
+	log   func(...any)
 }
 
 // New 创建 [Assertion] 对象
@@ -32,30 +34,27 @@ func New(tb testing.TB, fatal bool) *Assertion {
 // fatal 决定在出错时是调用 [testing.TB.Error] 还是 [testing.TB.Fatal]；
 // env 是以 [testing.TB.Setenv] 的形式设置环境参数；
 func NewWithEnv(tb testing.TB, fatal bool, env map[string]string) *Assertion {
-	p := tb.Error
-	if fatal {
-		p = tb.Fatal
-	}
-
-	return newWithLogEnv(tb, p, env)
-}
-
-func newWithLogEnv(tb testing.TB, log func(...any), env map[string]string) *Assertion {
 	for k, v := range env {
 		tb.Setenv(k, v)
 	}
 
+	log := tb.Error
+	if fatal {
+		log = tb.Fatal
+	}
+
 	return &Assertion{
-		tb:  tb,
-		log: log,
-		env: env,
+		tb:    tb,
+		fatal: fatal,
+		log:   log,
+		env:   env,
 	}
 }
 
 // New 从当前对象派生出一个新的 [Assertion] 对象
 //
 // 除了 [testing.TB] 之外，其它属性均从当前对象继承。
-func (a *Assertion) New(tb testing.TB) *Assertion { return newWithLogEnv(tb, a.log, a.env) }
+func (a *Assertion) New(tb testing.TB) *Assertion { return NewWithEnv(tb, a.fatal, a.env) }
 
 // Assert 断言 expr 条件成立
 //
